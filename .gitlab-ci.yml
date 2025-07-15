@@ -1,0 +1,125 @@
+stages:
+  - subproject
+
+.subproject:
+  stage: subproject
+  variables:
+    SUBPROJECT: $CI_JOB_NAME
+    DEPLOY_DOC: $DEPLOY_DOC
+
+sct_iceye_reader:
+  extends: .subproject
+  trigger:
+    include: sct_iceye_reader/.gitlab-ci.yml
+    strategy: depend
+  rules:
+    - if: "$CI_COMMIT_TAG =~ /^sct_iceye_reader.*/"
+    - if: "$CI_COMMIT_TAG == null"
+      changes:
+        - .gitlab-ci.yml
+        - sct_iceye_reader/*
+        - sct_iceye_reader/**/*
+
+sct_sentinel1_reader:
+  extends: .subproject
+  trigger:
+    include: sct_sentinel1_reader/.gitlab-ci.yml
+    strategy: depend
+  rules:
+    - if: "$CI_COMMIT_TAG =~ /^sct_sentinel1_reader.*/"
+    - if: "$CI_COMMIT_TAG == null"
+      changes:
+        - .gitlab-ci.yml
+        - sct_sentinel1_reader/*
+        - sct_sentinel1_reader/**/*
+
+sct_novasar1_reader:
+  extends: .subproject
+  trigger:
+    include: sct_novasar1_reader/.gitlab-ci.yml
+    strategy: depend
+  rules:
+    - if: "$CI_COMMIT_TAG =~ /^sct_novasar1_reader.*/"
+    - if: "$CI_COMMIT_TAG == null"
+      changes:
+        - .gitlab-ci.yml
+        - sct_novasar1_reader/*
+        - sct_novasar1_reader/**/*
+
+sct_saocom_reader:
+  extends: .subproject
+  trigger:
+    include: sct_saocom_reader/.gitlab-ci.yml
+    strategy: depend
+  rules:
+    - if: "$CI_COMMIT_TAG =~ /^sct_saocom_reader.*/"
+    - if: "$CI_COMMIT_TAG == null"
+      changes:
+        - .gitlab-ci.yml
+        - sct_saocom_reader/*
+        - sct_saocom_reader/**/*
+
+sct_radarsat2_reader:
+  extends: .subproject
+  trigger:
+    include: sct_radarsat2_reader/.gitlab-ci.yml
+    strategy: depend
+  rules:
+    - if: "$CI_COMMIT_TAG =~ /^sct_radarsat2_reader.*/"
+    - if: "$CI_COMMIT_TAG == null"
+      changes:
+        - .gitlab-ci.yml
+        - sct_radarsat2_reader/*
+        - sct_radarsat2_reader/**/*
+
+sct_eos04_reader:
+  extends: .subproject
+  trigger:
+    include: sct_eos04_reader/.gitlab-ci.yml
+    strategy: depend
+  rules:
+    - if: "$CI_COMMIT_TAG =~ /^sct_eos04_reader.*/"
+    - if: "$CI_COMMIT_TAG == null"
+      changes:
+        - .gitlab-ci.yml
+        - sct_eos04_reader/*
+        - sct_eos04_reader/**/*
+
+sct_cosmo_reader:
+  extends: .subproject
+  trigger:
+    include: sct_cosmo_reader/.gitlab-ci.yml
+    strategy: depend
+  rules:
+    - if: "$CI_COMMIT_TAG =~ /^sct_cosmo_reader.*/"
+    - if: "$CI_COMMIT_TAG == null"
+      changes:
+        - .gitlab-ci.yml
+        - sct_cosmo_reader/*
+        - sct_cosmo_reader/**/*
+
+sct_asar_reader:
+  extends: .subproject
+  trigger:
+    include: sct_asar_reader/.gitlab-ci.yml
+    strategy: depend
+  rules:
+    - if: "$CI_COMMIT_TAG =~ /^sct_asar_reader.*/"
+    - if: "$CI_COMMIT_TAG == null"
+      changes:
+        - .gitlab-ci.yml
+        - sct_asar_reader/*
+        - sct_asar_reader/**/*
+
+sct_aresys_reader:
+  extends: .subproject
+  trigger:
+    include: sct_aresys_reader/.gitlab-ci.yml
+    strategy: depend
+  rules:
+    - if: "$CI_COMMIT_TAG =~ /^sct_aresys_reader.*/"
+    - if: "$CI_COMMIT_TAG == null"
+      changes:
+        - .gitlab-ci.yml
+        - sct_aresys_reader/*
+        - sct_aresys_reader/**/*
