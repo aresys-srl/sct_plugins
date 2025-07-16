@@ -1,0 +1,122 @@
+stages:
+  - analysis
+  - build
+  - deploy
+
+workflow:
+  rules:
+    - when: always
+
+variables:
+  GIT_DEPTH: 1
+
+.tags_win10_conda:
+  tags: ["eo", "win10", "conda"]
+
+.tags_manylinux_2_28_std:
+  tags: ["manylinux_2_28"]
+
+.tags_manylinux_2_28:
+  tags: ["eotools_manylinux228"]
+
+.tags_deploy:
+  tags: ["eo", "deploy"]
+
+default:
+  before_script:
+    - cd $SUBPROJECT
+
+# === analysis ===============================================================
+# ============================================================================
+check_code_compliance_ruff:
+  stage: analysis
+  extends:
+    - .tags_manylinux_2_28_std
+  script:
+    - python3.12 -m pip install nox
+    - python3.12 -m nox -s check_format
+
+check_code_compliance_pylint:
+  stage: analysis
+  extends:
+    - .tags_manylinux_2_28_std
+  script:
+    - python3.12 -m pip install nox
+    - python3.12 -m nox -s pylint
+
+# === build ==================================================================
+# ============================================================================
+sdist:
+  stage: build
+  extends:
+    - .tags_manylinux_2_28_std
+  script:
+    - python3.12 -m pip install nox
+    - python3.12 -m nox -s build_sdist
+  artifacts:
+    expire_in: 2 weeks
+    paths:
+      - ${SUBPROJECT}/dist/*.tar.gz
+
+wheel:
+  stage: build
+  extends:
+    - .tags_manylinux_2_28_std
+  script:
+    - python3.12 -m pip install nox
+    - python3.12 -m nox -s build_wheel
+  artifacts:
+    expire_in: 2 weeks
+    paths:
+      - ${SUBPROJECT}/dist/*.whl
+
+doc:
+  stage: build
+  extends:
+    - .tags_manylinux_2_28_std
+  script:
+    - yum install -y pandoc
+    - python3.12 -m pip install nox
+    - python3.12 -m nox -s build_doc
+  needs: []
+  artifacts:
+    expire_in: 2 weeks
+    paths:
+      - ${SUBPROJECT}/docs/build/*.zip
+
+# === deploy =================================================================
+# ============================================================================
+deploy_package:
+  stage: deploy
+  extends: .tags_deploy
+  rules:
+    - if: "$CI_COMMIT_TAG"
+  script:
+    - eval "$(ssh-agent -s)"
+    - cd ..
+    - for file in ${SUBPROJECT}/dist/*.tar.gz ${SUBPROJECT}/dist/*.whl; do
+      eo_pgp-signme ${file} > ${file}.asc &&
+      ./.gitlab/ci/dashboard-copy.sh ${file} develop/sct-plugins/eos04/archive &&
+      ./.gitlab/ci/dashboard-copy.sh ${file}.asc develop/sct-plugins/eos04/archive;
+      done
+
+deploy_doc:
+  stage: deploy
+  extends: .tags_deploy
+  rules:
+    - if: "$CI_COMMIT_TAG"
+    - if: '$DEPLOY_DOC == "true"'
+  before_script:
+    - export PACKAGE_VERSION=v$(grep "__version__" $SUBPROJECT/src/sct_eos04_reader/__init__.py | awk -F '"' '{print $2}')
+  script:
+    - eval "$(ssh-agent)"
+    - cat "$DASHBOARD_PRIVATE_KEY" | base64 -d | ssh-add -
+    - for file in ${SUBPROJECT}/docs/build/*.zip; do
+      eo_pgp-signme ${file} > ${file}.asc &&
+      ./.gitlab/ci/dashboard-copy.sh ${file} develop/sct-plugins/eos04/archive &&
+      ./.gitlab/ci/dashboard-copy.sh ${file}.asc develop/sct-plugins/eos04/archive;
+      done
+    - unzip ${SUBPROJECT}/docs/build/*.zip
+    - mv *${SUBPROJECT}*-html-doc ${PACKAGE_VERSION}
+    - rsync --stats -r ${PACKAGE_VERSION} sardashboard@intranet.aresys.it:develop/sct-plugins/eos04/docs
+    - ssh sardashboard@intranet.aresys.it "cd develop/sct-plugins/eos04/docs && rm latest && ln -s ${PACKAGE_VERSION} latest"
