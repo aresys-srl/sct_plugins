@@ -1,0 +1,96 @@
+[project]
+name = "sct_asar_reader"
+description = "SCT (SAR Calibration Toolbox) plugin for reading ENVISAT/ERS Level 1 ASAR product format."
+authors = [{ name = "Aresys S.R.L.", email = "info@aresys.it" }]
+requires-python = ">= 3.10"
+readme = "README.md"
+license = {text = "GPL-3.0-or-later"}
+dependencies = [
+    "numpy",
+    "arepytools >= 1.7.6",
+    "arepyextras-quality >= 2.0.6",
+    "arepyextras-eo_products>=1.2.5",
+    "scipy",
+    "shapely>=2.1.0",
+]
+dynamic = ["version"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",  
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Utilities",
+    "Topic :: Scientific/Engineering",
+    "Typing :: Typed",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/sct_asar_reader/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+only-include = ["src", "tests", "docs"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[project.optional-dependencies]
+dev = ["nox", "ruff", "pylint"]
+test = ["unittest-xml-reporting", "coverage", "sct[cli,graphs]"]
+doc = [
+    "ipython",
+    "nbsphinx",
+    "sphinx",
+    "sphinx-design",
+    "sphinx-copybutton",
+    "pydata-sphinx-theme",
+]
+
+[tool.ruff]
+line-length = 120
+output-format = "grouped"
+extend-exclude = [".venv", "scripts", "docs", "noxfile.py"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "A", "B", "I"]
+
+[tool.pylint.master]
+fail-under = 8.5
+fail-on = ["unused-import"]
+
+[tool.pylint.message_control]
+disable = ["import-error", "logging-fstring-interpolation", "logging-not-lazy"]
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.scripts]
+format_check = "ruff format --check"
+format = "ruff format"
+sort = "ruff check --select I --fix-only"
+lint_check = "ruff check"
+lint_fix = "ruff check --show-fixes --fix-only"
+test = "python -m unittest discover -s ./tests -p test_*.py"
+clean_doc = "python -m sphinx -M clean docs/source {args}"
+build_doc = "python -m sphinx -b html docs/source {args}"
+check_code = { composite = ["format_check", "lint_check"] }
+fix_format = { composite = ["format", "sort", "lint_fix"] }
