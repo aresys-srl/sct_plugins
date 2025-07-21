@@ -1,0 +1,25 @@
+{
+    "iceye": {
+        "stripmap-pta": {
+            "analysis": "pta",
+            "product": "C:/chopper/reference_dataset/iceye/products/SM_1899652_93266",
+            "config": "C:/chopper/integration_tests/sct/configurations/test_ae30371d_config.toml",
+            "targets": "C:/chopper/reference_dataset/iceye/auxiliaries/rosamond_data.csv",
+            "reference_output": "C:/chopper/integration_tests/sct/reference_results/iceye/stripmap-pta/pta_res.csv"
+        },
+        "spotlight-pta": {
+            "analysis": "pta",
+            "product": "C:/chopper/reference_dataset/iceye/products/SLH_1835029_91260",
+            "config": "C:/chopper/integration_tests/sct/configurations/test_ae30371d_config.toml",
+            "targets": "C:/chopper/reference_dataset/iceye/auxiliaries/rosamond_data.csv",
+            "reference_output": "C:/chopper/integration_tests/sct/reference_results/iceye/spotlight-pta/pta_res.csv"
+        },
+        "topsar-pta": {
+            "analysis": "pta",
+            "product": "C:/chopper/reference_dataset/iceye/products/SC_2391740_117355",
+            "config": "C:/chopper/integration_tests/sct/configurations/test_ae30371d_config.toml",
+            "targets": "C:/chopper/reference_dataset/iceye/auxiliaries/rosamond_data.csv",
+            "reference_output": "C:/chopper/integration_tests/sct/reference_results/iceye/topsar-pta/pta_res.csv"
+        }
+    }
+}
