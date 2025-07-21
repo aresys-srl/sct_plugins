@@ -1,0 +1,60 @@
+{
+    "sentinel1A": {
+        "slc-etad-pta": {
+            "analysis": "pta",
+            "product": "/data/reference_dataset/sentinel1a/products/SLC_23.SAFE",
+            "config": "/data/integration_tests/sct/configurations/test_c6359f5a_config.toml",
+            "targets": "/data/reference_dataset/sentinel1a/auxiliaries/surat_basin_data.csv",
+            "etad_product": "/data/reference_dataset/sentinel1a/auxiliaries/ETAD_23.SAFE",
+            "reference_output": "/data/integration_tests/sct/reference_results/sentinel1A/slc-etad-pta/pta_res.csv"
+        },
+        "slc-perturb-pta": {
+            "analysis": "pta",
+            "product": "/data/reference_dataset/sentinel1a/products/SLC_19.SAFE",
+            "config": "/data/integration_tests/sct/configurations/test_ed18cc99_config.toml",
+            "targets": "/data/reference_dataset/sentinel1a/auxiliaries/surat_basin_data.csv",
+            "ionospheric_maps": "/data/reference_dataset/sentinel1a/auxiliaries/maps/ionosphere_maps",
+            "tropospheric_maps": "/data/reference_dataset/sentinel1a/auxiliaries/maps/troposphere_maps",
+            "reference_output": "/data/integration_tests/sct/reference_results/sentinel1A/slc-perturb-pta/pta_res.csv"
+        },
+        "slc-perturb-eof-pta": {
+            "analysis": "pta",
+            "product": "/data/reference_dataset/sentinel1a/products/SLC_19.SAFE",
+            "config": "/data/integration_tests/sct/configurations/test_ed18cc99_config.toml",
+            "targets": "/data/reference_dataset/sentinel1a/auxiliaries/surat_basin_data.csv",
+            "ionospheric_maps": "/data/reference_dataset/sentinel1a/auxiliaries/maps/ionosphere_maps",
+            "tropospheric_maps": "/data/reference_dataset/sentinel1a/auxiliaries/maps/troposphere_maps",
+            "external_orbit": "/data/reference_dataset/sentinel1a/auxiliaries/RESORB_19.EOF",
+            "reference_output": "/data/integration_tests/sct/reference_results/sentinel1A/slc-perturb-eof-pta/pta_res.csv"
+        },
+        "grd-perturb-pta": {
+            "analysis": "pta",
+            "product": "/data/reference_dataset/sentinel1a/products/GRD_19.SAFE",
+            "config": "/data/integration_tests/sct/configurations/test_ed18cc99_config.toml",
+            "targets": "/data/reference_dataset/sentinel1a/auxiliaries/surat_basin_data.csv",
+            "ionospheric_maps": "/data/reference_dataset/sentinel1a/auxiliaries/maps/ionosphere_maps",
+            "tropospheric_maps": "/data/reference_dataset/sentinel1a/auxiliaries/maps/troposphere_maps",
+            "reference_output": "/data/integration_tests/sct/reference_results/sentinel1A/grd-perturb-pta/pta_res.csv"
+        },
+        "grd-rain-forest": {
+            "analysis": "rf",
+            "product": "/data/reference_dataset/sentinel1a/products/GRD_24_RF.SAFE",
+            "config": "",
+            "targets": "",
+            "reference_output": [
+                "/data/integration_tests/sct/reference_results/sentinel1A/grd-rain-forest/RAIN_FOREST_profiles_IW_VH.nc",
+                "/data/integration_tests/sct/reference_results/sentinel1A/grd-rain-forest/RAIN_FOREST_profiles_IW_VV.nc"
+            ]
+        },
+        "grd-nesz": {
+            "analysis": "nesz",
+            "product": "/data/reference_dataset/sentinel1a/products/GRD_23_NESZ.SAFE",
+            "config": "",
+            "targets": "",
+            "reference_output": [
+                "/data/integration_tests/sct/reference_results/sentinel1A/grd-nesz/NESZ_profiles_IW_VH.nc",
+                "/data/integration_tests/sct/reference_results/sentinel1A/grd-nesz/NESZ_profiles_IW_VV.nc"
+            ]
+        }
+    }
+}

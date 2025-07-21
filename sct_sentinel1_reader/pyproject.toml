@@ -50,7 +50,7 @@ allow-direct-references = true
 
 [project.optional-dependencies]
 dev = ["nox", "ruff", "pylint"]
-test = ["unittest-xml-reporting", "coverage", "sct[cli,graphs]"]
+test = ["unittest-xml-reporting", "coverage", "sct[cli,graphs]>=1.1.0"]
 doc = [
     "ipython",
     "nbsphinx",
