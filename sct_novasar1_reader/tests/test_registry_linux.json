@@ -1,0 +1,39 @@
+{
+    "novasar1": {
+        "slc-pta": {
+            "analysis": "pta",
+            "product": "/data/reference_dataset/novasar1/products/NovaSAR_01_38993_slc_11_221103_004941_HH",
+            "config": "/data/integration_tests/sct/configurations/test_906f38dc_config.toml",
+            "targets": "/data/reference_dataset/novasar1/auxiliaries/novasar_surat_data.csv",
+            "reference_output": "/data/integration_tests/sct/reference_results/novasar1/slc-pta/pta_res.csv"
+        },
+        "grd-pta": {
+            "analysis": "pta",
+            "product": "/data/reference_dataset/novasar1/products/NovaSAR_01_38993_grd_13_221103_004941_HH",
+            "config": "/data/integration_tests/sct/configurations/test_906f38dc_config.toml",
+            "targets": "/data/reference_dataset/novasar1/auxiliaries/novasar_surat_data.csv",
+            "reference_output": "/data/integration_tests/sct/reference_results/novasar1/grd-pta/pta_res.csv"
+        },
+        "scd-pta": {
+            "analysis": "pta",
+            "product": "/data/reference_dataset/novasar1/products/NovaSAR_01_41461_scd_23_230126_005204_VV_HH",
+            "config": "/data/integration_tests/sct/configurations/test_906f38dc_config.toml",
+            "targets": "/data/reference_dataset/novasar1/auxiliaries/novasar_surat_data.csv",
+            "reference_output": "/data/integration_tests/sct/reference_results/novasar1/scd-pta/pta_res.csv"
+        },
+        "scd-rain-forest": {
+            "analysis": "rf",
+            "product": "/data/reference_dataset/novasar1/products/NovaSAR_01_40720_scd_20_221231_214639_VV",
+            "config": "",
+            "targets": "",
+            "reference_output": "/data/integration_tests/sct/reference_results/novasar1/scd-rain-forest/RAIN_FOREST_profiles_S_VV.nc"
+        },
+        "grd-nesz": {
+            "analysis": "nesz",
+            "product": "/data/reference_dataset/novasar1/products/NovaSAR_01_29655_grd_211218_150627_HH",
+            "config": "",
+            "targets": "",
+            "reference_output": "/data/integration_tests/sct/reference_results/novasar1/grd-nesz/NESZ_profiles_S1_HH.nc"
+        }
+    }
+}
