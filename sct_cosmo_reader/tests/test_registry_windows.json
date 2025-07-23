@@ -1,0 +1,11 @@
+{
+    "cosmo": {
+        "grd-pta": {
+            "analysis": "pta",
+            "product": "C:/chopper/reference_dataset/cosmo/products/CSKS1_DGM_B_WR_00_HH_RA_FF_20240107043057_20240107043111.h5",
+            "config": "C:/chopper/integration_tests/sct/configurations/test_d347c358_config.toml",
+            "targets": "C:/chopper/reference_dataset/cosmo/auxiliaries/neusterlitz_corner_reflectors_data.csv",
+            "reference_output": "C:/chopper/integration_tests/sct/reference_results/cosmo/grd-pta/pta_res.csv"
+        }
+    }
+}
