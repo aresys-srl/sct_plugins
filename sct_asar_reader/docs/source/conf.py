@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: GPLv3+
 
 """Configuration file for the Sphinx documentation builder."""
 

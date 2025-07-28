@@ -12,3 +12,7 @@ This package and its dependencies can be installed using ``pip`` tool:
 ```bash
     pip install sct_asar_reader
 ```
+
+## GPLv3+ License
+
+This project is released under the GNU General Public License v3 or later (GPLv3+).

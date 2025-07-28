@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: GPLv3+
 
 """
 ENVISAT/ERS ASAR format Arepyextras-Quality protocol-compliant wrapper
@@ -12,7 +12,6 @@ from itertools import product
 from pathlib import Path
 
 import numpy as np
-from arepyextras.eo_products.asar.l1_products.reader import open_product, read_channel_data, read_channel_metadata
 from arepyextras.quality.core.custom_errors import (
     CoordinatesOutOfBounds,
 )
@@ -41,6 +40,8 @@ from arepytools.timing.precisedatetime import PreciseDateTime
 from numpy.typing import ArrayLike
 from scipy.constants import speed_of_light
 from shapely import Polygon
+
+from sct_asar_reader.core.reader import open_product, read_channel_data, read_channel_metadata
 
 
 class ASARDopplerPolynomial:
@@ -135,7 +136,7 @@ class ASARChannelManager:
         self._product_path = product_path
         self._channel = read_channel_metadata(file_path=self._product_path, channel_id=channel_name)
 
-        # translating arepyextras.eo_products enum to arepyextras.quality ones
+        # translating internal enum to arepyextras.quality ones
         self._radiometric_quantity = SARRadiometricQuantity[self._channel.image_radiometric_quantity.name]
         self._polarization = SARPolarization(self._channel.general_info.polarization.value)
         self._projection = SARProjection(self._channel.general_info.projection.value)

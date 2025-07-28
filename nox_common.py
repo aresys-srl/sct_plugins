@@ -15,7 +15,12 @@ import nox
 
 nox.options.error_on_missing_interpreters = True
 
-_LICENSE_HEADER = """# SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
+_LICENSE_HEADER_MIT = """# SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
+# SPDX-License-Identifier: MIT
+
+"""
+
+_LICENSE_HEADER_GPL = """# SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
 """
@@ -47,7 +52,8 @@ def check_format(session: nox.Session):
             if "# noqa:" in first_line:
                 first_line = ifile.readline()
             header = first_line + ifile.readline() + ifile.readline()
-            return header != _LICENSE_HEADER
+            validation = header != _LICENSE_HEADER_MIT or header != _LICENSE_HEADER_GPL
+            return validation
 
     source_files = glob.glob("sct/**/*.py", recursive=True)
     no_licensed_files = list(filter(wrong_license_header, source_files))

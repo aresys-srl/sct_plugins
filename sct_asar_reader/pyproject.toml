@@ -9,9 +9,9 @@ dependencies = [
     "numpy",
     "arepytools >= 1.7.6",
     "arepyextras-quality >= 2.0.6",
-    "arepyextras-eo_products>=1.2.5",
     "scipy",
     "shapely>=2.1.0",
+    "pyepr"
 ]
 dynamic = ["version"]
 classifiers = [
