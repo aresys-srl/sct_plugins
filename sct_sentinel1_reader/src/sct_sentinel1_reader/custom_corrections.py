@@ -8,7 +8,7 @@ Sentinel-1 IPF range and azimuth custom corrections
 
 import numpy as np
 import pandas as pd
-from arepyextras.eo_products.safe.l1_products.utilities import S1AcquisitionMode
+from arepyextras.eo_products.sentinel1.l1_products.utilities import S1AcquisitionMode
 from arepyextras.quality.io.quality_input_protocol import QualityInputProduct
 from arepytools.timing.precisedatetime import PreciseDateTime
 from numpy.typing import ArrayLike

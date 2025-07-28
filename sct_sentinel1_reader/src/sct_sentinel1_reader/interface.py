@@ -11,7 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable
 
-from arepyextras.eo_products.safe.l1_products.utilities import is_s1_safe_product
+from arepyextras.eo_products.sentinel1.l1_products.utilities import is_s1_safe_product
 
 from sct_sentinel1_reader.custom_corrections import compute_azimuth_corrections, compute_range_corrections
 from sct_sentinel1_reader.protocol_implementation import Sentinel1ProductManager

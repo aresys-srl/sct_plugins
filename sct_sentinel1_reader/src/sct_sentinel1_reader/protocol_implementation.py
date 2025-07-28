@@ -12,7 +12,7 @@ from itertools import product
 from pathlib import Path
 
 import numpy as np
-from arepyextras.eo_products.safe.l1_products.reader import (
+from arepyextras.eo_products.sentinel1.l1_products.reader import (
     open_product,
     read_channel_calibration,
     read_channel_data,
