@@ -10,4 +10,4 @@ from sct_sentinel1_reader.interface import get_azimuth_corrections, get_detector
 
 __all__ = ["get_manager", "get_detector", "get_azimuth_corrections", "get_range_corrections"]
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
