@@ -13,7 +13,7 @@ from typing import Callable
 
 from arepyextras.eo_products.sentinel1.l1_products.utilities import is_s1_safe_product
 
-from sct_sentinel1_reader.custom_corrections import compute_azimuth_corrections, compute_range_corrections
+from sct_sentinel1_reader.corrections.main import S1ALECorrector
 from sct_sentinel1_reader.protocol_implementation import Sentinel1ProductManager
 
 
@@ -27,9 +27,6 @@ def get_detector() -> Callable[[str | Path], bool]:
     return is_s1_safe_product
 
 
-def get_azimuth_corrections():
-    return compute_azimuth_corrections
-
-
-def get_range_corrections():
-    return compute_range_corrections
+def get_ale_corrector() -> type[S1ALECorrector]:
+    """Retrieve ALE corrector class"""
+    return S1ALECorrector

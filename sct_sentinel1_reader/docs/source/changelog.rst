@@ -1,10 +1,17 @@
 Changelog
 =========
 
+v1.0.2
+------
+
+**Incompatible Changes**
+
+- Added ETAD ALE corrections computation method and refactored the plugin following the new SCT plugins protocol
+
 v1.0.1
 ------
 
-**Incompatible Features**
+**Incompatible Changes**
 
 - Fix to take into account latest Arepyextras-EO Products updates.
 

@@ -6,6 +6,8 @@ Sentinel-1 IPF range and azimuth custom corrections
 ---------------------------------------------------
 """
 
+from uuid import uuid4
+
 import numpy as np
 import pandas as pd
 from arepyextras.eo_products.sentinel1.l1_products.utilities import S1AcquisitionMode
@@ -13,6 +15,8 @@ from arepyextras.quality.io.quality_input_protocol import QualityInputProduct
 from arepytools.timing.precisedatetime import PreciseDateTime
 from numpy.typing import ArrayLike
 from scipy.constants import speed_of_light
+from sct.configuration.logger import sct_logger
+from sct.io.extended_protocols import SCTInputProduct
 
 
 def compute_doppler_shift_correction(pulse_rate: ArrayLike, squint_frequency: ArrayLike) -> ArrayLike:
@@ -353,3 +357,32 @@ def compute_azimuth_corrections(
     az_corrections = fm_rate_shift.merge(instrument_timing, on="id").merge(bistatic_delay, on="id")
 
     return az_corrections
+
+
+def compute_corrections(product: SCTInputProduct, data: pd.DataFrame) -> pd.DataFrame:
+    """Computing Sentinel-1 IPF custom Absolute Localization Error corrections.
+
+    Parameters
+    ----------
+    product : SCTInputProduct
+        Sentinel-1 product
+    data : pd.DataFrame
+        point target analysis results dataframe
+
+    Returns
+    -------
+    pd.DataFrame
+        updated dataframe with sensor specific ALE corrections
+    """
+    data_ = data.copy()
+    data_["id"] = [uuid4() for _ in range(len(data_))]
+    sct_logger.info("Computing sensor specific range corrections...")
+    range_corrections_df = compute_range_corrections(product, data_.copy())
+
+    sct_logger.info("Computing sensor specific azimuth corrections...")
+    azimuth_corrections_df = compute_azimuth_corrections(product, data_.copy())
+
+    data_out = data_.merge(range_corrections_df, on="id").merge(azimuth_corrections_df, on="id")
+    data_out.drop(columns="id", axis=1, inplace=True)
+
+    return data_out

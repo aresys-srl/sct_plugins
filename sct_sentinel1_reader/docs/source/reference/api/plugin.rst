@@ -5,4 +5,12 @@ Sentinel-1 Reader Plugin
 
 .. automodule:: sct_sentinel1_reader.protocol_implementation
 
-.. automodule:: sct_sentinel1_reader.custom_corrections
+
+Absolute Localization Error Corrections
+=======================================
+
+.. automodule:: sct_sentinel1_reader.corrections.main
+
+.. automodule:: sct_sentinel1_reader.corrections.custom_corrections
+
+.. automodule:: sct_sentinel1_reader.corrections.etad_corrections
