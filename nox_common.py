@@ -20,11 +20,6 @@ _LICENSE_HEADER_MIT = """# SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it
 
 """
 
-_LICENSE_HEADER_GPL = """# SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
-# SPDX-License-Identifier: MIT
-
-"""
-
 PY_VERSIONS = ["3.10", "3.11", "3.12", "3.13"]
 WIN32 = sys.platform == "win32"
 PLATFORM = "win" if WIN32 else "linux"
@@ -52,10 +47,10 @@ def check_format(session: nox.Session):
             if "# noqa:" in first_line:
                 first_line = ifile.readline()
             header = first_line + ifile.readline() + ifile.readline()
-            validation = header != _LICENSE_HEADER_MIT or header != _LICENSE_HEADER_GPL
+            validation = header != _LICENSE_HEADER_MIT
             return validation
 
-    source_files = glob.glob("sct/**/*.py", recursive=True)
+    source_files = glob.glob("src/**/*.py", recursive=True)
     no_licensed_files = list(filter(wrong_license_header, source_files))
 
     if len(no_licensed_files) > 0:
@@ -74,15 +69,16 @@ def pylint(session: nox.Session):
 @nox.session(python=PY_VERSIONS)
 def unittest(session: nox.Session):
     """Execute unittest"""
+    project = Path.cwd()
     Path("_build").mkdir(exist_ok=True)
 
-    session.install("-e", ".[cli,test,graph]")
+    session.install("-e", ".[test]")
     session.run(
         "python",
         "-m",
         "coverage",
         "run",
-        "--source=arepytools",
+        f"--source={project.name}",
         "-m",
         "xmlrunner",
         "--output-file",
