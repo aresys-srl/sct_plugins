@@ -48,6 +48,49 @@ check_code_compliance_pylint:
     - python3.12 -m pip install nox
     - python3.12 -m nox -s pylint
 
+# === test - unittest ========================================================
+# ============================================================================
+unittest_linux:
+  stage: test
+  script:
+    - python${PYTHON} -m pip install nox
+    - python${PYTHON} -m nox -s unittest -p ${PYTHON}
+  parallel:
+    matrix:
+      - PYTHON: ["3.10", "3.11", "3.12", "3.13"]
+  extends: .tags_manylinux_2_28_std
+  needs: []
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      junit:
+        - ${SUBPROJECT}/_build/unittest-report-*.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: ${SUBPROJECT}/_build/unittest-coverage-*.xml
+
+unittest_win:
+  stage: test
+  script:
+    - . "C:\Users\ContainerAdministrator\Documents\WindowsPowerShell\profile.ps1"
+    - conda create -y -n integration_test python=${PYTHON}
+    - conda activate integration_test
+    - python -m pip install nox
+    - python -m nox -s unittest -p ${PYTHON}
+  parallel:
+    matrix:
+      - PYTHON: ["3.10", "3.11", "3.12", "3.13"]
+  needs: []
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  extends: .tags_win10_conda
+  artifacts:
+    reports:
+      junit:
+        - ${SUBPROJECT}/_build/unittest-report-*.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: ${SUBPROJECT}/_build/unittest-coverage-*.xml
+
 # === test - integration =====================================================
 # ============================================================================
 integration_test_linux:
@@ -56,7 +99,6 @@ integration_test_linux:
     - python${PYTHON} -m venv ./ci_test
     - source ./ci_test/bin/activate
     - python -m pip install .[test]
-    - mkdir test_output
     - sct-testing -r ./tests/test_registry_linux.json -out ./test_output
   parallel:
     matrix:
@@ -71,7 +113,6 @@ integration_test_windows:
     - conda create -y -n integration_test python=${PYTHON}
     - conda activate integration_test
     - python -m pip install -e .[test]
-    - mkdir -p ./test_output
     - sct-testing -r ./tests/test_registry_windows.json -out ./test_output
   parallel:
     matrix:
