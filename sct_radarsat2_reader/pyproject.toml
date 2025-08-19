@@ -12,6 +12,7 @@ dependencies = [
     "arepyextras-eo_products>=1.2.5",
     "scipy",
     "shapely>=2.1.0",
+    "sct>=1.1.2",
 ]
 dynamic = ["version"]
 classifiers = [
