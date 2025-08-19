@@ -1,5 +1,6 @@
 stages:
   - analysis
+  - test
   - build
   - deploy
 
@@ -18,6 +19,9 @@ variables:
 
 .tags_manylinux_2_28:
   tags: ["eotools_manylinux228"]
+
+.tags_win10_new:
+  tags: ["eotools_win10"]
 
 .tags_deploy:
   tags: ["eo", "deploy"]
@@ -43,6 +47,49 @@ check_code_compliance_pylint:
   script:
     - python3.12 -m pip install nox
     - python3.12 -m nox -s pylint
+
+# === test - unittest ========================================================
+# ============================================================================
+unittest_linux:
+  stage: test
+  script:
+    - python${PYTHON} -m pip install nox
+    - python${PYTHON} -m nox -s unittest -p ${PYTHON}
+  parallel:
+    matrix:
+      - PYTHON: ["3.10", "3.11", "3.12", "3.13"]
+  extends: .tags_manylinux_2_28_std
+  needs: []
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      junit:
+        - ${SUBPROJECT}/_build/unittest-report-*.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: ${SUBPROJECT}/_build/unittest-coverage-*.xml
+
+unittest_win:
+  stage: test
+  script:
+    - . "C:\Users\ContainerAdministrator\Documents\WindowsPowerShell\profile.ps1"
+    - conda create -y -n integration_test python=${PYTHON}
+    - conda activate integration_test
+    - python -m pip install nox
+    - python -m nox -s unittest -p ${PYTHON}
+  parallel:
+    matrix:
+      - PYTHON: ["3.10", "3.11", "3.12", "3.13"]
+  needs: []
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  extends: .tags_win10_new
+  artifacts:
+    reports:
+      junit:
+        - ${SUBPROJECT}/_build/unittest-report-*.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: ${SUBPROJECT}/_build/unittest-coverage-*.xml
 
 # === build ==================================================================
 # ============================================================================
