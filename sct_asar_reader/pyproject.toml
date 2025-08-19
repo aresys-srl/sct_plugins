@@ -4,18 +4,19 @@ description = "SCT (SAR Calibration Toolbox) plugin for reading ENVISAT/ERS Leve
 authors = [{ name = "Aresys S.R.L.", email = "info@aresys.it" }]
 requires-python = ">= 3.10"
 readme = "README.md"
-license = {text = "GPL-3.0-or-later"}
+license = { text = "GPL-3.0-or-later" }
 dependencies = [
     "numpy",
     "arepytools >= 1.7.6",
     "arepyextras-quality >= 2.0.6",
     "scipy",
     "shapely>=2.1.0",
-    "pyepr"
+    "pyepr",
+    "sct>=1.1.2",
 ]
 dynamic = ["version"]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",  
+    "Development Status :: 5 - Production/Stable",
     "Operating System :: OS Independent",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Education",
@@ -49,7 +50,7 @@ allow-direct-references = true
 
 [project.optional-dependencies]
 dev = ["nox", "ruff", "pylint"]
-test = ["unittest-xml-reporting", "coverage", "sct[cli,graphs]>=1.1.0"]
+test = ["unittest-xml-reporting", "coverage", "sct[cli,graphs]"]
 doc = [
     "ipython",
     "nbsphinx",
