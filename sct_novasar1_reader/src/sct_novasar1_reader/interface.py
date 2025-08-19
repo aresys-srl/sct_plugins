@@ -26,9 +26,6 @@ def get_detector() -> Callable[[str | Path], bool]:
     return is_novasar_1_product
 
 
-def get_azimuth_corrections():
-    return None
-
-
-def get_range_corrections():
+def get_ale_corrector() -> None:
+    """Retrieve ALE corrector class"""
     return None
