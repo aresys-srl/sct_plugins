@@ -12,6 +12,7 @@ dependencies = [
     "arepyextras-eo_products>=1.2.5",
     "scipy",
     "shapely>=2.1.0",
+    "sct>=1.1.2",
 ]
 dynamic = ["version"]
 classifiers = [
@@ -49,7 +50,7 @@ allow-direct-references = true
 
 [project.optional-dependencies]
 dev = ["nox", "ruff", "pylint"]
-test = ["unittest-xml-reporting", "coverage", "sct[cli,graphs]>=1.1.0"]
+test = ["unittest-xml-reporting", "coverage", "sct[cli,graphs]"]
 doc = [
     "ipython",
     "nbsphinx",
