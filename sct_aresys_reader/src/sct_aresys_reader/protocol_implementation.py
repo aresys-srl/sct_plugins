@@ -289,6 +289,7 @@ class ChannelManager:
             self._acq_mode = SARAcquisitionMode.WAVE
 
         # re-arranging signal sampling frequencies
+        self._sensor_name = "" if self._dataset_info.sensor_name is None else self._dataset_info.sensor_name
         self._sampling_constants = self._channel_metadata.get_sampling_constants()
         self._signal_constants = SARSamplingFrequencies(
             range_freq_hz=self._sampling_constants.frg_hz,
@@ -386,6 +387,11 @@ class ChannelManager:
         burst_rng_boundaries = [[b.range_axis[0], b.range_axis[-1]] for b in self._raster_layout.bursts]
 
         return burst_az_boundaries, burst_rng_boundaries
+
+    @property
+    def sensor_name(self) -> str:
+        """Name of the sensor"""
+        return self._sensor_name
 
     @property
     def swath_name(self) -> str:
