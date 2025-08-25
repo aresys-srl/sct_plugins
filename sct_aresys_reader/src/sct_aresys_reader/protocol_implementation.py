@@ -279,7 +279,7 @@ class ChannelManager:
         # setting acquisition mode
         if self._dataset_info.acquisition_mode == "SCANSAR":
             self._acq_mode = SARAcquisitionMode.SCANSAR
-        elif self._dataset_info.acquisition_mode == "SPOT":
+        elif self._dataset_info.acquisition_mode == "SPOT" or self._dataset_info.acquisition_mode == "SPOTLIGHT":
             self._acq_mode = SARAcquisitionMode.SPOTLIGHT
         elif self._dataset_info.acquisition_mode == "STRIPMAP":
             self._acq_mode = SARAcquisitionMode.STRIPMAP

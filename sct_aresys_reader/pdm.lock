@@ -2468,7 +2468,7 @@ files = [
 
 [[package]]
 name = "sct"
-version = "1.1.2"
+version = "1.1.3"
 requires_python = ">=3.10"
 summary = "SCT (SAR Calibration Toolbox) is the Aresys Python module for SAR products quality analysis."
 groups = ["default", "test"]
@@ -2485,13 +2485,13 @@ dependencies = [
     "toml",
 ]
 files = [
-    {file = "sct-1.1.2-py3-none-any.whl", hash = "sha256:8665711d9cc7cb942189758352aecc5de4e53dca84db2dd494cffae785748836"},
-    {file = "sct-1.1.2.tar.gz", hash = "sha256:87fb185e2c45df67f865d9425df65dcdf285d0c532340483a42bccf11fcb3177"},
+    {file = "sct-1.1.3-py3-none-any.whl", hash = "sha256:fea95f177ca860d581828cff7da1e6ae2143aeb09de9ca7346bd51253921d8f5"},
+    {file = "sct-1.1.3.tar.gz", hash = "sha256:e28b3a3632da07d6401d0d312baf464e86aec0e90cf4152542f6bb4e55a7a5fb"},
 ]
 
 [[package]]
 name = "sct"
-version = "1.1.2"
+version = "1.1.3"
 extras = ["cli", "graphs"]
 requires_python = ">=3.10"
 summary = "SCT (SAR Calibration Toolbox) is the Aresys Python module for SAR products quality analysis."
@@ -2501,11 +2501,11 @@ dependencies = [
     "click",
     "matplotlib>=3.5",
     "requests",
-    "sct==1.1.2",
+    "sct==1.1.3",
 ]
 files = [
-    {file = "sct-1.1.2-py3-none-any.whl", hash = "sha256:8665711d9cc7cb942189758352aecc5de4e53dca84db2dd494cffae785748836"},
-    {file = "sct-1.1.2.tar.gz", hash = "sha256:87fb185e2c45df67f865d9425df65dcdf285d0c532340483a42bccf11fcb3177"},
+    {file = "sct-1.1.3-py3-none-any.whl", hash = "sha256:fea95f177ca860d581828cff7da1e6ae2143aeb09de9ca7346bd51253921d8f5"},
+    {file = "sct-1.1.3.tar.gz", hash = "sha256:e28b3a3632da07d6401d0d312baf464e86aec0e90cf4152542f6bb4e55a7a5fb"},
 ]
 
 [[package]]
