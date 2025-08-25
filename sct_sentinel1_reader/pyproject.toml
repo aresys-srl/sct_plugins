@@ -8,7 +8,7 @@ license = { file = "LICENSE.txt" }
 dependencies = [
     "numpy",
     "arepytools >= 1.7.6",
-    "arepyextras-quality >= 2.0.6",
+    "arepyextras-quality >= 2.0.9",
     "arepyextras-eo_products>=1.2.13",
     "scipy",
     "pyproj",

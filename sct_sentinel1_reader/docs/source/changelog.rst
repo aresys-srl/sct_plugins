@@ -7,6 +7,7 @@ v1.0.2
 **Incompatible Changes**
 
 - Added ETAD ALE corrections computation method and refactored the plugin following the new SCT plugins protocol
+- Added sensor name property to protocol implementation
 
 v1.0.1
 ------
