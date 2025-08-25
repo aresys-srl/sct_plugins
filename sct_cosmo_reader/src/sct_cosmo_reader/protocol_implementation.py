@@ -137,6 +137,9 @@ class COSMOChannelManager:
         self._channel_id = channel_name
         self._raster_file = product_path
         self._channel = read_channel_metadata(file_path=product_path, channel_id=channel_name)
+        self._sensor_name = (
+            "" if self._channel.dataset_info.sensor_name is None else self._channel.dataset_info.sensor_name
+        )
 
         # translating arepyextras.eo_products enum to arepyextras.quality ones
         self._radiometric_quantity = SARRadiometricQuantity[self._channel.image_radiometric_quantity.name]
@@ -282,6 +285,11 @@ class COSMOChannelManager:
             ]
 
         return burst_az_boundaries, burst_rng_boundaries
+
+    @property
+    def sensor_name(self) -> str:
+        """Name of the sensor"""
+        return self._sensor_name
 
     @property
     def swath_name(self) -> str:
