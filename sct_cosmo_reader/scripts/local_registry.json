@@ -1,0 +1,11 @@
+{
+    "cosmo": {
+        "grd-pta": {
+            "analysis": "pta",
+            "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/cosmo/CSKS1_DGM_B_WR_00_HH_RA_FF_20240107043057_20240107043111.h5",
+            "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_d347c358_config.toml",
+            "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/cosmo/neusterlitz_corner_reflectors_data.csv",
+            "reference_output": "C:/chopper/integration_tests/sct/reference_results/cosmo/grd-pta/pta_res.csv"
+        }
+    }
+}

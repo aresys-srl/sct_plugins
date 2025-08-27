@@ -1,0 +1,25 @@
+{
+    "iceye": {
+        "stripmap-pta": {
+            "analysis": "pta",
+            "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/iceye/SM_1899652_93266",
+            "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_ae30371d_config.toml",
+            "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/iceye/rosamond_data.csv",
+            "reference_output": "C:/chopper/integration_tests/sct/reference_results/iceye/stripmap-pta/pta_res.csv"
+        },
+        "spotlight-pta": {
+            "analysis": "pta",
+            "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/iceye/SLH_1835029_91260",
+            "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_ae30371d_config.toml",
+            "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/iceye/rosamond_data.csv",
+            "reference_output": "C:/chopper/integration_tests/sct/reference_results/iceye/spotlight-pta/pta_res.csv"
+        },
+        "topsar-pta": {
+            "analysis": "pta",
+            "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/iceye/SC_2391740_117355",
+            "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_ae30371d_config.toml",
+            "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/iceye/rosamond_data.csv",
+            "reference_output": "C:/chopper/integration_tests/sct/reference_results/iceye/topsar-pta/pta_res.csv"
+        }
+    }
+}

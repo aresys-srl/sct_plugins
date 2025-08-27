@@ -1,0 +1,25 @@
+{
+    "novasar1": {
+        "slc-pta": {
+            "analysis": "pta",
+            "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/novasar1/NovaSAR_01_38993_slc_11_221103_004941_HH",
+            "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_906f38dc_config.toml",
+            "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/novasar1/novasar_surat_data.csv",
+            "reference_output": "C:/chopper/integration_tests/sct/reference_results/novasar1/slc-pta/pta_res.csv"
+        },
+        "grd-pta": {
+            "analysis": "pta",
+            "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/novasar1/NovaSAR_01_38993_grd_13_221103_004941_HH",
+            "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_906f38dc_config.toml",
+            "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/novasar1/novasar_surat_data.csv",
+            "reference_output": "C:/chopper/integration_tests/sct/reference_results/novasar1/grd-pta/pta_res.csv"
+        },
+        "scd-pta": {
+            "analysis": "pta",
+            "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/novasar1/NovaSAR_01_41461_scd_23_230126_005204_VV_HH",
+            "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_906f38dc_config.toml",
+            "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/novasar1/novasar_surat_data.csv",
+            "reference_output": "C:/chopper/integration_tests/sct/reference_results/novasar1/scd-pta/pta_res.csv"
+        }
+    }
+}
