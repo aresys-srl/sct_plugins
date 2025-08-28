@@ -210,10 +210,6 @@ class ASARChannelManager:
         self._doppler_centroid_poly = ASARDopplerPolynomial(sorted_poly=self._channel.doppler_centroid_poly)
         self._doppler_rate_poly = ASARDopplerPolynomial(sorted_poly=self._channel.doppler_rate_poly)
 
-        # re-organizing SWST changes
-        # TODO: implement acquisition timeline, if needed
-        self._swst_changes = [(0, 0)]
-
         # get burst boundaries
         self._burst_az_boundaries, self._burst_rng_boundaries = self._get_raster_layout()
 
@@ -432,16 +428,6 @@ class ASARChannelManager:
     def radiometric_quantity(self) -> np.ndarray:
         """Product radiometric quantity"""
         return self._radiometric_quantity
-
-    @property
-    def pulse_latch_time(self) -> None:
-        """Signal pulse latch time"""
-        return None
-
-    @property
-    def swst_changes(self) -> list[tuple[PreciseDateTime, float]] | None:
-        """SWST changes list as tuple of time of change and new SWST value"""
-        return self._swst_changes
 
     def get_mid_burst_times(self, burst: int) -> tuple[PreciseDateTime, float]:
         """Compute mid azimuth and range times for a given burst.

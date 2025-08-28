@@ -359,20 +359,6 @@ class ChannelManager:
             )
             self._boresight_normal = create_attitude_boresight_normal_curve_wrapper(attitude=self._attitude)
 
-        # assemble swst changes
-        self._swst_changes = None
-        if self._acquisition_time_line is not None and self._acquisition_time_line._swst_changes_values:
-            self._swst_changes = list(
-                zip(
-                    [
-                        self._raster_info.lines_start + t
-                        for t in self._acquisition_time_line._swst_changes_azimuth_times
-                    ],
-                    self._acquisition_time_line._swst_changes_values,
-                    strict=True,
-                )
-            )
-
     def _get_raster_layout(self) -> tuple[list[PreciseDateTime], list[float]]:
         """Evaluating raster boundaries taking into account the bursts, if needed.
 
@@ -517,16 +503,6 @@ class ChannelManager:
     def radiometric_quantity(self) -> np.ndarray:
         """Product radiometric quantity"""
         return self._radiometric_quantity
-
-    @property
-    def pulse_latch_time(self) -> float:
-        """Signal pulse latch time"""
-        return np.nan
-
-    @property
-    def swst_changes(self) -> list[tuple[PreciseDateTime, float]] | None:
-        """SWST changes list as tuple of time of change and new SWST value"""
-        return self._swst_changes
 
     # TODO: is this still needed? exposing layout would remove a lot of properties...
     def get_mid_burst_times(self, burst: int) -> tuple[PreciseDateTime, float]:

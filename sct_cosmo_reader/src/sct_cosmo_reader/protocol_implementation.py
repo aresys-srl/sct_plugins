@@ -195,10 +195,6 @@ class COSMOChannelManager:
         # generating doppler centroid wrappers
         self._doppler_centroid_poly = COSMODopplerPolynomial(sorted_poly=self._channel.doppler_centroid_poly)
 
-        # TODO
-        # re-organizing SWST changes
-        # self._swst_changes = ...
-
         # get burst boundaries
         self._burst_az_boundaries, self._burst_rng_boundaries = self._get_raster_layout()
 
@@ -415,17 +411,6 @@ class COSMOChannelManager:
     def radiometric_quantity(self) -> np.ndarray:
         """Product radiometric quantity"""
         return self._radiometric_quantity
-
-    @property
-    def pulse_latch_time(self) -> None:
-        """Signal pulse latch time"""
-        return None
-
-    @property
-    def swst_changes(self) -> list[tuple[PreciseDateTime, float]]:
-        """SWST changes list as tuple of time of change and new SWST value"""
-        # TODO: not defined yet
-        return [(0, 0)]
 
     def get_mid_burst_times(self, burst: int) -> tuple[PreciseDateTime, float]:
         """Compute mid azimuth and range times for a given burst.
