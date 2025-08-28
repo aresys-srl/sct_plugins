@@ -12,7 +12,7 @@ dependencies = [
     "scipy",
     "shapely>=2.1.0",
     "pyepr",
-    "sct>=1.1.2",
+    "sct>=1.1.4",
 ]
 dynamic = ["version"]
 classifiers = [
