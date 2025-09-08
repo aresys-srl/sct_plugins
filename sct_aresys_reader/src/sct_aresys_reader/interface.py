@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-Aresys product format Arepyextras-Quality protocol-compliant wrapper
+Aresys product format PERSEO-Quality protocol-compliant wrapper
 --------------------------------------------------------------------
 """
 

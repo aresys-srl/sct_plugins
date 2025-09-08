@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-Aresys product format Arepyextras-Quality protocol-compliant wrapper
+Aresys product format PERSEO-Quality protocol-compliant wrapper
 --------------------------------------------------------------------
 """
 
@@ -12,23 +12,6 @@ from itertools import product
 from pathlib import Path
 
 import numpy as np
-from arepyextras.quality.core.custom_errors import (
-    CoordinatesOutOfBounds,
-)
-from arepyextras.quality.core.generic_dataclasses import (
-    LocationData,
-    SARAcquisitionMode,
-    SARImageType,
-    SAROrbitDirection,
-    SARPolarization,
-    SARProjection,
-    SARRadiometricQuantity,
-    SARSamplingFrequencies,
-    SARSideLooking,
-)
-from arepyextras.quality.core.signal_processing import radiometric_correction
-from arepyextras.quality.io.layout import L1BurstLayout, L1RasterLayout
-from arepyextras.quality.io.protocol_utilities import roi_validation
 from arepytools.geometry.conversions import xyz2llh
 from arepytools.geometry.curve import Generic3DCurve
 from arepytools.geometry.direct_geocoding import direct_geocoding_monostatic
@@ -53,6 +36,23 @@ from arepytools.io.metadata import BurstInfo, RasterInfo
 from arepytools.math.genericpoly import SortedPolyList, create_sorted_poly_list
 from arepytools.timing.precisedatetime import PreciseDateTime
 from numpy.typing import ArrayLike
+from perseo_quality.core.custom_errors import (
+    CoordinatesOutOfBounds,
+)
+from perseo_quality.core.generic_dataclasses import (
+    LocationData,
+    SARAcquisitionMode,
+    SARImageType,
+    SAROrbitDirection,
+    SARPolarization,
+    SARProjection,
+    SARRadiometricQuantity,
+    SARSamplingFrequencies,
+    SARSideLooking,
+)
+from perseo_quality.core.signal_processing import radiometric_correction
+from perseo_quality.io.layout import L1BurstLayout, L1RasterLayout
+from perseo_quality.io.protocol_utilities import roi_validation
 from scipy.constants import speed_of_light
 from shapely import Polygon
 

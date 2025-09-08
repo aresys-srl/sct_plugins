@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import unittest
 
-from arepyextras.quality.io.quality_input_protocol import ChannelData, SARCoordinatesFunction
 from arepytools.io.productfolder2 import is_product_folder as is_aresys_product
+from perseo_quality.io.quality_input_protocol import ChannelData, SARCoordinatesFunction
 from sct.io.extended_protocols import SCTInputProduct
 from sct.io.input_product_plugins import import_input_product_plugins
 
