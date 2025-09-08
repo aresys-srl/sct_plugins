@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-Sentinel-1 format Arepyextras-Quality protocol-compliant wrapper
+Sentinel-1 format PERSEO-Quality protocol-compliant wrapper
 ----------------------------------------------------------------
 """
 
@@ -18,22 +18,6 @@ from arepyextras.eo_products.sentinel1.l1_products.reader import (
     read_channel_data,
     read_channel_metadata,
 )
-from arepyextras.quality.core.custom_errors import (
-    CoordinatesOutOfBounds,
-)
-from arepyextras.quality.core.generic_dataclasses import (
-    LocationData,
-    SARAcquisitionMode,
-    SARImageType,
-    SAROrbitDirection,
-    SARPolarization,
-    SARProjection,
-    SARRadiometricQuantity,
-    SARSamplingFrequencies,
-    SARSideLooking,
-)
-from arepyextras.quality.core.signal_processing import radiometric_correction
-from arepyextras.quality.io.protocol_utilities import roi_validation
 from arepytools.geometry.geometric_functions import (
     compute_ground_velocity_from_trajectory,
     compute_incidence_angles_from_trajectory,
@@ -44,12 +28,28 @@ from arepytools.geometry.orbit import Orbit
 from arepytools.math.genericpoly import SortedPolyList
 from arepytools.timing.precisedatetime import PreciseDateTime
 from numpy.typing import ArrayLike
+from perseo_quality.core.custom_errors import (
+    CoordinatesOutOfBounds,
+)
+from perseo_quality.core.generic_dataclasses import (
+    LocationData,
+    SARAcquisitionMode,
+    SARImageType,
+    SAROrbitDirection,
+    SARPolarization,
+    SARProjection,
+    SARRadiometricQuantity,
+    SARSamplingFrequencies,
+    SARSideLooking,
+)
+from perseo_quality.core.signal_processing import radiometric_correction
+from perseo_quality.io.protocol_utilities import roi_validation
 from scipy.constants import speed_of_light
 from shapely import Polygon
 
 
 class Sentinel1DopplerPolynomial:
-    """Arepyextras-quality Doppler Polynomial protocol compliant SAFE doppler polynomial wrapper"""
+    """PERSEO-quality Doppler Polynomial protocol compliant SAFE doppler polynomial wrapper"""
 
     def __init__(self, sorted_poly: SortedPolyList) -> None:
         self._sorted_poly = sorted_poly
@@ -127,7 +127,7 @@ class Sentinel1ProductManager:
 
 
 class Sentinel1ChannelManager:
-    """Arepyextras-quality ChannelData protocol compliant SAFE channel wrapper"""
+    """PERSEO-quality ChannelData protocol compliant SAFE channel wrapper"""
 
     def __init__(
         self,
@@ -160,7 +160,6 @@ class Sentinel1ChannelManager:
             "" if self._channel.dataset_info.sensor_name is None else self._channel.dataset_info.sensor_name
         )
 
-        # translating arepyextras.eo_products enum to arepyextras.quality ones
         # NOTE: BETA NOUGHT fixed and taking only first value of first calibration vector
         self._radiometric_quantity = SARRadiometricQuantity.BETA_NOUGHT
         self._polarization = SARPolarization(self._channel.general_info.polarization.value)

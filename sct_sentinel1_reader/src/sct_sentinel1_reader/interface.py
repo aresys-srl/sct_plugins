@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-Sentinel-1 format Arepyextras-Quality protocol-compliant wrapper
+Sentinel-1 format PERSEO-Quality protocol-compliant wrapper
 ----------------------------------------------------------------
 """
 

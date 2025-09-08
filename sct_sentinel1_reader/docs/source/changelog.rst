@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v1.1.0
+------
+
+**Incompatible Changes**
+
+- Changing Arepyextras-Quality dependency with PERSEO-Quality
+
 v1.0.2
 ------
 

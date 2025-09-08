@@ -11,9 +11,9 @@ from uuid import uuid4
 import numpy as np
 import pandas as pd
 from arepyextras.eo_products.sentinel1.l1_products.utilities import S1AcquisitionMode
-from arepyextras.quality.io.quality_input_protocol import QualityInputProduct
 from arepytools.timing.precisedatetime import PreciseDateTime
 from numpy.typing import ArrayLike
+from perseo_quality.io.quality_input_protocol import QualityInputProduct
 from scipy.constants import speed_of_light
 from sct.configuration.logger import sct_logger
 from sct.io.extended_protocols import SCTInputProduct
