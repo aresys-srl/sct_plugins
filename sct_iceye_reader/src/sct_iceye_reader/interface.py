@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-ICEYE format Arepyextras-Quality protocol-compliant wrapper
+ICEYE format PERSEO-Quality protocol-compliant wrapper
 -----------------------------------------------------------
 """
 

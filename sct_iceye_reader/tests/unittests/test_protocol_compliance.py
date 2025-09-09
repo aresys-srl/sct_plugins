@@ -10,7 +10,7 @@ from __future__ import annotations
 import unittest
 
 from arepyextras.eo_products.iceye.l1_products.utilities import is_iceye_product
-from arepyextras.quality.io.quality_input_protocol import ChannelData, SARCoordinatesFunction
+from perseo_quality.io.quality_input_protocol import ChannelData, SARCoordinatesFunction
 from sct.io.extended_protocols import SCTInputProduct
 from sct.io.input_product_plugins import import_input_product_plugins
 

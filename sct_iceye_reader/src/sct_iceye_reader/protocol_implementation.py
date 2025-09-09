@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-ICEYE format Arepyextras-Quality protocol-compliant wrapper
+ICEYE format PERSEO-Quality protocol-compliant wrapper
 -----------------------------------------------------------
 """
 
@@ -13,22 +13,6 @@ from pathlib import Path
 
 import numpy as np
 from arepyextras.eo_products.iceye.l1_products.reader import open_product, read_channel_data, read_channel_metadata
-from arepyextras.quality.core.custom_errors import (
-    CoordinatesOutOfBounds,
-)
-from arepyextras.quality.core.generic_dataclasses import (
-    LocationData,
-    SARAcquisitionMode,
-    SARImageType,
-    SAROrbitDirection,
-    SARPolarization,
-    SARProjection,
-    SARRadiometricQuantity,
-    SARSamplingFrequencies,
-    SARSideLooking,
-)
-from arepyextras.quality.core.signal_processing import radiometric_correction
-from arepyextras.quality.io.protocol_utilities import roi_validation
 from arepytools.geometry.geometric_functions import (
     compute_ground_velocity_from_trajectory,
     compute_incidence_angles_from_trajectory,
@@ -39,12 +23,28 @@ from arepytools.geometry.orbit import Orbit
 from arepytools.math.genericpoly import SortedPolyList
 from arepytools.timing.precisedatetime import PreciseDateTime
 from numpy.typing import ArrayLike
+from perseo_quality.core.custom_errors import (
+    CoordinatesOutOfBounds,
+)
+from perseo_quality.core.generic_dataclasses import (
+    LocationData,
+    SARAcquisitionMode,
+    SARImageType,
+    SAROrbitDirection,
+    SARPolarization,
+    SARProjection,
+    SARRadiometricQuantity,
+    SARSamplingFrequencies,
+    SARSideLooking,
+)
+from perseo_quality.core.signal_processing import radiometric_correction
+from perseo_quality.io.protocol_utilities import roi_validation
 from scipy.constants import speed_of_light
 from shapely import Polygon
 
 
 class ICEYEDopplerPolynomial:
-    """ICEYE doppler polynomial wrapper compliant with Arepyextras-quality Coordinate Conversion Function protocol"""
+    """ICEYE doppler polynomial wrapper compliant with PERSEO-quality Coordinate Conversion Function protocol"""
 
     def __init__(self, sorted_poly: SortedPolyList) -> None:
         self._sorted_poly = sorted_poly
@@ -117,7 +117,7 @@ class ICEYEProductManager:
 
 
 class ICEYEChannelManager:
-    """Arepyextras-quality ChannelData protocol compliant ICEYE channel wrapper"""
+    """PERSEO-quality ChannelData protocol compliant ICEYE channel wrapper"""
 
     def __init__(
         self,
@@ -148,7 +148,6 @@ class ICEYEChannelManager:
             "" if self._channel.dataset_info.sensor_name is None else self._channel.dataset_info.sensor_name
         )
 
-        # translating arepyextras.eo_products enum to arepyextras.quality ones
         self._radiometric_quantity = SARRadiometricQuantity[self._channel.image_radiometric_quantity.name]
         self._polarization = SARPolarization(self._channel.general_info.polarization.value)
         self._projection = SARProjection(self._channel.general_info.projection.value)
