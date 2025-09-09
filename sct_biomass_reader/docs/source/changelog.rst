@@ -1,15 +1,14 @@
 Changelog
 =========
 
-v1.0.1
+v1.0.0
 ------
 
 **Incompatible Changes**
 
-- Changed plugin's interface following the new SCT plugins protocol
-- Added sensor name property to protocol implementation
+- Changing Arepyextras-Quality dependency with PERSEO-Quality
 
-v1.0.0
-------
+v1.0.0.dev0
+-----------
 
 First release version of this plugin.

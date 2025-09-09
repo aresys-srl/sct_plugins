@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-Biomass product format Arepyextras-Quality protocol-compliant wrapper
+Biomass product format PERSEO-Quality protocol-compliant wrapper
 ---------------------------------------------------------------------
 """
 

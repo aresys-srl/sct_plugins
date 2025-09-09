@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-Biomass product format Arepyextras-Quality protocol-compliant wrapper
+Biomass product format PERSEO-Quality protocol-compliant wrapper
 --------------------------------------------------------------------
 """
 
@@ -13,20 +13,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import numpy as np
-from arepyextras.quality.core.generic_dataclasses import (
-    LocationData,
-    SARAcquisitionMode,
-    SARImageType,
-    SAROrbitDirection,
-    SARPolarization,
-    SARProjection,
-    SARRadiometricQuantity,
-    SARSamplingFrequencies,
-    SARSideLooking,
-)
-from arepyextras.quality.core.signal_processing import radiometric_correction
-from arepyextras.quality.io.layout import L1BurstLayout, L1RasterLayout
-from arepyextras.quality.io.protocol_utilities import roi_validation
 from arepytools.geometry.generalsarattitude import (
     create_attitude_boresight_normal_curve_wrapper,
     create_general_sar_attitude,
@@ -44,6 +30,20 @@ from bps.transcoder.sarproduct.biomass_l1product_reader import (
     BIOMASSL1Product,
     BIOMASSL1ProductReader,
 )
+from perseo_quality.core.generic_dataclasses import (
+    LocationData,
+    SARAcquisitionMode,
+    SARImageType,
+    SAROrbitDirection,
+    SARPolarization,
+    SARProjection,
+    SARRadiometricQuantity,
+    SARSamplingFrequencies,
+    SARSideLooking,
+)
+from perseo_quality.core.signal_processing import radiometric_correction
+from perseo_quality.io.layout import L1BurstLayout, L1RasterLayout
+from perseo_quality.io.protocol_utilities import roi_validation
 from scipy.constants import speed_of_light
 from shapely import Polygon
 
