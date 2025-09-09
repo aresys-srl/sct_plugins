@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-NovaSAR1 format Arepyextras-Quality protocol-compliant wrapper
+NovaSAR1 format PERSEO-Quality protocol-compliant wrapper
 --------------------------------------------------------------
 """
 
