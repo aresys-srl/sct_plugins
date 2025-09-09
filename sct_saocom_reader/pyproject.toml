@@ -8,11 +8,11 @@ license = { file = "LICENSE.txt" }
 dependencies = [
     "numpy",
     "arepytools >= 1.7.6",
-    "arepyextras-quality >= 2.0.9",
+    "perseo-quality",
     "arepyextras-eo_products>=1.2.5",
     "scipy",
     "shapely>=2.1.0",
-    "sct>=1.1.4",
+    "sct>=2",
 ]
 dynamic = ["version"]
 classifiers = [

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-Saocom format Arepyextras-Quality protocol-compliant wrapper
+Saocom format PERSEO-Quality protocol-compliant wrapper
 ------------------------------------------------------------
 """
 
