@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-COSMO-SkyMed format Arepyextras-Quality protocol-compliant wrapper
+COSMO-SkyMed format PERSEO-Quality protocol-compliant wrapper
 ------------------------------------------------------------------
 """
 

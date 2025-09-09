@@ -10,4 +10,4 @@ from sct_cosmo_reader.interface import get_ale_corrector, get_detector, get_mana
 
 __all__ = ["get_manager", "get_detector", "get_ale_corrector"]
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
