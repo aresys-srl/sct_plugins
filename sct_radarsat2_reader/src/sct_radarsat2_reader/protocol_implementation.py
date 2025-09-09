@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-RADARSAT-2 format Arepyextras-Quality protocol-compliant wrapper
+RADARSAT-2 format PERSEO-Quality protocol-compliant wrapper
 ----------------------------------------------------------------
 """
 
@@ -17,22 +17,6 @@ from arepyextras.eo_products.radarsat.l1_products.utilities import (
     RADARSATChannelMetadata,
     RADARSATTimeOrdering,
 )
-from arepyextras.quality.core.custom_errors import (
-    CoordinatesOutOfBounds,
-)
-from arepyextras.quality.core.generic_dataclasses import (
-    LocationData,
-    SARAcquisitionMode,
-    SARImageType,
-    SAROrbitDirection,
-    SARPolarization,
-    SARProjection,
-    SARRadiometricQuantity,
-    SARSamplingFrequencies,
-    SARSideLooking,
-)
-from arepyextras.quality.core.signal_processing import radiometric_correction
-from arepyextras.quality.io.protocol_utilities import roi_validation
 from arepytools.geometry.geometric_functions import (
     compute_ground_velocity_from_trajectory,
     compute_incidence_angles_from_trajectory,
@@ -43,12 +27,28 @@ from arepytools.geometry.orbit import Orbit
 from arepytools.math.genericpoly import SortedPolyList
 from arepytools.timing.precisedatetime import PreciseDateTime
 from numpy.typing import ArrayLike
+from perseo_quality.core.custom_errors import (
+    CoordinatesOutOfBounds,
+)
+from perseo_quality.core.generic_dataclasses import (
+    LocationData,
+    SARAcquisitionMode,
+    SARImageType,
+    SAROrbitDirection,
+    SARPolarization,
+    SARProjection,
+    SARRadiometricQuantity,
+    SARSamplingFrequencies,
+    SARSideLooking,
+)
+from perseo_quality.core.signal_processing import radiometric_correction
+from perseo_quality.io.protocol_utilities import roi_validation
 from scipy.constants import speed_of_light
 from shapely import Polygon
 
 
 class RADARSAT2DopplerPolynomial:
-    """Arepyextras-quality Doppler Function protocol compliant RADARSAT-2 doppler polynomial wrapper"""
+    """PERSEO-quality Doppler Function protocol compliant RADARSAT-2 doppler polynomial wrapper"""
 
     def __init__(self, sorted_poly: SortedPolyList) -> None:
         self._sorted_poly = sorted_poly
@@ -130,7 +130,7 @@ class RADARSAT2ProductManager:
 
 
 class RADARSAT2ChannelManager:
-    """Arepyextras-quality ChannelData protocol compliant RADARSAT channel wrapper"""
+    """PERSEO-quality ChannelData protocol compliant RADARSAT channel wrapper"""
 
     def __init__(self, channel_name: str, channel_raster_path: Path, channel_metadata: RADARSATChannelMetadata) -> None:
         """Creating a ChannelManager object compliant with the ChannelData protocol.
@@ -152,7 +152,6 @@ class RADARSAT2ChannelManager:
             "" if self._channel.dataset_info.sensor_name is None else self._channel.dataset_info.sensor_name
         )
 
-        # translating arepyextras.eo_products enum to arepyextras.quality ones
         self._radiometric_quantity = SARRadiometricQuantity[self._channel.image_radiometric_quantity.name]
         self._polarization = SARPolarization(self._channel.general_info.polarization.value)
         self._projection = SARProjection(self._channel.general_info.projection.value)

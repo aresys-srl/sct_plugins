@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-RADARSAT-2 format Arepyextras-Quality protocol-compliant wrapper
+RADARSAT-2 format PERSEO-Quality protocol-compliant wrapper
 ----------------------------------------------------------------
 """
 
