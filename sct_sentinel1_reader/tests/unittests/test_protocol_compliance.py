@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import unittest
 
-from arepyextras.eo_products.sentinel1.l1_products.utilities import is_s1_safe_product
+from eo_products.sentinel1.utilities import is_s1_safe_product
 from perseo_quality.io.quality_input_protocol import ChannelData, SARCoordinatesFunction
 from sct.io.extended_protocols import SCTInputProduct
 from sct.io.input_product_plugins import AbsoluteLocalizationErrorCorrector, import_input_product_plugins

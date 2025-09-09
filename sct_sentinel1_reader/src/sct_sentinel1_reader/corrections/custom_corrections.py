@@ -10,8 +10,8 @@ from uuid import uuid4
 
 import numpy as np
 import pandas as pd
-from arepyextras.eo_products.sentinel1.l1_products.utilities import S1AcquisitionMode
 from arepytools.timing.precisedatetime import PreciseDateTime
+from eo_products.sentinel1.utilities import S1AcquisitionMode
 from numpy.typing import ArrayLike
 from perseo_quality.io.quality_input_protocol import QualityInputProduct
 from scipy.constants import speed_of_light
@@ -285,7 +285,7 @@ def compute_azimuth_corrections(
         if channel_data._channel.burst_info.num > 0:
             burst_start_times[ch_id] = channel_data._channel.burst_info.range_start_times
         else:
-            burst_start_times[ch_id] = channel_data._channel.raster_info.samples_start
+            burst_start_times[ch_id] = channel_data._channel.raster_info.samples.start
         if channel_data.swath_name not in subswath_mid_first_burst_times:
             subswath_mid_first_burst_times[channel_data.swath_name] = {}
         if channel_data.polarization.value not in subswath_mid_first_burst_times[channel_data.swath_name]:

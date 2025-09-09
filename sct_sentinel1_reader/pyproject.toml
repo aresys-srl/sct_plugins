@@ -9,7 +9,7 @@ dependencies = [
     "numpy",
     "arepytools >= 1.7.6",
     "perseo-quality",
-    "arepyextras-eo_products>=1.2.13",
+    "eo-products",
     "scipy",
     "pyproj",
     "pandas",
