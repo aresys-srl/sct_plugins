@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-EOS-04 format Arepyextras-Quality protocol-compliant wrapper
+EOS-04 format PERSEO-Quality protocol-compliant wrapper
 ------------------------------------------------------------
 """
 
