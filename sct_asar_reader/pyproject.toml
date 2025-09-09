@@ -8,11 +8,11 @@ license = { text = "GPL-3.0-or-later" }
 dependencies = [
     "numpy",
     "arepytools >= 1.7.6",
-    "arepyextras-quality >= 2.0.9",
+    "perseo-quality",
     "scipy",
     "shapely>=2.1.0",
     "pyepr",
-    "sct>=1.1.4",
+    "sct>=2",
 ]
 dynamic = ["version"]
 classifiers = [

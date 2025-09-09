@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPLv3+
 
 """
-ENVISAT/ERS ASAR format Arepyextras-Quality protocol-compliant wrapper
+ENVISAT/ERS ASAR format PERSEO-Quality protocol-compliant wrapper
 ----------------------------------------------------------------------
 """
 
@@ -12,22 +12,6 @@ from itertools import product
 from pathlib import Path
 
 import numpy as np
-from arepyextras.quality.core.custom_errors import (
-    CoordinatesOutOfBounds,
-)
-from arepyextras.quality.core.generic_dataclasses import (
-    LocationData,
-    SARAcquisitionMode,
-    SARImageType,
-    SAROrbitDirection,
-    SARPolarization,
-    SARProjection,
-    SARRadiometricQuantity,
-    SARSamplingFrequencies,
-    SARSideLooking,
-)
-from arepyextras.quality.core.signal_processing import radiometric_correction
-from arepyextras.quality.io.protocol_utilities import roi_validation
 from arepytools.geometry.geometric_functions import (
     compute_ground_velocity_from_trajectory,
     compute_incidence_angles_from_trajectory,
@@ -38,6 +22,22 @@ from arepytools.geometry.orbit import Orbit
 from arepytools.math.genericpoly import SortedPolyList
 from arepytools.timing.precisedatetime import PreciseDateTime
 from numpy.typing import ArrayLike
+from perseo_quality.core.custom_errors import (
+    CoordinatesOutOfBounds,
+)
+from perseo_quality.core.generic_dataclasses import (
+    LocationData,
+    SARAcquisitionMode,
+    SARImageType,
+    SAROrbitDirection,
+    SARPolarization,
+    SARProjection,
+    SARRadiometricQuantity,
+    SARSamplingFrequencies,
+    SARSideLooking,
+)
+from perseo_quality.core.signal_processing import radiometric_correction
+from perseo_quality.io.protocol_utilities import roi_validation
 from scipy.constants import speed_of_light
 from shapely import Polygon
 
@@ -45,7 +45,7 @@ from sct_asar_reader.core.reader import open_product, read_channel_data, read_ch
 
 
 class ASARDopplerPolynomial:
-    """ASAR doppler polynomial wrapper compliant with Arepyextras-quality Coordinate Conversion Function protocol"""
+    """ASAR doppler polynomial wrapper compliant with PERSEO-quality Coordinate Conversion Function protocol"""
 
     def __init__(self, sorted_poly: SortedPolyList) -> None:
         self._sorted_poly = sorted_poly
@@ -115,7 +115,7 @@ class ASARProductManager:
 
 
 class ASARChannelManager:
-    """Arepyextras-quality ChannelData protocol compliant SAOCOM channel wrapper"""
+    """PERSEO-quality ChannelData protocol compliant SAOCOM channel wrapper"""
 
     def __init__(
         self,
@@ -139,7 +139,6 @@ class ASARChannelManager:
             "" if self._channel.dataset_info.sensor_name is None else self._channel.dataset_info.sensor_name
         )
 
-        # translating internal enum to arepyextras.quality ones
         self._radiometric_quantity = SARRadiometricQuantity[self._channel.image_radiometric_quantity.name]
         self._polarization = SARPolarization(self._channel.general_info.polarization.value)
         self._projection = SARProjection(self._channel.general_info.projection.value)

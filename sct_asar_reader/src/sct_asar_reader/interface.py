@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPLv3+
 
 """
-ENVISAT/ERS ASAR format Arepyextras-Quality protocol-compliant wrapper
+ENVISAT/ERS ASAR format PERSEO-Quality protocol-compliant wrapper
 ----------------------------------------------------------------------
 """
 
