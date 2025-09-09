@@ -11,7 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable
 
-from arepyextras.eo_products.iceye.l1_products.utilities import is_iceye_product
+from eo_products.iceye.utilities import is_iceye_product
 
 from sct_iceye_reader.protocol_implementation import ICEYEProductManager
 

@@ -12,7 +12,6 @@ from itertools import product
 from pathlib import Path
 
 import numpy as np
-from arepyextras.eo_products.iceye.l1_products.reader import open_product, read_channel_data, read_channel_metadata
 from arepytools.geometry.geometric_functions import (
     compute_ground_velocity_from_trajectory,
     compute_incidence_angles_from_trajectory,
@@ -20,8 +19,9 @@ from arepytools.geometry.geometric_functions import (
 )
 from arepytools.geometry.inverse_geocoding_core import inverse_geocoding_monostatic_core
 from arepytools.geometry.orbit import Orbit
-from arepytools.math.genericpoly import SortedPolyList
 from arepytools.timing.precisedatetime import PreciseDateTime
+from eo_products.common.utilities import DopplerEvaluator
+from eo_products.iceye.reader import open_product, read_channel_data, read_channel_metadata
 from numpy.typing import ArrayLike
 from perseo_quality.core.custom_errors import (
     CoordinatesOutOfBounds,
@@ -46,8 +46,8 @@ from shapely import Polygon
 class ICEYEDopplerPolynomial:
     """ICEYE doppler polynomial wrapper compliant with PERSEO-quality Coordinate Conversion Function protocol"""
 
-    def __init__(self, sorted_poly: SortedPolyList) -> None:
-        self._sorted_poly = sorted_poly
+    def __init__(self, evaluator: DopplerEvaluator) -> None:
+        self._evaluator = evaluator
 
     def evaluate(self, azimuth_time: PreciseDateTime, range_time: float) -> float:
         """Evaluate the Doppler Polynomial at given azimuth and range times.
@@ -64,7 +64,7 @@ class ICEYEDopplerPolynomial:
         float
             doppler centroid at that time
         """
-        return self._sorted_poly.evaluate((azimuth_time, range_time))
+        return self._evaluator.evaluate(azimuth_time, range_time)
 
 
 class ICEYEProductManager:
@@ -156,19 +156,19 @@ class ICEYEChannelManager:
 
         self._range_step_m = self._compute_range_step_m()
         self._image_type = self._channel.general_info.product_level
-        self._looking_side = SARSideLooking(self._channel.dataset_info.side_looking.value.upper())
+        self._looking_side = SARSideLooking(self._channel.dataset_info.side_looking)
 
         # compute axes
         self._azimuth_axis = self._compute_azimuth_axis()
         self._az_time_half_swath = self._azimuth_axis[self._azimuth_axis.size // 2]
         self._range_axis = (
-            np.arange(0, self._channel.raster_info.samples, 1) * self._channel.raster_info.samples_step
-            + self._channel.raster_info.samples_start
+            np.arange(0, self._channel.raster_info.samples.length, 1) * self._channel.raster_info.samples.step
+            + self._channel.raster_info.samples.start
         )
         self._slant_range_axis = self._compute_slant_range_axis()
         rng_time_half_swath = (
-            self._channel.raster_info.samples_start
-            + (self._channel.raster_info.samples - 1) * self._channel.raster_info.samples_step / 2
+            self._channel.raster_info.samples.start
+            + (self._channel.raster_info.samples.length - 1) * self._channel.raster_info.samples.step / 2
         )
         if self._projection == SARProjection.GROUND_RANGE:
             rng_time_half_swath = self._channel.coordinate_conversions.evaluate_ground_to_slant(
@@ -183,7 +183,7 @@ class ICEYEChannelManager:
             )
         else:
             # should be a 1D array
-            self._lines_per_burst_array = np.repeat(self._channel.raster_info.lines, 1)
+            self._lines_per_burst_array = np.repeat(self._channel.raster_info.lines.length, 1)
 
         # lines per burst array
         if self._channel.burst_info.num > 0:
@@ -192,10 +192,10 @@ class ICEYEChannelManager:
             )
         else:
             # should be a 1D array
-            self._lines_per_burst_array = np.repeat(self._channel.raster_info.lines, 1)
+            self._lines_per_burst_array = np.repeat(self._channel.raster_info.lines.length, 1)
 
         # pulse rate
-        self._signal_pulse_rate = self._channel.pulse.bandwidth / self._channel.pulse.pulse_length
+        self._signal_pulse_rate = self._channel.pulse.bandwidth_hz / self._channel.pulse.length_s
 
         # prf
         self._prf = self._channel.swath_info.prf
@@ -208,8 +208,8 @@ class ICEYEChannelManager:
         self._trajectory_tx = None
 
         # generating doppler centroid wrappers
-        self._doppler_centroid_poly = ICEYEDopplerPolynomial(sorted_poly=self._channel.doppler_centroid_poly)
-        self._doppler_rate_poly = ICEYEDopplerPolynomial(sorted_poly=self._channel.doppler_rate_poly)
+        self._doppler_centroid_poly = ICEYEDopplerPolynomial(evaluator=self._channel.doppler_centroid_poly)
+        self._doppler_rate_poly = ICEYEDopplerPolynomial(evaluator=self._channel.doppler_rate_poly)
 
         # get burst boundaries
         self._burst_az_boundaries, self._burst_rng_boundaries = self._get_raster_layout()
@@ -217,9 +217,9 @@ class ICEYEChannelManager:
     def _compute_range_step_m(self) -> float:
         """Computing step along range direction, in meters"""
         if self._projection == SARProjection.GROUND_RANGE:
-            return self._channel.raster_info.samples_step
+            return self._channel.raster_info.samples.step
 
-        return self._channel.raster_info.samples_step * speed_of_light / 2
+        return self._channel.raster_info.samples.step * speed_of_light / 2
 
     def _compute_slant_range_axis(self) -> np.ndarray:
         """Computing slant range full axis.
@@ -246,15 +246,15 @@ class ICEYEChannelManager:
             azimuth axis
         """
         az_axis = (
-            np.arange(0, self._channel.raster_info.lines, 1) * self._channel.raster_info.lines_step
-            + self._channel.raster_info.lines_start
+            np.arange(0, self._channel.raster_info.lines.length, 1) * self._channel.raster_info.lines.step
+            + self._channel.raster_info.lines.start
         )
         if self._channel.burst_info.num > 0:
             az_axis = []
             for brst in range(self._channel.burst_info.num):
                 az_axis.append(
                     self._channel.burst_info.azimuth_start_times[brst]
-                    + np.arange(0, self._channel.burst_info.lines_per_burst, 1) * self._channel.raster_info.lines_step
+                    + np.arange(0, self._channel.burst_info.lines_per_burst, 1) * self._channel.raster_info.lines.step
                 )
             az_axis = np.concatenate(az_axis)
         return az_axis
@@ -271,30 +271,33 @@ class ICEYEChannelManager:
 
         if self._channel.burst_info.num > 0:
             az_times = self._channel.burst_info.azimuth_start_times
-            rng_times = np.repeat(self._channel.raster_info.samples_start, az_times.size)
+            rng_times = np.repeat(self._channel.raster_info.samples.start, az_times.size)
             burst_az_boundaries = []
             for az_time in az_times:
                 burst_az_boundaries.append(
-                    [az_time, az_time + self._channel.burst_info.lines_per_burst * self._channel.raster_info.lines_step]
+                    [az_time, az_time + self._channel.burst_info.lines_per_burst * self._channel.raster_info.lines.step]
                 )
             burst_rng_boundaries = []
             for rng_time in rng_times:
                 burst_rng_boundaries.append(
-                    [rng_time, rng_time + self._channel.raster_info.samples * self._channel.raster_info.samples_step]
+                    [
+                        rng_time,
+                        rng_time + self._channel.raster_info.samples.length * self._channel.raster_info.samples.step,
+                    ]
                 )
         else:
             burst_az_boundaries = [
                 [
-                    self._channel.raster_info.lines_start,
-                    self._channel.raster_info.lines_start
-                    + self._channel.raster_info.lines * self._channel.raster_info.lines_step,
+                    self._channel.raster_info.lines.start,
+                    self._channel.raster_info.lines.start
+                    + self._channel.raster_info.lines.length * self._channel.raster_info.lines.step,
                 ]
             ]
             burst_rng_boundaries = [
                 [
-                    self._channel.raster_info.samples_start,
-                    self._channel.raster_info.samples_start
-                    + self._channel.raster_info.samples * self._channel.raster_info.samples_step,
+                    self._channel.raster_info.samples.start,
+                    self._channel.raster_info.samples.start
+                    + self._channel.raster_info.samples.length * self._channel.raster_info.samples.step,
                 ]
             ]
 
@@ -328,7 +331,7 @@ class ICEYEChannelManager:
     @property
     def azimuth_step_s(self) -> float:
         """Step along azimuth direction, in seconds"""
-        return self._channel.raster_info.lines_step
+        return self._channel.raster_info.lines.step
 
     @property
     def projection(self) -> SARProjection:
@@ -471,7 +474,7 @@ class ICEYEChannelManager:
         if self._channel.burst_info.num > 0 and burst is not None:
             time_rel = azimuth_time - self._channel.burst_info.azimuth_start_times[burst]
         else:
-            time_rel = azimuth_time - self._channel.raster_info.lines_start
+            time_rel = azimuth_time - self._channel.raster_info.lines.start
         return (
             self._steering_rate_poly_coeff[0]
             + self._steering_rate_poly_coeff[1] * time_rel
@@ -553,17 +556,17 @@ class ICEYEChannelManager:
             range time
         """
 
-        start_time_rng = self._channel.raster_info.samples_start
+        start_time_rng = self._channel.raster_info.samples.start
         if self._channel.burst_info.num > 0 and burst is not None:
             start_time_az = self._channel.burst_info.azimuth_start_times[burst]
             az_time = (
                 azimuth_index - self._channel.burst_info.lines_per_burst * burst
-            ) * self._channel.raster_info.lines_step + start_time_az
+            ) * self._channel.raster_info.lines.step + start_time_az
         else:
-            start_time_az = self._channel.raster_info.lines_start
-            az_time = azimuth_index * self._channel.raster_info.lines_step + start_time_az
+            start_time_az = self._channel.raster_info.lines.start
+            az_time = azimuth_index * self._channel.raster_info.lines.step + start_time_az
 
-        rng_time = range_index * self._channel.raster_info.samples_step + start_time_rng
+        rng_time = range_index * self._channel.raster_info.samples.step + start_time_rng
 
         if self.projection == SARProjection.GROUND_RANGE:
             rng_time = self._channel.coordinate_conversions.evaluate_ground_to_slant(
@@ -601,15 +604,15 @@ class ICEYEChannelManager:
                 azimuth_time=azimuth_time, slant_range=range_time
             )
 
-        rng_idx = (rng_value - self._channel.raster_info.samples_start) / self._channel.raster_info.samples_step
+        rng_idx = (rng_value - self._channel.raster_info.samples.start) / self._channel.raster_info.samples.step
         if self._channel.burst_info.num > 0:
             if burst is None:
                 burst = self.times_to_burst_association([azimuth_time])[0]
             azmth_idx = (
                 azimuth_time - self._channel.burst_info.azimuth_start_times[burst]
-            ) / self._channel.raster_info.lines_step + self._channel.burst_info.lines_per_burst * burst
+            ) / self._channel.raster_info.lines.step + self._channel.burst_info.lines_per_burst * burst
         else:
-            azmth_idx = (azimuth_time - self._channel.raster_info.lines_start) / self._channel.raster_info.lines_step
+            azmth_idx = (azimuth_time - self._channel.raster_info.lines.start) / self._channel.raster_info.lines.step
 
         return azmth_idx, rng_idx
 
@@ -695,7 +698,7 @@ class ICEYEChannelManager:
             bursts_start_times[0]
             + self._channel.burst_info.num
             * self._channel.burst_info.lines_per_burst
-            * self._channel.raster_info.lines_step
+            * self._channel.raster_info.lines.step
         )
 
         bursts = []
@@ -797,7 +800,7 @@ class ICEYEChannelManager:
         ]
 
         # full raster boundaries and burst boundaries, if applicable
-        raster_boundaries = [0, 0, self._channel.raster_info.lines, self._channel.raster_info.samples]
+        raster_boundaries = [0, 0, self._channel.raster_info.lines.length, self._channel.raster_info.samples.length]
         burst_boundaries = None
         # if burst is provided, it means that the ROI to be read must be inside of this burst, otherwise the extracted
         # data are not meaningful with respect to times, acquisition consistency and IRF
@@ -806,7 +809,7 @@ class ICEYEChannelManager:
                 sum(self.lines_per_burst[:burst]),
                 0,
                 self.lines_per_burst[burst],
-                self._channel.raster_info.samples,
+                self._channel.raster_info.samples.length,
             ]
 
         # validating target block extraction with respect to raster boundaries and burst boundaries

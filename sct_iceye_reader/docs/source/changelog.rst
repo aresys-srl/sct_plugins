@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v1.1.1
+------
+
+**Incompatible Changes**
+
+- Changing Arepyextras - EO Products dependency with EO Products
+
 v1.1.0
 ------
 
