@@ -11,7 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable
 
-from arepyextras.eo_products.saocom.l1_products.utilities import is_saocom_product
+from eo_products.saocom.utilities import is_saocom_product
 
 from sct_saocom_reader.protocol_implementation import SAOCOMProductManager
 
