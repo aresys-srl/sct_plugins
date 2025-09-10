@@ -11,7 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable
 
-from arepyextras.eo_products.eos.l1_products.utilities import is_eos04_product
+from eo_products.eos04.utilities import is_eos04_product
 
 from sct_eos04_reader.protocol_implementation import EOS04ProductManager
 
