@@ -11,7 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable
 
-from arepyextras.eo_products.cosmo.l1_products.utilities import is_cosmo_product
+from eo_products.cosmo.utilities import is_cosmo_product
 
 from sct_cosmo_reader.protocol_implementation import COSMOProductManager
 
