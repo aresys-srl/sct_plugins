@@ -5,7 +5,7 @@
 groups = ["default", "dev", "doc", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:e1287eb3f5a201e651faf4c33ee3e60ff689a83c8e0caacf8482b0aaad488f27"
+content_hash = "sha256:9a9e6b698708583ff78ecc9b809dce25650faf13d68cd5feb0c43e2255af5bcb"
 
 [[metadata.targets]]
 requires_python = ">=3.10"
@@ -47,26 +47,6 @@ dependencies = [
 files = [
     {file = "annotated_types-0.7.0-py3-none-any.whl", hash = "sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53"},
     {file = "annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89"},
-]
-
-[[package]]
-name = "arepyextras-eo-products"
-version = "1.2.13"
-requires_python = ">=3.10"
-summary = "ArePyExtras EO Products is the Aresys Python module containing utilities to manage external SAR product formats."
-groups = ["default"]
-dependencies = [
-    "arepytools>1.7.6",
-    "h5py",
-    "imagecodecs",
-    "lxml",
-    "numpy",
-    "tifffile",
-    "zarr",
-]
-files = [
-    {file = "arepyextras_eo_products-1.2.13-py3-none-any.whl", hash = "sha256:a62d00f9904139ab8ac33ae285e43a86848a75f14547fed1e1337345dbc52bf5"},
-    {file = "arepyextras_eo_products-1.2.13.tar.gz", hash = "sha256:a8237f9c0606433ed34374ebfd9d019e1ea53ef1d86cd15f6dcef9a2d5639616"},
 ]
 
 [[package]]
@@ -689,6 +669,26 @@ groups = ["doc"]
 files = [
     {file = "docutils-0.21.2-py3-none-any.whl", hash = "sha256:dafca5b9e384f0e419294eb4d2ff9fa826435bf15f15b7bd45723e8ad76811b2"},
     {file = "docutils-0.21.2.tar.gz", hash = "sha256:3a6b18732edf182daa3cd12775bbb338cf5691468f91eeeb109deff6ebfa986f"},
+]
+
+[[package]]
+name = "eo-products"
+version = "1.0.0.dev0"
+requires_python = ">=3.10"
+summary = "Collection of SAR Earth Observation L1 Product Formats readers."
+groups = ["default"]
+dependencies = [
+    "arepytools>1.7.6",
+    "h5py",
+    "imagecodecs",
+    "lxml",
+    "numpy",
+    "tifffile",
+    "zarr",
+]
+files = [
+    {file = "eo_products-1.0.0.dev0-py3-none-any.whl", hash = "sha256:56bd16c06c42cefa00a33b3c94d774c61b560c52b86e9b8ca862fb83e868c6cf"},
+    {file = "eo_products-1.0.0.dev0.tar.gz", hash = "sha256:f0064d77a2917cc337ac23ddcdea114385aa27e13de00d3d84cd51d2b49a732e"},
 ]
 
 [[package]]
@@ -1999,14 +1999,14 @@ files = [
 
 [[package]]
 name = "pycparser"
-version = "2.22"
+version = "2.23"
 requires_python = ">=3.8"
 summary = "C parser in Python"
 groups = ["doc"]
 marker = "implementation_name == \"pypy\""
 files = [
-    {file = "pycparser-2.22-py3-none-any.whl", hash = "sha256:c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc"},
-    {file = "pycparser-2.22.tar.gz", hash = "sha256:491c8be9c040f5390f5bf44a5b07752bd07f56edf992381b05c701439eec10f6"},
+    {file = "pycparser-2.23-py3-none-any.whl", hash = "sha256:e5c6e8d3fbad53479cab09ac03729e0a9faf2bee3db8208a550daf5af81a5934"},
+    {file = "pycparser-2.23.tar.gz", hash = "sha256:78816d4f24add8f10a06d6f05b4d424ad9e96cfebf68a4ddc99c65c0720d00c2"},
 ]
 
 [[package]]

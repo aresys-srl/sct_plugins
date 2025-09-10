@@ -11,7 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable
 
-from arepyextras.eo_products.novasar.l1_products.utilities import is_novasar_1_product
+from eo_products.novasar1.utilities import is_novasar_1_product
 
 from sct_novasar1_reader.protocol_implementation import NovaSAR1ProductManager
 

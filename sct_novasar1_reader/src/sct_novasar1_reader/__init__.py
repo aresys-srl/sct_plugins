@@ -10,4 +10,4 @@ from sct_novasar1_reader.interface import get_ale_corrector, get_detector, get_m
 
 __all__ = ["get_manager", "get_detector", "get_ale_corrector"]
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
