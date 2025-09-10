@@ -100,6 +100,7 @@ sdist:
   script:
     - python3.12 -m pip install nox
     - python3.12 -m nox -s build_sdist
+  needs: []
   artifacts:
     expire_in: 2 weeks
     paths:
@@ -112,6 +113,7 @@ wheel:
   script:
     - python3.12 -m pip install nox
     - python3.12 -m nox -s build_wheel
+  needs: []
   artifacts:
     expire_in: 2 weeks
     paths:
