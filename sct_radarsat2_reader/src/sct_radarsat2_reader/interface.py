@@ -11,7 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable
 
-from arepyextras.eo_products.radarsat.l1_products.utilities import is_radarsat_product
+from eo_products.radarsat2.utilities import is_radarsat_product
 
 from sct_radarsat2_reader.protocol_implementation import RADARSAT2ProductManager
 
