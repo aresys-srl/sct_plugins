@@ -301,13 +301,6 @@ class BiomassChannelManager:
         return self._signal_constants
 
     @property
-    def pulse_rate(self) -> float:
-        """Signal pulse rate"""
-        assert self._pulse.bandwidth is not None
-        assert self._pulse.pulse_length is not None
-        return self._pulse.bandwidth / self._pulse.pulse_length
-
-    @property
     def looking_side(self) -> SARSideLooking:
         """Sensor look direction for this channel"""
         assert self._dataset_info.side_looking is not None

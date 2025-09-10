@@ -297,9 +297,6 @@ class ChannelManager:
             range_bandwidth_freq_hz=self._sampling_constants.brg_hz,
             azimuth_bandwidth_freq_hz=self._sampling_constants.baz_hz,
         )
-        self._signal_pulse_rate = np.nan
-        if self._pulse is not None:
-            self._signal_pulse_rate = self._pulse.bandwidth / self._pulse.pulse_length
         self._prf = self._swath_info.acquisition_prf
 
         # creating doppler centroid and rate polynomial wrappers
@@ -433,11 +430,6 @@ class ChannelManager:
     def sampling_constants(self) -> SARSamplingFrequencies:
         """Channel data signal sampling frequencies"""
         return self._signal_constants
-
-    @property
-    def pulse_rate(self) -> float:
-        """Signal pulse rate"""
-        return self._signal_pulse_rate
 
     @property
     def looking_side(self) -> SARSideLooking:

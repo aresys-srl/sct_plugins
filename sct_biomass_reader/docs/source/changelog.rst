@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v1.0.1
+------
+
+**Incompatible Changes**
+
+- Removing ``pulse_rate`` property form protocol implementation
+
 v1.0.0
 ------
 

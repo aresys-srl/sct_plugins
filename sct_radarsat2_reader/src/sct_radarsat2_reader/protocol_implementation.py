@@ -189,9 +189,6 @@ class RADARSAT2ChannelManager:
             # should be a 1D array
             self._lines_per_burst_array = np.repeat(self._channel.raster_info.lines.length, 1)
 
-        # pulse rate
-        self._signal_pulse_rate = None
-
         # prf
         self._prf = self._channel.swath_info.prf
 
@@ -359,11 +356,6 @@ class RADARSAT2ChannelManager:
     def sampling_constants(self) -> SARSamplingFrequencies:
         """Channel data signal sampling frequencies"""
         return self._channel.sampling_constants
-
-    @property
-    def pulse_rate(self) -> None:
-        """Signal pulse rate"""
-        return None
 
     @property
     def looking_side(self) -> SARSideLooking:

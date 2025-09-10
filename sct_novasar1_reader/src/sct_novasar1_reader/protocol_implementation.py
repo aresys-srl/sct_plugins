@@ -184,9 +184,6 @@ class NovaSAR1ChannelManager:
             # should be a 1D array
             self._lines_per_burst_array = np.repeat(self._channel.raster_info.lines.length, 1)
 
-        # pulse rate
-        self._signal_pulse_rate = self._channel.pulse.bandwidth_hz / self._channel.pulse.length_s
-
         # prf
         self._prf = self._channel.swath_info.prf
 
@@ -353,11 +350,6 @@ class NovaSAR1ChannelManager:
     def sampling_constants(self) -> SARSamplingFrequencies:
         """Channel data signal sampling frequencies"""
         return self._channel.sampling_constants
-
-    @property
-    def pulse_rate(self) -> float:
-        """Signal pulse rate"""
-        return self._signal_pulse_rate
 
     @property
     def looking_side(self) -> SARSideLooking:
