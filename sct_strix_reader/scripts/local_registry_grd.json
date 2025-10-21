@@ -1,0 +1,11 @@
+{
+    "strix": {
+        "stripmap-grd-pta": {
+            "analysis": "pta",
+            "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/synspective/stripmap/IMG-VV-STRIX3-20240603T115211Z-SMGRD_warp.tif",
+            "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/synspective/config.toml",
+            "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/synspective/stripmap/rosamond_point_target.csv",
+            "reference_output": ""
+        }
+    }
+}
