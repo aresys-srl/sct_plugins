@@ -15,6 +15,7 @@ import pandas as pd
 from sct.configuration.point_target_analysis_configuration import SCTPointTargetAnalysisCorrectionsConf
 from sct.io.extended_protocols import ALECorrectionFunctionType
 
+from sct_sentinel1_reader.corrections import ALE_CORRECTIONS_FIELDS
 from sct_sentinel1_reader.corrections.custom_corrections import (
     compute_corrections,
 )
@@ -26,6 +27,11 @@ class S1ALECorrector:
 
     def __init__(self, external_product_path: Path | None):
         self._etad_product = external_product_path
+
+    @property
+    def additional_corrections_fields(self) -> list[str]:
+        """List of all possible additional corrections fields that can be added to the output dataframe"""
+        return list(ALE_CORRECTIONS_FIELDS.values())
 
     def get_ale_corrections_function(self) -> ALECorrectionFunctionType:
         """Retrieving proper Absolute Localization Error corrections function. Returning ETAD corrections if ETAD

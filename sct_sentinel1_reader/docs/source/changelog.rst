@@ -8,6 +8,11 @@ v1.1.2
 
 - Removing ``pulse_rate`` property form protocol implementation
 
+**Additional Features**
+
+- Added a property to ``S1ALECorrector`` class to retrieve the list of all possible additional corrections fields that
+  can be added to the output dataframe.
+
 v1.1.1
 ------
 

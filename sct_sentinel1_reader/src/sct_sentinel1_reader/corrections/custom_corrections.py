@@ -18,6 +18,8 @@ from scipy.constants import speed_of_light
 from sct.configuration.logger import sct_logger
 from sct.io.extended_protocols import SCTInputProduct
 
+from sct_sentinel1_reader.corrections import ALE_CORRECTIONS_FIELDS
+
 
 def compute_doppler_shift_correction(pulse_rate: ArrayLike, squint_frequency: ArrayLike) -> ArrayLike:
     """Compute doppler shift correction that affects ALE along range direction.
@@ -249,7 +251,7 @@ def compute_range_corrections(
             )
         )
 
-    return pd.DataFrame(rng_corr, columns=["id", "doppler_shift_range_correction_[m]"])
+    return pd.DataFrame(rng_corr, columns=["id", ALE_CORRECTIONS_FIELDS["rng_doppler_shift"]])
 
 
 def compute_azimuth_corrections(
@@ -351,9 +353,9 @@ def compute_azimuth_corrections(
             bistatic_delay.append((row["id"], np.nan))
 
     # converting output to dataframe
-    fm_rate_shift = pd.DataFrame(fm_rate_shift, columns=["id", "fm_rate_shift_azimuth_correction_[m]"])
-    instrument_timing = pd.DataFrame(instrument_timing, columns=["id", "instrument_timing_azimuth_correction_[m]"])
-    bistatic_delay = pd.DataFrame(bistatic_delay, columns=["id", "bistatic_delay_azimuth_correction_[m]"])
+    fm_rate_shift = pd.DataFrame(fm_rate_shift, columns=["id", ALE_CORRECTIONS_FIELDS["az_fmrate_shift"]])
+    instrument_timing = pd.DataFrame(instrument_timing, columns=["id", ALE_CORRECTIONS_FIELDS["az_instrument_timing"]])
+    bistatic_delay = pd.DataFrame(bistatic_delay, columns=["id", ALE_CORRECTIONS_FIELDS["az_bistatic_delay"]])
     az_corrections = fm_rate_shift.merge(instrument_timing, on="id").merge(bistatic_delay, on="id")
 
     return az_corrections

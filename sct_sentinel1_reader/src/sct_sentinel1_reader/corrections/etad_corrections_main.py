@@ -17,6 +17,8 @@ from scipy.interpolate import RegularGridInterpolator
 from shapely.errors import ShapelyDeprecationWarning
 from shapely.geometry import Point
 
+from sct_sentinel1_reader.corrections import ALE_CORRECTIONS_FIELDS
+
 # due to s1etad use of deprecated shapely function
 warnings.filterwarnings("ignore", category=ShapelyDeprecationWarning)
 
@@ -91,8 +93,8 @@ def get_etad_corrections(etad_product_path: Path, data: pd.DataFrame) -> pd.Data
         corrections.append(
             {
                 "target_name": row["target_name"],
-                "ext_range_correction_[m]": total_rng_correction,
-                "ext_azimuth_correction_[m]": total_az_correction,
+                ALE_CORRECTIONS_FIELDS["etad_range"]: total_rng_correction,
+                ALE_CORRECTIONS_FIELDS["etad_azimuth"]: total_az_correction,
             }
         )
     corrections_df = pd.DataFrame(corrections)
