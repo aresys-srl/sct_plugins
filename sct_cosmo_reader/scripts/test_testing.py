@@ -12,5 +12,5 @@ if __name__ == "__main__":
     run_tests(
         registry_path=r"scripts\local_registry.json",
         output_dir=r"scripts\out",
-        graphs=False,
+        graphs=True,
     )
