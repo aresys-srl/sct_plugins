@@ -20,6 +20,20 @@
             "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_906f38dc_config.toml",
             "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/novasar1/novasar_surat_data.csv",
             "reference_output": "C:/chopper/integration_tests/sct/reference_results/novasar1/scd-pta/pta_res.csv"
+        },
+        "scd-rain-forest": {
+            "analysis": "rf",
+            "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/novasar1/NovaSAR_01_40720_scd_20_221231_214639_VV",
+            "config": "",
+            "targets": "",
+            "reference_output": "C:/chopper/integration_tests/sct/reference_results/novasar1/scd-rain-forest/RAIN_FOREST_profiles_S_VV.nc"
+        },
+        "grd-nesz": {
+            "analysis": "nesz",
+            "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/novasar1/NovaSAR_01_29655_grd_211218_150627_HH",
+            "config": "",
+            "targets": "",
+            "reference_output": "C:/chopper/integration_tests/sct/reference_results/novasar1/grd-nesz/NESZ_profiles_S1_HH.nc"
         }
     }
 }

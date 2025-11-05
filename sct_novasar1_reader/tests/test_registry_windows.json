@@ -26,14 +26,20 @@
             "product": "C:/chopper/reference_dataset/novasar1/products/NovaSAR_01_40720_scd_20_221231_214639_VV",
             "config": "",
             "targets": "",
-            "reference_output": "C:/chopper/integration_tests/sct/reference_results/novasar1/scd-rain-forest/RAIN_FOREST_profiles_S_VV.nc"
+            "reference_output": [
+                "C:/chopper/integration_tests/sct/reference_results/novasar1/scd-rain-forest/RAIN_FOREST_profiles_S_VV.nc",
+                "C:/chopper/integration_tests/sct/reference_results/novasar1/scd-rain-forest/kpi_stats.csv"
+            ]
         },
         "grd-nesz": {
             "analysis": "nesz",
             "product": "C:/chopper/reference_dataset/novasar1/products/NovaSAR_01_29655_grd_211218_150627_HH",
             "config": "",
             "targets": "",
-            "reference_output": "C:/chopper/integration_tests/sct/reference_results/novasar1/grd-nesz/NESZ_profiles_S1_HH.nc"
+            "reference_output": [
+                "C:/chopper/integration_tests/sct/reference_results/novasar1/grd-nesz/NESZ_profiles_S1_HH.nc",
+                "C:/chopper/integration_tests/sct/reference_results/novasar1/grd-nesz/kpi_stats.csv"
+            ]
         }
     }
 }
