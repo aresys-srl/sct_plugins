@@ -1,0 +1,11 @@
+{
+    "radarsat2": {
+        "stripmap-pta": {
+            "analysis": "pta",
+            "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/radarsat2/RS2_OK160407_PK1473274_DK1437615_W3_20250821_015358_HH_SLC",
+            "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_906f38dc_config.toml",
+            "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/radarsat2/rosamond_data.csv",
+            "reference_output": "C:/chopper/integration_tests/sct/reference_results/radarsat2/stripmap-pta/pta_res.csv"
+        }
+    }
+}
