@@ -1,25 +1,47 @@
 {
     "cosmo": {
-        "grd-pta": {
+        "gen1-grd-pta": {
             "analysis": "pta",
             "product": "/data/reference_dataset/cosmo/products/CSKS1_DGM_B_WR_00_HH_RA_FF_20240107043057_20240107043111.h5",
             "config": "/data/integration_tests/sct/configurations/test_d347c358_config.toml",
             "targets": "/data/reference_dataset/cosmo/auxiliaries/neusterlitz_corner_reflectors_data.csv",
-            "reference_output": "/data/integration_tests/sct/reference_results/cosmo/grd-pta/pta_res.csv"
+            "reference_output": "/data/integration_tests/sct/reference_results/cosmo/gen1-grd-pta/pta_res.csv"
         },
-        "rain-forest-slc": {
+        "gen1-rain-forest-slc": {
             "analysis": "rf",
             "product": "/data/reference_dataset/cosmo/products/CSKS4_SCS_B_HR_02_VV_RA_SF_20250427103653_20250427103723.h5",
             "config": "",
             "targets": "",
             "reference_output": [
-                "/data/integration_tests/sct/reference_results/cosmo/rain-forest-slc/RAIN_FOREST_profiles_S01_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/rain-forest-slc/RAIN_FOREST_profiles_S02_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/rain-forest-slc/RAIN_FOREST_profiles_S03_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/rain-forest-slc/RAIN_FOREST_profiles_S04_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/rain-forest-slc/RAIN_FOREST_profiles_S05_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/rain-forest-slc/RAIN_FOREST_profiles_S06_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/rain-forest-slc/kpi_stats.csv"
+                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S01_VV.nc",
+                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S02_VV.nc",
+                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S03_VV.nc",
+                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S04_VV.nc",
+                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S05_VV.nc",
+                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S06_VV.nc",
+                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/kpi_stats.csv"
+            ]
+        },
+        "gen2-sim-pta-slc": {
+            "analysis": "pta",
+            "product": "/data/reference_dataset/cosmo/products/CSG_SSAR3_SCS_U_0101_SPP_001_VV_LA_R_20000101123033_20000101123048_1_F_08S_Z20_N00.h5",
+            "config": "/data/integration_tests/sct/configurations/test_d347c358_config.toml",
+            "targets": "/data/reference_dataset/cosmo/auxiliaries/simulation_corner_reflectors_data.csv",
+            "reference_output": "/data/integration_tests/sct/reference_results/cosmo/gen2-sim-pta-slc/pta_res.csv"
+        },
+        "gen2-rain-forest-slc": {
+            "analysis": "rf",
+            "product": "/data/reference_dataset/cosmo/products/CSG_SSAR1_SCS_B_0101_SC2_003_VV_RA_F_20250205103650_20250205103720_1_F_07S_Z19_N00.h5",
+            "config": "",
+            "targets": "",
+            "reference_output": [
+                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/RAIN_FOREST_profiles_S01_VV.nc",
+                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/RAIN_FOREST_profiles_S02_VV.nc",
+                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/RAIN_FOREST_profiles_S03_VV.nc",
+                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/RAIN_FOREST_profiles_S04_VV.nc",
+                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/RAIN_FOREST_profiles_S05_VV.nc",
+                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/RAIN_FOREST_profiles_S06_VV.nc",
+                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/kpi_stats.csv"
             ]
         }
     }
