@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v1.1.3
+------
+
+**Additional Features**
+
+- Adding ``get_roll_angle_deg`` method to protocol implementation to be used in PERSEO-Quality Elevation Notch Analysis
+
 v1.1.2
 ------
 

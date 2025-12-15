@@ -12,6 +12,7 @@ from itertools import product
 from pathlib import Path
 
 import numpy as np
+from arepytools.geometry.conversions import xyz2llh
 from arepytools.geometry.geometric_functions import (
     compute_ground_velocity_from_trajectory,
     compute_incidence_angles_from_trajectory,
@@ -46,6 +47,10 @@ from perseo_quality.core.signal_processing import radiometric_correction
 from perseo_quality.io.protocol_utilities import roi_validation
 from scipy.constants import speed_of_light
 from shapely import Polygon
+
+ALPHA_ROLL = 0.0566
+SENSOR_HEIGHT_REF = 711.7  # km
+BORESIGHT_ANGLE_REF = 29.450  # deg
 
 
 class Sentinel1DopplerPolynomial:
@@ -530,6 +535,21 @@ class Sentinel1ChannelManager:
             + self._steering_rate_poly_coeff[2] * time_rel**2
         )
 
+    def get_roll_angle_deg(self, azimuth_time: PreciseDateTime) -> float:
+        """Compute roll angle at a given azimuth time.
+
+        Parameters
+        ----------
+        azimuth_time : PreciseDateTime
+            azimuth time at which compute roll angle
+
+        Returns
+        -------
+        float
+            roll angle in degrees
+        """
+        return _compute_roll_angle_deg(self.trajectory.evaluate(azimuth_time))
+
     def get_location_data(self, azimuth_time: PreciseDateTime, range_time: float) -> LocationData:
         """Generating a LocationData object containing data and info derived from the current SafeChannelManager and
         declined to the specific azimuth and range times selected.
@@ -891,3 +911,8 @@ class Sentinel1ChannelManager:
             )
 
         return data
+
+
+def _compute_roll_angle_deg(sensor_pos: np.ndarray) -> float:
+    """Computing roll angle from sensor position"""
+    return BORESIGHT_ANGLE_REF - ALPHA_ROLL * (xyz2llh(sensor_pos)[2] / 1e3 - SENSOR_HEIGHT_REF)
