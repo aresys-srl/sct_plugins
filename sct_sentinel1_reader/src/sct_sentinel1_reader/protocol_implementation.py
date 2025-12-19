@@ -241,6 +241,14 @@ class Sentinel1ChannelManager:
         # get burst boundaries
         self._burst_az_boundaries, self._burst_rng_boundaries = self._get_raster_layout()
 
+        if not self._projection == SARProjection.GROUND_RANGE:
+            self._antenna_pattern_rel_times = (
+                self._channel.antenna_pattern[self._channel.general_info.swath].time_axis - self._azimuth_axis[0]
+            )
+            self._antenna_pattern_altitudes = self._channel.antenna_pattern[
+                self._channel.general_info.swath
+            ].terrain_height
+
     def _compute_range_step_m(self) -> float:
         """Computing step along range direction, in meters"""
         if self._projection == SARProjection.GROUND_RANGE:
@@ -549,6 +557,29 @@ class Sentinel1ChannelManager:
             roll angle in degrees
         """
         return _compute_roll_angle_deg(self.trajectory.evaluate(azimuth_time))
+
+    def get_altitude_m(self, azimuth_time: PreciseDateTime) -> float:
+        """Compute altitude over WGS84 ellipsoid at a given azimuth time.
+
+        Parameters
+        ----------
+        azimuth_time : PreciseDateTime
+            azimuth time at which compute altitude
+
+        Returns
+        -------
+        float
+            altitude over WGS84 ellipsoid in meters
+        """
+        return (
+            np.interp(
+                float(azimuth_time - self._azimuth_axis[0]),
+                self._antenna_pattern_rel_times.astype(float),
+                self._antenna_pattern_altitudes,
+            )
+            if not self._projection == SARProjection.GROUND_RANGE
+            else 0
+        )
 
     def get_location_data(self, azimuth_time: PreciseDateTime, range_time: float) -> LocationData:
         """Generating a LocationData object containing data and info derived from the current SafeChannelManager and
