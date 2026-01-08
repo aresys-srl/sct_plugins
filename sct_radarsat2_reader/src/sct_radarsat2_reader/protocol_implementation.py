@@ -18,7 +18,7 @@ from arepytools.geometry.geometric_functions import (
     compute_look_angles_from_trajectory,
 )
 from arepytools.geometry.inverse_geocoding_core import inverse_geocoding_monostatic_core
-from arepytools.geometry.orbit import Orbit
+from arepytools.geometry.orbit import ExtrapolationNotAllowed, Orbit
 from arepytools.timing.precisedatetime import PreciseDateTime
 from eo_products.common.utilities import DopplerEvaluator
 from eo_products.radarsat2.reader import open_product, read_channel_data, read_product_metadata
@@ -499,9 +499,28 @@ class RADARSAT2ChannelManager:
             range_times=self.mid_range_time,
             look_direction=self.looking_side.value,
         )
-        v_ground = compute_ground_velocity_from_trajectory(
-            trajectory=self.trajectory, azimuth_time=azimuth_time, look_angles_rad=look_angle
-        )
+        try:
+            v_ground = compute_ground_velocity_from_trajectory(
+                trajectory=self.trajectory, azimuth_time=azimuth_time, look_angles_rad=look_angle
+            )
+        except ExtrapolationNotAllowed:
+            try:
+                v_ground = compute_ground_velocity_from_trajectory(
+                    trajectory=self.trajectory,
+                    azimuth_time=azimuth_time,
+                    look_angles_rad=look_angle,
+                    averaging_interval_duration=0.4,
+                )
+            except ExtrapolationNotAllowed:
+                time_to_end = self.azimuth_axis[-1] - self.mid_azimuth_time
+                v_ground = compute_ground_velocity_from_trajectory(
+                    trajectory=self.trajectory,
+                    azimuth_time=self.mid_azimuth_time,
+                    look_angles_rad=look_angle,
+                    averaging_interval_duration=time_to_end / 2,
+                    averaging_interval_num_points=21,
+                    averaging_interval_relative_origin=-time_to_end / 2,
+                )
         azimuth_step_m = self.azimuth_step_s * v_ground
 
         # TODO: this should be a common feature, also: slant_range_step_m, not range_step_m
