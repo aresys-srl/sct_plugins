@@ -1,0 +1,892 @@
+# SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
+# SPDX-License-Identifier: MIT
+
+"""
+TERRASAR-X format PERSEO-Quality protocol-compliant wrapper
+-----------------------------------------------------------
+"""
+
+from __future__ import annotations
+
+from itertools import product
+from pathlib import Path
+
+import numpy as np
+from arepytools.geometry.geometric_functions import (
+    compute_ground_velocity_from_trajectory,
+    compute_incidence_angles_from_trajectory,
+    compute_look_angles_from_trajectory,
+)
+from arepytools.geometry.inverse_geocoding_core import inverse_geocoding_monostatic_core
+from arepytools.geometry.orbit import Orbit
+from arepytools.timing.precisedatetime import PreciseDateTime
+from eo_products.common.utilities import DopplerEvaluator
+from eo_products.terrasarx.reader import (
+    open_product,
+    read_channel_data,
+    read_product_metadata,
+)
+from eo_products.terrasarx.utilities import (
+    TERRASARXChannelMetadata,
+    TERRASARXProductVariant,
+)
+from numpy.typing import ArrayLike
+from perseo_quality.core.custom_errors import (
+    AzimuthExceedsBoundariesError,
+    CoordinatesOutOfBounds,
+    RangeExceedsBoundariesError,
+)
+from perseo_quality.core.generic_dataclasses import (
+    LocationData,
+    SARAcquisitionMode,
+    SARImageType,
+    SAROrbitDirection,
+    SARPolarization,
+    SARProjection,
+    SARRadiometricQuantity,
+    SARSamplingFrequencies,
+    SARSideLooking,
+)
+from perseo_quality.core.signal_processing import radiometric_correction
+from scipy.constants import speed_of_light
+from shapely import Polygon
+
+
+class TERRASARXDopplerPolynomial:
+    """PERSEO-quality Doppler Function protocol compliant TERRASAR-X doppler polynomial wrapper"""
+
+    def __init__(self, evaluator: DopplerEvaluator) -> None:
+        self._evaluator = evaluator
+
+    def evaluate(self, azimuth_time: PreciseDateTime, range_time: float) -> float:
+        """Evaluate the Doppler Polynomial at given azimuth and range times.
+
+        Parameters
+        ----------
+        azimuth_time : PreciseDateTime
+            azimuth time at which evaluate the polynomial
+        range_time : float
+            range time at which evaluate the polynomial
+
+        Returns
+        -------
+        float
+            doppler centroid at that time
+        """
+        return self._evaluator.evaluate(azimuth_time, range_time)
+
+
+class TERRASARXProductManager:
+    """SCTInputProduct protocol compliant TERRASAR-X wrapper"""
+
+    def __init__(self, path: str | Path, **kwargs) -> None:
+        self._path = Path(path)
+        self._name = self._path.name
+        self._product = open_product(path)
+        self._metadata = read_product_metadata(self._product.metadata_file)
+        region_corners = list(product(self._product.footprint[:2], self._product.footprint[2:]))
+        self._footprint = Polygon(region_corners)
+
+    @property
+    def path(self) -> Path:
+        """Get product path"""
+        return self._path
+
+    @property
+    def name(self) -> str:
+        """Get product name"""
+        return self._name
+
+    @property
+    def footprint(self) -> Polygon:
+        """Get product footprint"""
+        return self._footprint
+
+    @property
+    def channels_list(self) -> list[str]:
+        """Get list of available channels for this product"""
+        return self._product.channels_list
+
+    def get_channel_data(self, channel_id: str) -> TERRASARXChannelManager:
+        """Gathering all the information that are channel dependent and storing them in a protocol compliant object.
+
+        Parameters
+        ----------
+        channel_id : int
+            selected channel identifier
+
+        Returns
+        -------
+        TERRASARXChannelManager
+            ChannelData-compliant object containing data corresponding to the selected channel
+        """
+        return TERRASARXChannelManager(
+            channel_metadata=self._metadata[channel_id],
+            channel_raster_path=self._product.get_raster_files_from_channel_name(channel_id),
+            channel_name=channel_id,
+        )
+
+
+class TERRASARXChannelManager:
+    """PERSEO-quality ChannelData protocol compliant TERRASAR-X channel wrapper"""
+
+    def __init__(
+        self,
+        channel_metadata: TERRASARXChannelMetadata,
+        channel_raster_path: Path,
+        channel_name: str,
+    ) -> None:
+        """Creating a ChannelManager object compliant with the ChannelData protocol.
+
+        Parameters
+        ----------
+        channel_metadata : TERRASARXChannelMetadata
+            channel metadata dataclass
+        channel_raster_path : int
+            Path to the channel raster file
+        channel_name : int
+            name of current channel
+        """
+
+        self._channel_id = channel_name
+        self._raster_file = channel_raster_path
+        self._channel = channel_metadata
+        self._sensor_name = (
+            "" if self._channel.dataset_info.sensor_name is None else self._channel.dataset_info.sensor_name
+        )
+
+        self._radiometric_quantity = SARRadiometricQuantity[self._channel.image_radiometric_quantity.name]
+        self._prod_variant = TERRASARXProductVariant(self._channel.dataset_info.image_type)
+        self._polarization = SARPolarization(self._channel.polarization.value)
+        self._projection = SARProjection(self._channel.dataset_info.projection)
+        self._orbit_direction = SAROrbitDirection[self._channel.state_vectors.orbit_direction.name]
+        self._acquisition_mode = SARAcquisitionMode[self._channel.dataset_info.acquisition_mode.name]
+
+        self._range_step_m = self._compute_range_step_m()
+        self._looking_side = SARSideLooking(self._channel.dataset_info.side_looking.upper())
+
+        # lines per burst array
+        if self._channel.burst_info.num > 1:
+            self._lines_per_burst_array = self._channel.burst_info.lines_per_burst
+        else:
+            # should be a 1D array
+            self._lines_per_burst_array = np.repeat(self._channel.raster_info.lines.length, 1)
+        # compute axes
+        if self._channel.burst_info.num > 1:
+            self._azimuth_axis = np.concat(
+                [
+                    np.arange(0, lines) * self._channel.raster_info.lines.step + az_start
+                    for az_start, lines in zip(
+                        self._channel.burst_info.azimuth_start_times,
+                        self._channel.burst_info.lines_per_burst,
+                        strict=True,
+                    )
+                ]
+            )
+        else:
+            self._azimuth_axis = self._channel.raster_info.lines.axis
+
+        self._az_time_half_swath = self._azimuth_axis[self._azimuth_axis.size // 2]
+        self._range_axis = self._channel.raster_info.samples.axis
+        self._slant_range_axis = self._compute_slant_range_axis()
+        rng_time_half_swath = (
+            self._channel.raster_info.samples.start
+            + (self._channel.raster_info.samples.length - 1) * self._channel.raster_info.samples.step / 2
+        )
+        if self._projection == SARProjection.GROUND_RANGE:
+            rng_time_half_swath = self._channel.coordinate_conversions.evaluate_ground_to_slant(
+                azimuth_time=self._az_time_half_swath,
+                ground_range=np.floor(rng_time_half_swath),
+            )
+        self._rng_time_half_swath = rng_time_half_swath
+
+        # prf
+        self._prf = self._channel.swath_info.prf
+
+        # steering rate
+        self._steering_rate_poly_coeff = self._channel.swath_info.azimuth_steering_rate_poly
+
+        # trajectory
+        self._trajectory_rx = self._channel.state_vectors.orbit
+        self._trajectory_tx = None
+
+        # generating doppler centroid wrappers
+        self._doppler_centroid_poly = TERRASARXDopplerPolynomial(evaluator=self._channel.doppler_centroid_poly)
+
+        # get burst boundaries
+        self._burst_az_boundaries, self._burst_rng_boundaries = self._get_raster_layout()
+
+        self._corrected_calibration_constant = self._channel.image_calibration_factor
+
+    def _compute_slant_range_axis(self) -> np.ndarray:
+        """Computing slant range full axis.
+
+        Returns
+        -------
+        np.ndarray
+            slant range axis
+        """
+        slant_rng_axis = self._range_axis
+        if self._projection == SARProjection.GROUND_RANGE:
+            slant_rng_axis = self._channel.coordinate_conversions.evaluate_ground_to_slant(
+                azimuth_time=self._az_time_half_swath, ground_range=self._range_axis
+            )
+
+        return slant_rng_axis
+
+    def _compute_range_step_m(self) -> float:
+        """Computing step along range direction, in meters"""
+        if self._channel.raster_info.samples.step_unit == "m":
+            return self._channel.raster_info.samples.step
+        return self._channel.raster_info.samples.step * speed_of_light / 2
+
+    def _get_raster_layout(self) -> tuple[list[PreciseDateTime], list[float]]:
+        """Evaluating raster boundaries taking into account the bursts, if needed.
+
+        Returns
+        -------
+        tuple[list[list[PreciseDateTime, PreciseDateTime]], list[list[float, float]]]
+            azimuth raster boundaries (azimuth start, azimuth stop),
+            range raster boundaries (range start, range stop)
+        """
+
+        if self._channel.burst_info.num > 1:
+            az_times = self._channel.burst_info.azimuth_start_times
+            rng_times = np.repeat(self._channel.raster_info.samples.start, az_times.size)
+            burst_az_boundaries = []
+            for az_id, az_time in enumerate(az_times):
+                burst_az_boundaries.append(
+                    [
+                        az_time,
+                        az_time
+                        + (self._channel.burst_info.lines_per_burst[az_id] * self._channel.raster_info.lines.step),
+                    ]
+                )
+            burst_rng_boundaries = []
+            for rng_time in rng_times:
+                burst_rng_boundaries.append(
+                    [
+                        rng_time,
+                        rng_time + self._channel.raster_info.samples.length * self._channel.raster_info.samples.step,
+                    ]
+                )
+        else:
+            burst_az_boundaries = [
+                [
+                    self._channel.raster_info.lines.start,
+                    self._channel.raster_info.lines.start
+                    + self._channel.raster_info.lines.length * self._channel.raster_info.lines.step,
+                ]
+            ]
+            burst_rng_boundaries = [
+                [
+                    self._channel.raster_info.samples.start,
+                    self._channel.raster_info.samples.start
+                    + self._channel.raster_info.samples.length * self._channel.raster_info.samples.step,
+                ]
+            ]
+
+        return burst_az_boundaries, burst_rng_boundaries
+
+    @property
+    def sensor_name(self) -> str:
+        """Name of the sensor"""
+        return self._sensor_name
+
+    @property
+    def swath_name(self) -> str:
+        """Name of the swath being analyzed"""
+        return self._channel.swath_info.swath
+
+    @property
+    def channel_id(self) -> str:
+        """Identifier of current channel data"""
+        return self._channel_id
+
+    @property
+    def prf(self) -> float:
+        """Sensor Pulse Repetition Frequency (PRF)"""
+        return self._prf
+
+    @property
+    def range_step_m(self) -> float:
+        """Step along range direction, in meters"""
+        return self._range_step_m
+
+    @property
+    def azimuth_step_s(self) -> float:
+        """Step along azimuth direction, in seconds"""
+        return self._channel.raster_info.lines.step
+
+    @property
+    def projection(self) -> SARProjection:
+        """Channel data projection"""
+        return self._projection
+
+    @property
+    def polarization(self) -> SARPolarization:
+        """Channel data polarization"""
+        return self._polarization
+
+    @property
+    def acquisition_mode(self) -> SARAcquisitionMode:
+        """Channel data acquisition mode"""
+        return self._acquisition_mode
+
+    @property
+    def orbit_direction(self) -> SAROrbitDirection:
+        """Channel data orbit direction"""
+        return self._orbit_direction
+
+    @property
+    def image_type(self) -> SARImageType:
+        """Channel raster image type"""
+        return self._prod_variant
+
+    @property
+    def sampling_constants(self) -> SARSamplingFrequencies:
+        """Channel data signal sampling frequencies"""
+        return None  # TODO: self._channel.sampling_constants
+
+    @property
+    def looking_side(self) -> SARSideLooking:
+        """Sensor look direction for this channel"""
+        return self._looking_side
+
+    @property
+    def carrier_frequency(self) -> float:
+        """Signal carrier frequency"""
+        return self._channel.dataset_info.fc_hz
+
+    @property
+    def mid_azimuth_time(self) -> PreciseDateTime:
+        """Azimuth time at half swath"""
+        return self._az_time_half_swath
+
+    @property
+    def trajectory(self) -> Orbit:
+        """Channel trajectory rx 3D curve"""
+        return self._trajectory_rx
+
+    @property
+    def boresight_normal_curve(self) -> None:
+        """Channel attitude boresight normal 3D curve"""
+        return None
+
+    @property
+    def doppler_centroid(self) -> TERRASARXDopplerPolynomial:
+        """Channel doppler centroid polynomial wrapper"""
+        return self._doppler_centroid_poly
+
+    @property
+    def doppler_rate(self) -> None:
+        """Channel doppler rate polynomial wrapper"""
+        return None
+
+    @property
+    def mid_range_time(self) -> float:
+        """Range time at half swath"""
+        return self._rng_time_half_swath
+
+    @property
+    def range_axis(self) -> np.ndarray:
+        """Range axis"""
+        return self._range_axis
+
+    @property
+    def slant_range_axis(self) -> np.ndarray:
+        """Range axis"""
+        return self._slant_range_axis
+
+    @property
+    def azimuth_axis(self) -> np.ndarray:
+        """Azimuth axis, PreciseDateTime format"""
+        return self._azimuth_axis
+
+    @property
+    def lines_per_burst(self) -> np.ndarray:
+        """Lines per burst, for each burst in the swath"""
+        return self._lines_per_burst_array
+
+    @property
+    def radiometric_quantity(self) -> np.ndarray:
+        """Product radiometric quantity"""
+        return self._radiometric_quantity
+
+    def get_mid_burst_times(self, burst: int) -> tuple[PreciseDateTime, float]:
+        """Compute mid azimuth and range times for a given burst.
+
+        Parameters
+        ----------
+        burst : int
+            burst for which azimuth and range times are computed
+
+        Returns
+        -------
+        tuple[PreciseDateTime, float]
+            azimuth and range mid burst times
+        """
+        az_mid_burst = self.mid_azimuth_time
+        rng_mid_burst = self.mid_range_time
+        if self._channel.burst_info.num > 1:
+            az_time_boundaries, rng_time_boundaries = self._get_raster_layout()
+            az_mid_burst = (az_time_boundaries[burst][1] - az_time_boundaries[burst][0]) / 2 + az_time_boundaries[
+                burst
+            ][0]
+            rng_mid_burst = (rng_time_boundaries[burst][1] - rng_time_boundaries[burst][0]) / 2 + rng_time_boundaries[
+                burst
+            ][0]
+
+        return az_mid_burst, rng_mid_burst
+
+    def get_steering_rate(self, azimuth_time: PreciseDateTime, burst: int) -> float:
+        """Compute steering rate at a given azimuth time and for a given burst.
+
+        Parameters
+        ----------
+        azimuth_time : PreciseDateTime
+            azimuth time
+        burst : int
+            burst corresponding to the input time
+
+        Returns
+        -------
+        float
+            azimuth steering rate
+        """
+        if self._channel.burst_info.num > 1 and burst is not None:
+            time_rel = azimuth_time - self._channel.burst_info.azimuth_start_times[burst]
+        else:
+            time_rel = azimuth_time - self._channel.raster_info.lines.start
+        return (
+            self._steering_rate_poly_coeff[0]
+            + self._steering_rate_poly_coeff[1] * time_rel
+            + self._steering_rate_poly_coeff[2] * time_rel**2
+        )
+
+    def get_location_data(self, azimuth_time: PreciseDateTime, range_time: float) -> LocationData:
+        """Generating a LocationData object containing data and info derived from the current TERRASARXChannelManager
+        and declined to the specific azimuth and range times selected.
+
+        Parameters
+        ----------
+        azimuth_time : PreciseDateTime
+            selected azimuth time
+        range_time : float
+            selected range time
+
+        Returns
+        -------
+        LocationData
+            LocationData instance related to the selected location
+        """
+
+        incidence_angle = compute_incidence_angles_from_trajectory(
+            trajectory=self.trajectory,
+            azimuth_time=azimuth_time,
+            range_times=range_time,
+            look_direction=self.looking_side.value,
+        )
+        look_angle = compute_look_angles_from_trajectory(
+            trajectory=self.trajectory,
+            azimuth_time=azimuth_time,
+            range_times=self.mid_range_time,
+            look_direction=self.looking_side.value,
+        )
+        v_ground = compute_ground_velocity_from_trajectory(
+            trajectory=self.trajectory,
+            azimuth_time=azimuth_time,
+            look_angles_rad=look_angle,
+        )
+        azimuth_step_m = self.azimuth_step_s * v_ground
+
+        if self.projection == SARProjection.SLANT_RANGE:
+            ground_range_step_m: float = self.range_step_m / np.sin(incidence_angle)
+            range_step_m = self.range_step_m
+        elif self.projection == SARProjection.GROUND_RANGE:
+            ground_range_step_m: float = self.range_step_m
+            range_step_m = self.range_step_m * np.sin(incidence_angle)
+
+        return LocationData(
+            abs_azimuth_time=azimuth_time,
+            abs_range_time=range_time,
+            incidence_angle=incidence_angle,
+            look_angle=look_angle,
+            ground_velocity=v_ground,
+            azimuth_step_m=azimuth_step_m,
+            range_step_m=range_step_m,
+            ground_range_step_m=ground_range_step_m,
+        )
+
+    def pixel_to_times_conversion(
+        self, azimuth_index: float, range_index: float, burst: int = None
+    ) -> tuple[PreciseDateTime, float]:
+        """Converting input raster pixel coordinates (azimuth_index and range index) to corresponding absolute times,
+        azimuth and range.
+
+        Parameters
+        ----------
+        azimuth_index : float
+            azimuth pixel index, subpixel precision
+        range_index : float
+            range pixel index, subpixel precision
+        burst : int, optional
+            burst index, by default None
+
+        Returns
+        -------
+        PreciseDateTime
+            azimuth time
+        float
+            range time
+        """
+
+        start_time_rng = self._channel.raster_info.samples.start
+        if self._channel.burst_info.num > 1 and burst is not None:
+            start_time_az = self._channel.burst_info.azimuth_start_times[burst]
+            az_time = (
+                azimuth_index - self._channel.burst_info.lines_per_burst[burst] * burst
+            ) * self._channel.raster_info.lines.step + start_time_az
+        else:
+            start_time_az = self._channel.raster_info.lines.start
+            az_time = azimuth_index * self._channel.raster_info.lines.step + start_time_az
+
+        rng_time = range_index * self._channel.raster_info.samples.step + start_time_rng
+
+        if self.projection == SARProjection.GROUND_RANGE:
+            rng_time = self._channel.coordinate_conversions.evaluate_ground_to_slant(
+                azimuth_time=self.mid_azimuth_time, ground_range=rng_time
+            )
+
+        return az_time, rng_time
+
+    def times_to_pixel_conversion(
+        self, azimuth_time: PreciseDateTime, range_time: float, burst: int = None
+    ) -> tuple[float, float]:
+        """Converting azimuth and range times to raster image pixels indexes with subpixel precision.
+
+        Parameters
+        ----------
+        azimuth_time : PreciseDateTime
+            azimuth time
+        range_time : float
+            range time
+        burst : int
+            burst number corresponding to these times
+
+        Returns
+        -------
+        float
+            pixel corresponding to azimuth time
+        float
+            pixel corresponding to range time
+        """
+
+        rng_value = range_time
+        if self.projection == SARProjection.GROUND_RANGE:
+            # if projection is GROUND RANGE, range info are expressed in meters, so it must be converted
+            rng_value = self._channel.coordinate_conversions.evaluate_slant_to_ground(
+                azimuth_time=azimuth_time, slant_range=range_time
+            )
+
+        rng_idx = (rng_value - self._channel.raster_info.samples.start) / self._channel.raster_info.samples.step
+        if self._channel.burst_info.num > 1:
+            if burst is None:
+                burst = self.times_to_burst_association([azimuth_time])[0]
+            azmth_idx = (
+                azimuth_time - self._channel.burst_info.azimuth_start_times[burst]
+            ) / self._channel.raster_info.lines.step + self._channel.burst_info.lines_per_burst[burst] * burst
+        else:
+            azmth_idx = (azimuth_time - self._channel.raster_info.lines.start) / self._channel.raster_info.lines.step
+
+        return azmth_idx, rng_idx
+
+    def times_to_burst_association(self, azimuth_times: ArrayLike) -> list[int]:
+        """Associate the right burst to a given input time point. This function returns 1 association for each
+        input time.
+        Associating time only to the first burst containing it.
+
+        Parameters
+        ----------
+        azimuth_time : ArrayLike
+            azimuth time array in PreciseDateTime format
+
+        Returns
+        -------
+        list[int]
+            burst associated with a given time
+
+        Raises
+        ------
+        CoordinatesOutOfBounds
+            if input time exceeds tme boundaries of the swath
+        """
+        if self._channel.burst_info is None:
+            return [0] * len(azimuth_times)
+
+        bursts_start_times = self._channel.burst_info.azimuth_start_times
+        last_time = (
+            bursts_start_times[0]
+            + self._channel.burst_info.num
+            * self._channel.burst_info.lines_per_burst
+            * self._channel.raster_info.lines.step
+        )
+
+        bursts = []
+        for time in azimuth_times:
+            if time < bursts_start_times[0] or time > last_time:
+                raise CoordinatesOutOfBounds(f"{time} is out of the recorded timeline")
+
+            time_diff = time - bursts_start_times
+            time_mask = np.ma.masked_less(time_diff.astype("float64"), 0)
+            # associating time only to the first burst containing it
+            bursts.append(time_mask.argmin())
+
+        return bursts
+
+    def pixel_to_burst_association(self, azimuth_px_indexes: ArrayLike) -> list[int]:
+        """Associate the azimuth pixel value to the right burst. This function returns 1 association for each
+        input time.
+
+        Parameters
+        ----------
+        azimuth_px_indexes : ArrayLike
+            azimuth pixel indexes array
+
+        Returns
+        -------
+        list[int]
+            burst associated with a given pixel index
+
+        Raises
+        ------
+        CoordinatesOutOfBounds
+            if input time exceeds tme boundaries of the swath
+        """
+        if self._channel.burst_info is None:
+            return [0] * len(azimuth_px_indexes)
+
+        bursts_lines = np.repeat(self._channel.burst_info.lines_per_burst, self._channel.burst_info.num)
+        burst_boundaries = np.array([0] + [sum(bursts_lines[: t + 1]) for t, _ in enumerate(bursts_lines)])
+
+        bursts = []
+        for coord in azimuth_px_indexes:
+            if coord > burst_boundaries[-1]:
+                raise CoordinatesOutOfBounds(f"{coord} pixel exceeds swath's bounds")
+
+            px_diff = coord - burst_boundaries
+            px_mask = np.ma.masked_less(px_diff, 0)
+
+            bursts.append(px_mask.argmin())
+
+        return bursts
+
+    def ground_points_to_burst_association(self, coordinates: ArrayLike) -> list[list[int] | None]:
+        """Determining the burst (or bursts) where the input coordinates lie. If no association can be found (i.e. the
+        point is not visible in the scene), None is returned.
+
+        Parameters
+        ----------
+        coordinates : ArrayLike
+            array of coordinates, in the form (N, 3)
+
+        Returns
+        -------
+        list[list[int] | None]
+            list containing the burst association for each input point, None if no association was found
+        """
+
+        coordinates = np.atleast_2d(coordinates)
+
+        t_azmth, t_rng = [], []
+        for coord in coordinates:
+            try:
+                t_azmth_i, t_rng_i = inverse_geocoding_monostatic_core(
+                    trajectory=self.trajectory,
+                    ground_points=coord,
+                    wavelength=1,
+                    frequencies_doppler_centroid=0,
+                    initial_guesses=self.mid_azimuth_time,
+                )
+                t_azmth.append(t_azmth_i)
+                t_rng.append(t_rng_i)
+            except Exception:
+                t_azmth.append(np.nan)
+                t_rng.append(np.nan)
+
+        t_azmth = np.asarray(t_azmth)
+        t_rng = np.asarray(t_rng)
+
+        az_check = [
+            (
+                [(t < az[1] and t > az[0]) for az in self._burst_az_boundaries]
+                if isinstance(t, PreciseDateTime)
+                else [False]
+            )
+            for t in t_azmth
+        ]
+        rng_check = [
+            [(t < rng[1] and t > rng[0]) for rng in self._burst_rng_boundaries] if ~np.isnan(t) else [False]
+            for t in t_rng
+        ]
+        check = [np.logical_and(az_check[c], rng_check[c]) for c in range(len(az_check))]
+
+        bursts = [list(np.where(c)[0]) if c.any() else None for c in check]
+
+        return bursts
+
+    def read_data(
+        self,
+        azimuth_index: float,
+        range_index: float,
+        cropping_size: tuple[int, int] = (150, 150),
+        output_radiometric_quantity: SARRadiometricQuantity = SARRadiometricQuantity.BETA_NOUGHT,
+        burst: int | None = None,
+    ) -> np.ndarray:
+        """Extracting the swath portion centered to the provided target position and of size cropping_size by
+        cropping_size. Target position is provided via its azimuth and range indexes in the swath array.
+
+        Parameters
+        ----------
+        azimuth_index : float
+            index of azimuth time in swath array
+        range_index : float
+            index of range time in swath array
+        cropping_size : tuple[int, int], optional
+            size in pixel of the swath portion to be read (number of samples, number of lines), by default (150, 150)
+        output_radiometric_quantity : SARRadiometricQuantity, optional
+            selected output radiometric quantity to convert the read data to, if needed,
+            by default SARRadiometricQuantity.BETA_NOUGHT
+        burst : int, optional
+            if burst is provided, the roi extraction gives error if the boundaries exceed the burst boundaries,
+            by default None
+
+        Returns
+        -------
+        np.ndarray
+            cropped swath array centered to the input target coordinates, output array is (samples, lines)
+            by default the output radiometric quantity is BETA_NOUGHT, unless specified otherwise
+
+        Raises
+        ------
+        AzimuthExceedsBoundariesError
+            azimuth index exceeds swath boundaries
+        RangeExceedsBoundariesError
+            range index exceeds swath boundaries
+        """
+
+        # creating the target block identifier for partial swath reading
+        # [start line, start sample, number of lines, number of samples]
+        target_block = [
+            azimuth_index - np.floor(cropping_size[1] / 2).astype(int),
+            range_index - np.floor(cropping_size[0] / 2).astype(int),
+            cropping_size[1],
+            cropping_size[0],
+        ]
+
+        # full raster boundaries and burst boundaries, if applicable
+        raster_boundaries = [
+            0,
+            0,
+            self._channel.raster_info.lines.length,
+            self._channel.raster_info.samples.length,
+        ]
+        burst_boundaries = None
+        # if burst is provided, it means that the ROI to be read must be inside of this burst, otherwise the extracted
+        # data are not meaningful with respect to times, acquisition consistency and IRF
+        if burst is not None:
+            burst_boundaries = [
+                sum(self.lines_per_burst[:burst]),
+                0,
+                self.lines_per_burst[burst],
+                self._channel.raster_info.samples.length,
+            ]
+
+        # validating target block extraction with respect to raster boundaries and burst boundaries
+        custom_roi_validation(
+            roi=target_block,
+            raster_boundaries=(
+                [0, 0, sum(self.lines_per_burst), self._channel.raster_info.samples.length]
+                if self.lines_per_burst.size > 1
+                else raster_boundaries
+            ),
+            burst_boundaries=burst_boundaries,
+            check_raster_only=True if self.lines_per_burst.size > 1 else False,
+        )
+
+        # reading data portion and switching to convention (samples, lines) with transpose
+        data = read_channel_data(
+            raster_file=self._raster_file,
+            block_to_read=target_block,
+            burst_info=self._channel.burst_info,
+            scaling_conversion=self._corrected_calibration_constant,
+        ).T
+
+        # converting to beta nought if radiometric quantity is different
+        if self._radiometric_quantity != output_radiometric_quantity:
+            azimuth_time, _ = self.pixel_to_times_conversion(azimuth_index=azimuth_index, range_index=range_index)
+            incidence_angles_rad = compute_incidence_angles_from_trajectory(
+                trajectory=self.trajectory,
+                azimuth_time=azimuth_time,
+                range_times=self._slant_range_axis[target_block[1] : target_block[1] + target_block[3]],
+                look_direction=self.looking_side.value,
+            )
+            data = radiometric_correction(
+                data=data,
+                incidence_angle=incidence_angles_rad,
+                input_quantity=self._radiometric_quantity,
+                output_quantity=output_radiometric_quantity,
+            )
+
+        return data
+
+
+def custom_roi_validation(
+    roi: list[int, int, int, int],
+    raster_boundaries: list[int, int, int, int],
+    check_raster_only: bool = False,
+    burst_boundaries: list[int, int, int, int] | None = None,
+) -> None:
+    """Validating the region of interest to be read from raster.
+
+    Parameters
+    ----------
+    roi : list[int, int, int, int]
+        [reading start line, reading start sample, number of lines to be read, number of samples to be read]
+    raster_boundaries : list[int, int, int, int]
+        [0, 0, raster number of lines, raster number of samples]
+    check_raster_only: bool
+        if True check only raster, by default False
+    burst_boundaries : list[int, int, int, int] | None, optional
+        [current burst starting line, current burst starting sample, lines of current burst, samples of current burst],
+        if None no validation against burst boundaries is performed, by default None
+
+    Raises
+    ------
+    AzimuthExceedsBoundariesError
+        if roi boundaries exceed raster or burst azimuth boundaries
+    RangeExceedsBoundariesError
+        ir roi boundaries exceed raster or burst range boundaries
+    """
+
+    if roi[0] >= raster_boundaries[2] or roi[0] < 0:
+        # starting azimuth line to be read is out of azimuth swath boundaries
+        raise AzimuthExceedsBoundariesError(f"First ROI line {roi[0]} exceeds azimuth swath boundaries")
+    if roi[0] + roi[2] > raster_boundaries[2]:
+        # last azimuth line to be read is out of azimuth swath boundaries
+        raise AzimuthExceedsBoundariesError(f"Last ROI line {roi[0] + roi[2]} exceeds azimuth swath boundaries")
+    if roi[1] >= raster_boundaries[3] or roi[1] < 0:
+        # starting range sample to be read is out of range swath boundaries
+        raise RangeExceedsBoundariesError(f"First ROI sample {roi[1]} exceeds range swath boundaries")
+    if roi[1] + roi[3] > raster_boundaries[3]:
+        # last range sample to be read is out of range swath boundaries
+        raise RangeExceedsBoundariesError(f"Last ROI sample {roi[1] + roi[3]} exceeds range swath boundaries")
+
+    # checking for burst boundaries
+    if burst_boundaries is not None and not check_raster_only:
+        if roi[0] < burst_boundaries[0] or roi[0] >= burst_boundaries[0] + burst_boundaries[2]:
+            # starting azimuth line to be read is out of azimuth burst boundaries
+            raise AzimuthExceedsBoundariesError(f"First ROI line {roi[0]} exceeds azimuth burst boundaries")
+        if roi[0] + roi[2] > burst_boundaries[0] + burst_boundaries[2]:
+            # last azimuth line to be read is out of azimuth burst boundaries
+            raise AzimuthExceedsBoundariesError(f"Last ROI line {roi[0] + roi[2]} exceeds azimuth burst boundaries")

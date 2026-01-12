@@ -1,0 +1,33 @@
+{
+    "terrasar-x": {
+        "slc-stripmap-pta": {
+            "analysis": "pta",
+            "product": "C:/Aresys_data/sct_data/terrasarx/TDX1_SAR__SSC______SM_S_SRA_20250912T083006_20250912T083014",
+            "config": "C:/Aresys_data/configurations/test_906f38dc_config.toml",
+            "targets": "C:/Aresys_data/sct_data/terrasarx/surat_basin_corner_reflectors_data.csv",
+            "reference_output": ""
+        },
+        "slc-spotlight-pta": {
+            "analysis": "pta",
+            "product": "C:/Aresys_data/sct_data/terrasarx/TDX1_SAR__SSC______SL_S_SRA_20250821T083011_20250821T083013",
+            "config": "C:/Aresys_data/configurations/test_906f38dc_config.toml",
+            "targets": "C:/Aresys_data/sct_data/terrasarx/surat_basin_corner_reflectors_data.csv",
+            "reference_output": ""
+        },
+        "gen1-rain-forest-slc": {
+            "analysis": "rf",
+            "product": "C:/Aresys_data/sct_data/terrasarx/TSX1_SAR__SSC______SM_S_SRA_20240516T224859_20240516T224907",
+            "config": "",
+            "targets": "",
+            "reference_output": [
+                "C:/chopper/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S01_VV.nc",
+                "C:/chopper/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S02_VV.nc",
+                "C:/chopper/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S03_VV.nc",
+                "C:/chopper/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S04_VV.nc",
+                "C:/chopper/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S05_VV.nc",
+                "C:/chopper/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S06_VV.nc",
+                "C:/chopper/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/kpi_stats.csv"
+            ]
+        }
+    }
+}
