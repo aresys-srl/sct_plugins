@@ -385,6 +385,6 @@ def compute_corrections(product: SCTInputProduct, data: pd.DataFrame) -> pd.Data
     azimuth_corrections_df = compute_azimuth_corrections(product, data_.copy())
 
     data_out = data_.merge(range_corrections_df, on="id").merge(azimuth_corrections_df, on="id")
-    data_out.drop(columns="id", axis=1, inplace=True)
+    data_out.drop(columns="id", inplace=True)
 
     return data_out

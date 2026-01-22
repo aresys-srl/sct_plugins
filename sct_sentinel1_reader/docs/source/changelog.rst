@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v1.1.4
+------
+
+**Bug Fixing**
+
+- Fixing bug in ``compute_corrections`` when dropping index `id` column in Pandas dataframe due to interface change in pandas>3.0.0
+
 v1.1.3
 ------
 
