@@ -26,7 +26,7 @@ class PluginProtocolComplianceTest(unittest.TestCase):
     """Test Plugin Protocol Compliance"""
 
     def setUp(self):
-        self.plugin = import_input_product_plugins([])
+        self.plugin = import_input_product_plugins(additional_plugins=[])
 
     def test_installed_plugin(self) -> None:
         """Testing correct plugin installation"""
