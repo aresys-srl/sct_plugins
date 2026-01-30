@@ -229,7 +229,7 @@ class ProductFolderManagerExtended(ProductFolderManager):
         max_lat, max_lon = footprint.max(axis=0)
         boundaries = [min_lat, max_lat, min_lon, max_lon]
         region_corners = list(product(boundaries[:2], boundaries[2:]))
-        return Polygon(region_corners)
+        return Polygon(region_corners).convex_hull
 
     @property
     def footprint(self) -> Polygon | None:

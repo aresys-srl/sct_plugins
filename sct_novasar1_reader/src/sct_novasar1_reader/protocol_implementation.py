@@ -77,7 +77,7 @@ class NovaSAR1ProductManager:
         self._product = open_product(path)
         self._metadata = read_product_metadata(self._product.metadata_file)
         region_corners = list(product(self._product.footprint[:2], self._product.footprint[2:]))
-        self._footprint = Polygon(region_corners)
+        self._footprint = Polygon(region_corners).convex_hull
 
     @property
     def path(self) -> Path:

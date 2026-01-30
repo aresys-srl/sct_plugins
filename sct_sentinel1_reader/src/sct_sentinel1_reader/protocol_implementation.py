@@ -86,7 +86,7 @@ class Sentinel1ProductManager:
         self._product = open_product(path)
         self._external_orbit_path = Path(external_orbit_path) if external_orbit_path is not None else None
         region_corners = list(product(self._product.footprint[:2], self._product.footprint[2:]))
-        self._footprint = Polygon(region_corners)
+        self._footprint = Polygon(region_corners).convex_hull
 
     @property
     def path(self) -> Path:

@@ -76,7 +76,7 @@ class ASARProductManager:
         self._name = self._path.name
         self._product = open_product(path)
         region_corners = list(product(self._product.footprint[:2], self._product.footprint[2:]))
-        self._footprint = Polygon(region_corners)
+        self._footprint = Polygon(region_corners).convex_hull
 
     @property
     def path(self) -> Path:

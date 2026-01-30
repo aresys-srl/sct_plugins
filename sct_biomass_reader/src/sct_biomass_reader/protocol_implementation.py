@@ -162,7 +162,7 @@ class BiomassL1ProductManager:
         max_lat, max_lon = footprint.max(axis=0)
         boundaries = [min_lat, max_lat, min_lon, max_lon]
         region_corners = list(itertools.product(boundaries[:2], boundaries[2:]))
-        return Polygon(region_corners)
+        return Polygon(region_corners).convex_hull
 
 
 def _sampling_frequencies_from_metadata(sampling_constants: SamplingConstants) -> SARSamplingFrequencies:

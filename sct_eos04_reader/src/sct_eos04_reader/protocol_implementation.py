@@ -79,7 +79,7 @@ class EOS04ProductManager:
             xml_path=self._product.metadata_file, channels=self._product.channels_list
         )
         region_corners = list(product(self._product.footprint[:2], self._product.footprint[2:]))
-        self._footprint = Polygon(region_corners)
+        self._footprint = Polygon(region_corners).convex_hull
 
     @property
     def path(self) -> Path:

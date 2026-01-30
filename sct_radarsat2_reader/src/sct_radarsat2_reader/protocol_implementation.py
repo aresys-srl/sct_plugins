@@ -79,7 +79,7 @@ class RADARSAT2ProductManager:
         self._name = self._path.name
         self._product = open_product(path)
         region_corners = list(product(self._product.footprint[:2], self._product.footprint[2:]))
-        self._footprint = Polygon(region_corners)
+        self._footprint = Polygon(region_corners).convex_hull
         self._metadata = read_product_metadata(
             xml_path=self._product.metadata_file, beta_calibration_xml=self._product.beta_calibration_lut_file
         )
