@@ -12,7 +12,7 @@ dependencies = [
     "eo_products",
     "scipy",
     "shapely>=2.1.0",
-    "sct>=2",
+    "sct>=2.0.6",
 ]
 dynamic = ["version"]
 classifiers = [

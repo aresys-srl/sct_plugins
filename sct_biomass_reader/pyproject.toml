@@ -10,7 +10,7 @@ dependencies = [
     "arepytools >= 1.7.6",
     "perseo-quality",
     "bps-transcoder >= 4.0.0",
-    "sct>=2",
+    "sct>=2.0.6",
 ]
 dynamic = ["version"]
 classifiers = [
