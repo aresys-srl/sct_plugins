@@ -13,13 +13,8 @@
             "config": "",
             "targets": "",
             "reference_output": [
-                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S01_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S02_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S03_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S04_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S05_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles_S06_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/kpi_stats.csv"
+                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/kpi_stats.csv",
+                "/data/integration_tests/sct/reference_results/cosmo/gen1-rain-forest-slc/RAIN_FOREST_profiles.nc"
             ]
         },
         "gen2-sim-pta-slc": {
@@ -35,13 +30,8 @@
             "config": "",
             "targets": "",
             "reference_output": [
-                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/RAIN_FOREST_profiles_S01_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/RAIN_FOREST_profiles_S02_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/RAIN_FOREST_profiles_S03_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/RAIN_FOREST_profiles_S04_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/RAIN_FOREST_profiles_S05_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/RAIN_FOREST_profiles_S06_VV.nc",
-                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/kpi_stats.csv"
+                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/kpi_stats.csv",
+                "/data/integration_tests/sct/reference_results/cosmo/gen2-rain-forest-slc/RAIN_FOREST_profiles.nc"
             ]
         }
     }

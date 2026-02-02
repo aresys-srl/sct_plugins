@@ -20,8 +20,8 @@
             "config": "",
             "targets": "",
             "reference_output": [
-                "/data/integration_tests/sct/reference_results/terrasarx/slc-stripmap-rain-forest/RAIN_FOREST_profiles_s_HH.nc",
-                "/data/integration_tests/sct/reference_results/terrasarx/slc-stripmap-rain-forest/kpi_stats.csv"
+                "/data/integration_tests/sct/reference_results/terrasarx/slc-stripmap-rain-forest/kpi_stats.csv",
+                "/data/integration_tests/sct/reference_results/terrasarx/slc-stripmap-rain-forest/RAIN_FOREST_profiles.nc"
             ]
         }
     }

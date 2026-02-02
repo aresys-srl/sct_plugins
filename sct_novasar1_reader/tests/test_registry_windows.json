@@ -27,8 +27,8 @@
             "config": "",
             "targets": "",
             "reference_output": [
-                "C:/chopper/integration_tests/sct/reference_results/novasar1/scd-rain-forest/RAIN_FOREST_profiles_S_VV.nc",
-                "C:/chopper/integration_tests/sct/reference_results/novasar1/scd-rain-forest/kpi_stats.csv"
+                "C:/chopper/integration_tests/sct/reference_results/novasar1/scd-rain-forest/kpi_stats.csv",
+                "C:/chopper/integration_tests/sct/reference_results/novasar1/scd-rain-forest/RAIN_FOREST_profiles.nc"
             ]
         },
         "grd-nesz": {
@@ -37,8 +37,8 @@
             "config": "",
             "targets": "",
             "reference_output": [
-                "C:/chopper/integration_tests/sct/reference_results/novasar1/grd-nesz/NESZ_profiles_S1_HH.nc",
-                "C:/chopper/integration_tests/sct/reference_results/novasar1/grd-nesz/kpi_stats.csv"
+                "C:/chopper/integration_tests/sct/reference_results/novasar1/grd-nesz/kpi_stats.csv",
+                "C:/chopper/integration_tests/sct/reference_results/novasar1/grd-nesz/NESZ_profiles.nc"
             ]
         }
     }
