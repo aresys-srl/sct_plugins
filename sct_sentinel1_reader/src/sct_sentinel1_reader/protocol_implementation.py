@@ -199,7 +199,7 @@ class Sentinel1ChannelManager:
         self._rng_time_half_swath = rng_time_half_swath
 
         # lines per burst array
-        if self._channel.burst_info.num > 0:
+        if self._channel.burst_info.num > 1:
             self._lines_per_burst_array = np.repeat(
                 self._channel.burst_info.lines_per_burst, self._channel.burst_info.num
             )
@@ -301,7 +301,7 @@ class Sentinel1ChannelManager:
             np.arange(0, self._channel.raster_info.lines.length, 1) * self._channel.raster_info.lines.step
             + self._channel.raster_info.lines.start
         )
-        if self._channel.burst_info.num > 0:
+        if self._channel.burst_info.num > 1:
             az_axis = []
             for brst in range(self._channel.burst_info.num):
                 az_axis.append(
@@ -321,7 +321,7 @@ class Sentinel1ChannelManager:
             range raster boundaries (range start, range stop)
         """
 
-        if self._channel.burst_info.num > 0:
+        if self._channel.burst_info.num > 1:
             az_times = self._channel.burst_info.azimuth_start_times
             rng_times = np.repeat(self._channel.raster_info.samples.start, az_times.size)
             burst_az_boundaries = []
@@ -507,7 +507,7 @@ class Sentinel1ChannelManager:
         """
         az_mid_burst = self.mid_azimuth_time
         rng_mid_burst = self.mid_range_time
-        if self._channel.burst_info.num > 0:
+        if self._channel.burst_info.num > 1:
             az_time_boundaries, rng_time_boundaries = self._get_raster_layout()
             az_mid_burst = (az_time_boundaries[burst][1] - az_time_boundaries[burst][0]) / 2 + az_time_boundaries[
                 burst
@@ -533,7 +533,7 @@ class Sentinel1ChannelManager:
         float
             azimuth steering rate
         """
-        if self._channel.burst_info.num > 0 and burst is not None:
+        if self._channel.burst_info.num > 1 and burst is not None:
             time_rel = azimuth_time - self._channel.burst_info.azimuth_start_times[burst]
         else:
             time_rel = azimuth_time - self._channel.raster_info.lines.start
@@ -657,7 +657,7 @@ class Sentinel1ChannelManager:
         """
 
         start_time_rng = self._channel.raster_info.samples.start
-        if self._channel.burst_info.num > 0 and burst is not None:
+        if self._channel.burst_info.num > 1 and burst is not None:
             start_time_az = self._channel.burst_info.azimuth_start_times[burst]
             az_time = (
                 azimuth_index - self._channel.burst_info.lines_per_burst * burst
@@ -708,7 +708,7 @@ class Sentinel1ChannelManager:
             )
 
         rng_idx = (rng_value - self._channel.raster_info.samples.start) / self._channel.raster_info.samples.step
-        if self._channel.burst_info.num > 0:
+        if self._channel.burst_info.num > 1:
             if burst is None:
                 burst = self.times_to_burst_association([azimuth_time])[0]
             azmth_idx = (

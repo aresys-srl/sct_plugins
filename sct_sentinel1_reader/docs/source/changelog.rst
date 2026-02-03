@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v1.1.5
+------
+
+**Bug Fixing**
+
+- Adapting to changes in EO Products >= 1.0.5
+
 v1.1.4
 ------
 

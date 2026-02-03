@@ -7,9 +7,9 @@ readme = "README.md"
 license = { file = "LICENSE.txt" }
 dependencies = [
     "numpy",
-    "arepytools >= 1.7.6",
+    "arepytools>=1.7.6",
     "perseo-quality",
-    "eo-products",
+    "eo-products>=1.0.5",
     "scipy",
     "pyproj",
     "pandas",
