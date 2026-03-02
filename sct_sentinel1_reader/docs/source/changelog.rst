@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v1.1.6
+------
+
+**Incompatible Changes**
+
+- Dropping support for Python < 3.11
+- Updating SCT import to match latest changes in SCT >= 2.1.0
+
 v1.1.5
 ------
 

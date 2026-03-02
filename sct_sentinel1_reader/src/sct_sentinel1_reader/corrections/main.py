@@ -12,7 +12,7 @@ from copy import deepcopy
 from pathlib import Path
 
 import pandas as pd
-from sct.configuration.point_target_analysis_configuration import SCTPointTargetAnalysisCorrectionsConf
+from sct.analyses.point_target.config import SCTPointTargetAnalysisCorrectionsConf
 from sct.io.extended_protocols import ALECorrectionFunctionType
 
 from sct_sentinel1_reader.corrections import ALE_CORRECTIONS_FIELDS

@@ -1,7 +1,7 @@
 {
     "sentinel1A": {
         "slc-etad-pta": {
-            "analysis": "pta",
+            "analysis": "point_target",
             "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/sentinel1/SLC_23.SAFE",
             "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_c6359f5a_config.toml",
             "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/sentinel1/surat_basin_data.csv",
@@ -9,7 +9,7 @@
             "reference_output": "C:/chopper/integration_tests/sct/reference_results/sentinel1A/slc-etad-pta/pta_res.csv"
         },
         "slc-perturb-pta": {
-            "analysis": "pta",
+            "analysis": "point_target",
             "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/sentinel1/SLC_19.SAFE",
             "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_ed18cc99_config.toml",
             "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/sentinel1/surat_basin_data.csv",
@@ -18,7 +18,7 @@
             "reference_output": "C:/chopper/integration_tests/sct/reference_results/sentinel1A/slc-perturb-pta/pta_res.csv"
         },
         "slc-perturb-eof-pta": {
-            "analysis": "pta",
+            "analysis": "point_target",
             "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/sentinel1/SLC_19.SAFE",
             "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_ed18cc99_config.toml",
             "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/sentinel1/surat_basin_data.csv",
@@ -28,7 +28,7 @@
             "reference_output": "C:/chopper/integration_tests/sct/reference_results/sentinel1A/slc-perturb-eof-pta/pta_res.csv"
         },
         "grd-perturb-pta": {
-            "analysis": "pta",
+            "analysis": "point_target",
             "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/sentinel1/GRD_19.SAFE",
             "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_ed18cc99_config.toml",
             "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/sentinel1/surat_basin_data.csv",

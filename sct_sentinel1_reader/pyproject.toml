@@ -2,7 +2,7 @@
 name = "sct_sentinel1_reader"
 description = "SCT (SAR Calibration Toolbox) plugin for reading Sentinel-1 Level 1 product format."
 authors = [{ name = "Aresys S.R.L.", email = "info@aresys.it" }]
-requires-python = ">= 3.10"
+requires-python = ">= 3.11"
 readme = "README.md"
 license = { file = "LICENSE.txt" }
 dependencies = [
@@ -15,7 +15,7 @@ dependencies = [
     "pandas",
     "s1etad",
     "shapely>=2.1.0",
-    "sct>=2.0.6",
+    "sct>=2.1.0",
 ]
 dynamic = ["version"]
 classifiers = [
@@ -28,7 +28,6 @@ classifiers = [
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -53,7 +52,7 @@ allow-direct-references = true
 
 [project.optional-dependencies]
 dev = ["nox", "ruff", "pylint"]
-test = ["unittest-xml-reporting", "coverage", "sct[cli,graphs]"]
+test = ["unittest-xml-reporting", "coverage", "sct[cli,graphs]>=2.1.0"]
 doc = [
     "ipython",
     "nbsphinx",
