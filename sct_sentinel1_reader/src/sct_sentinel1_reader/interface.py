@@ -9,24 +9,33 @@ Sentinel-1 format PERSEO-Quality protocol-compliant wrapper
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
-from eo_products.sentinel1.utilities import is_s1_safe_product
+from sct_sentinel1_reader import __version__
 
-from sct_sentinel1_reader.corrections.main import S1ALECorrector
-from sct_sentinel1_reader.protocol_implementation import Sentinel1ProductManager
-
-
-def get_manager() -> type[Sentinel1ProductManager]:
-    """Retrieve manager"""
-    return Sentinel1ProductManager
+if TYPE_CHECKING:
+    from sct.io.extended_protocols import ALECorrectionFunctionType, SCTInputProduct
 
 
-def get_detector() -> Callable[[str | Path], bool]:
-    """Retrieve detector"""
-    return is_s1_safe_product
+class Sentinel1InputProductPlugin:
+    """Plugin for Sentinel-1 product format"""
 
+    version = __version__
 
-def get_ale_corrector() -> type[S1ALECorrector]:
-    """Retrieve ALE corrector class"""
-    return S1ALECorrector
+    @classmethod
+    def get_manager(cls) -> type[SCTInputProduct]:
+        from sct_sentinel1_reader.protocol_implementation import Sentinel1ProductManager
+
+        return Sentinel1ProductManager
+
+    @classmethod
+    def get_detector(cls) -> Callable[[str | Path], bool]:
+        from eo_products.sentinel1.utilities import is_s1_safe_product
+
+        return is_s1_safe_product
+
+    @classmethod
+    def get_ale_corrector(cls) -> ALECorrectionFunctionType:
+        from sct_sentinel1_reader.corrections.main import S1ALECorrector
+
+        return S1ALECorrector

@@ -4,7 +4,7 @@ Installation
 Requirements
 ------------
 
-SCT Sentinel-1 Reader plugin requires a Python version **equal or higher than 3.10**.
+SCT Sentinel-1 Reader plugin requires a Python version **equal or higher than 3.11**.
 
 
 Install with pip

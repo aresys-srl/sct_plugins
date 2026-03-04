@@ -15,7 +15,7 @@ dependencies = [
     "pandas",
     "s1etad",
     "shapely>=2.1.0",
-    "sct>=2.1.0",
+    "sct>=2.1.1",
 ]
 dynamic = ["version"]
 classifiers = [
@@ -37,6 +37,9 @@ classifiers = [
     "Typing :: Typed",
 ]
 
+[project.entry-points."sct.input_products"]
+sentinel1 = "sct_sentinel1_reader.interface:Sentinel1InputProductPlugin"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -52,7 +55,7 @@ allow-direct-references = true
 
 [project.optional-dependencies]
 dev = ["nox", "ruff", "pylint"]
-test = ["unittest-xml-reporting", "coverage", "sct[cli,graphs]>=2.1.0"]
+test = ["unittest-xml-reporting", "coverage", "sct[graphs]>=2.1.1"]
 doc = [
     "ipython",
     "nbsphinx",

@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v1.1.7
+------
+
+**Incompatible Changes**
+
+- Changing plugin structure to be compliant with the new SCT plugins discovery and loading using **Stevedore**
+
 v1.1.6
 ------
 

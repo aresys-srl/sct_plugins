@@ -5,7 +5,7 @@
 groups = ["default", "dev", "doc", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:72b49f7f76e35482f1770118cd17a104fd23f9cca85a54632edb8362075ee8dd"
+content_hash = "sha256:a71b39d470e2b7e97df1ce813ac9f4d31ec316f7bf5d86f0392bbd60e0534aa8"
 
 [[metadata.targets]]
 requires_python = ">=3.11"
@@ -33,6 +33,17 @@ groups = ["doc"]
 files = [
     {file = "alabaster-1.0.0-py3-none-any.whl", hash = "sha256:fc6786402dc3fcb2de3cabd5fe455a2db534b371124f1f21de8731783dec828b"},
     {file = "alabaster-1.0.0.tar.gz", hash = "sha256:c00dca57bca26fa62a6d7d0a9fcce65f3e026e9bfe33e9c538fd3fbb2144fd9e"},
+]
+
+[[package]]
+name = "annotated-doc"
+version = "0.0.4"
+requires_python = ">=3.8"
+summary = "Document parameters, class attributes, return types, and variables inline, with Annotated."
+groups = ["default", "test"]
+files = [
+    {file = "annotated_doc-0.0.4-py3-none-any.whl", hash = "sha256:571ac1dc6991c450b25a9c2d84a3705e2ae7a53467b5d111c24fa8baabbed320"},
+    {file = "annotated_doc-0.0.4.tar.gz", hash = "sha256:fbcda96e87e9c92ad167c2e53839e57503ecfda18804ea28102353485033faa4"},
 ]
 
 [[package]]
@@ -1389,6 +1400,20 @@ files = [
 ]
 
 [[package]]
+name = "markdown-it-py"
+version = "4.0.0"
+requires_python = ">=3.10"
+summary = "Python port of markdown-it. Markdown parsing, done right!"
+groups = ["default", "test"]
+dependencies = [
+    "mdurl~=0.1",
+]
+files = [
+    {file = "markdown_it_py-4.0.0-py3-none-any.whl", hash = "sha256:87327c59b172c5011896038353a81343b6754500a08cd7a4973bb48c6d578147"},
+    {file = "markdown_it_py-4.0.0.tar.gz", hash = "sha256:cb0a2b4aa34f932c007117b194e945bd74e0ec24133ceb5bac59009cda1cb9f3"},
+]
+
+[[package]]
 name = "markupsafe"
 version = "3.0.3"
 requires_python = ">=3.9"
@@ -1573,6 +1598,17 @@ groups = ["dev"]
 files = [
     {file = "mccabe-0.7.0-py2.py3-none-any.whl", hash = "sha256:6c2d30ab6be0e4a46919781807b4f0d834ebdd6c6e3dca0bda5a15f863427b6e"},
     {file = "mccabe-0.7.0.tar.gz", hash = "sha256:348e0240c33b60bbdf4e523192ef919f28cb2c3d7d5c7794f74009290f236325"},
+]
+
+[[package]]
+name = "mdurl"
+version = "0.1.2"
+requires_python = ">=3.7"
+summary = "Markdown URL utilities"
+groups = ["default", "test"]
+files = [
+    {file = "mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8"},
+    {file = "mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba"},
 ]
 
 [[package]]
@@ -2379,7 +2415,7 @@ name = "pygments"
 version = "2.19.2"
 requires_python = ">=3.8"
 summary = "Pygments is a syntax highlighting package written in Python."
-groups = ["doc"]
+groups = ["default", "doc", "test"]
 files = [
     {file = "pygments-2.19.2-py3-none-any.whl", hash = "sha256:86540386c03d588bb81d44bc3928634ff26449851e99741617ecb9037ee5ec0b"},
     {file = "pygments-2.19.2.tar.gz", hash = "sha256:636cb2477cec7f8952536970bc533bc43743542f70392ae026374600add5b887"},
@@ -2622,6 +2658,21 @@ dependencies = [
 files = [
     {file = "requests-2.32.5-py3-none-any.whl", hash = "sha256:2462f94637a34fd532264295e186976db0f5d453d1cdd31473c85a6a161affb6"},
     {file = "requests-2.32.5.tar.gz", hash = "sha256:dbba0bac56e100853db0ea71b82b4dfd5fe2bf6d3754a8893c3af500cec7d7cf"},
+]
+
+[[package]]
+name = "rich"
+version = "14.3.3"
+requires_python = ">=3.8.0"
+summary = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
+groups = ["default", "test"]
+dependencies = [
+    "markdown-it-py>=2.2.0",
+    "pygments<3.0.0,>=2.13.0",
+]
+files = [
+    {file = "rich-14.3.3-py3-none-any.whl", hash = "sha256:793431c1f8619afa7d3b52b2cdec859562b950ea0d4b6b505397612db8d5362d"},
+    {file = "rich-14.3.3.tar.gz", hash = "sha256:b8daa0b9e4eef54dd8cf7c86c03713f53241884e814f4e2f5fb342fe520f639b"},
 ]
 
 [[package]]
@@ -2875,15 +2926,13 @@ files = [
 
 [[package]]
 name = "sct"
-version = "2.0.9"
+version = "2.1.1"
 requires_python = ">=3.11"
-path = "C:/ARESYS_PROJ/sct/dist/sct-2.0.9-py3-none-any.whl"
 summary = "SCT (SAR Calibration Toolbox) is the Aresys Python module for SAR products quality analysis."
 groups = ["default", "test"]
 dependencies = [
     "arepytools>=1.7.2",
     "art",
-    "click",
     "jsonschema",
     "numba>=0.61",
     "numpy",
@@ -2892,15 +2941,18 @@ dependencies = [
     "perseo-quality>=1.0.9",
     "scipy",
     "shapely",
+    "stevedore>=5.7.0",
     "toml",
+    "typer>=0.24.1",
 ]
 files = [
-    {file = "sct-2.0.9-py3-none-any.whl", hash = "sha256:888518d6ff385f8cccd9a66cf4aa85460453022909b53ec803942d2304dc580c"},
+    {file = "sct-2.1.1-py3-none-any.whl", hash = "sha256:6d1766b4a6810c00539b667e6573a282604b4261a3d45a49f76b09c8f298e78c"},
+    {file = "sct-2.1.1.tar.gz", hash = "sha256:933d39b550e0170f20a9e05873475d44d1bb552fc61cf206385c2cce28645a94"},
 ]
 
 [[package]]
 name = "sct"
-version = "2.0.9"
+version = "2.1.1"
 extras = ["cli", "graphs"]
 requires_python = ">=3.11"
 summary = "SCT (SAR Calibration Toolbox) is the Aresys Python module for SAR products quality analysis."
@@ -2908,7 +2960,11 @@ groups = ["test"]
 dependencies = [
     "matplotlib>=3.5",
     "perseo-quality[graphs]",
-    "sct==2.0.9",
+    "sct==2.1.1",
+]
+files = [
+    {file = "sct-2.1.1-py3-none-any.whl", hash = "sha256:6d1766b4a6810c00539b667e6573a282604b4261a3d45a49f76b09c8f298e78c"},
+    {file = "sct-2.1.1.tar.gz", hash = "sha256:933d39b550e0170f20a9e05873475d44d1bb552fc61cf206385c2cce28645a94"},
 ]
 
 [[package]]
@@ -2978,6 +3034,17 @@ files = [
     {file = "shapely-2.1.2-cp314-cp314t-win32.whl", hash = "sha256:b54df60f1fbdecc8ebc2c5b11870461a6417b3d617f555e5033f1505d36e5735"},
     {file = "shapely-2.1.2-cp314-cp314t-win_amd64.whl", hash = "sha256:0036ac886e0923417932c2e6369b6c52e38e0ff5d9120b90eef5cd9a5fc5cae9"},
     {file = "shapely-2.1.2.tar.gz", hash = "sha256:2ed4ecb28320a433db18a5bf029986aa8afcfd740745e78847e330d5d94922a9"},
+]
+
+[[package]]
+name = "shellingham"
+version = "1.5.4"
+requires_python = ">=3.7"
+summary = "Tool to Detect Surrounding Shell"
+groups = ["default", "test"]
+files = [
+    {file = "shellingham-1.5.4-py2.py3-none-any.whl", hash = "sha256:7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686"},
+    {file = "shellingham-1.5.4.tar.gz", hash = "sha256:8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de"},
 ]
 
 [[package]]
@@ -3153,6 +3220,17 @@ files = [
 ]
 
 [[package]]
+name = "stevedore"
+version = "5.7.0"
+requires_python = ">=3.10"
+summary = "Manage dynamic plugins for Python applications"
+groups = ["default", "test"]
+files = [
+    {file = "stevedore-5.7.0-py3-none-any.whl", hash = "sha256:fd25efbb32f1abb4c9e502f385f0018632baac11f9ee5d1b70f88cc5e22ad4ed"},
+    {file = "stevedore-5.7.0.tar.gz", hash = "sha256:31dd6fe6b3cbe921e21dcefabc9a5f1cf848cf538a1f27543721b8ca09948aa3"},
+]
+
+[[package]]
 name = "tifffile"
 version = "2025.5.10"
 requires_python = ">=3.10"
@@ -3232,6 +3310,23 @@ groups = ["doc"]
 files = [
     {file = "traitlets-5.14.3-py3-none-any.whl", hash = "sha256:b74e89e397b1ed28cc831db7aea759ba6640cb3de13090ca145426688ff1ac4f"},
     {file = "traitlets-5.14.3.tar.gz", hash = "sha256:9ed0579d3502c94b4b3732ac120375cda96f923114522847de4b3bb98b96b6b7"},
+]
+
+[[package]]
+name = "typer"
+version = "0.24.1"
+requires_python = ">=3.10"
+summary = "Typer, build great CLIs. Easy to code. Based on Python type hints."
+groups = ["default", "test"]
+dependencies = [
+    "annotated-doc>=0.0.2",
+    "click>=8.2.1",
+    "rich>=12.3.0",
+    "shellingham>=1.3.0",
+]
+files = [
+    {file = "typer-0.24.1-py3-none-any.whl", hash = "sha256:112c1f0ce578bfb4cab9ffdabc68f031416ebcc216536611ba21f04e9aa84c9e"},
+    {file = "typer-0.24.1.tar.gz", hash = "sha256:e39b4732d65fbdcde189ae76cf7cd48aeae72919dea1fdfc16593be016256b45"},
 ]
 
 [[package]]

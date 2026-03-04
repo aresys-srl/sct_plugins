@@ -99,7 +99,7 @@ integration_test_linux:
     - python${PYTHON} -m venv ./ci_test
     - source ./ci_test/bin/activate
     - python -m pip install .[test]
-    - sct-testing -r ./tests/test_registry_linux.json -out ./test_output
+    - sct testing test -r ./tests/test_registry_linux.json -out ./test_output
   parallel:
     matrix:
       - PYTHON: ["3.11", "3.12", "3.13"]
@@ -113,7 +113,7 @@ integration_test_windows:
     - conda create -y -n integration_test python=${PYTHON}
     - conda activate integration_test
     - python -m pip install -e .[test]
-    - sct-testing -r ./tests/test_registry_windows.json -out ./test_output
+    - sct testing test -r ./tests/test_registry_windows.json -out ./test_output
   parallel:
     matrix:
       - PYTHON: ["3.11", "3.12", "3.13"]
