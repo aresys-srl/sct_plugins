@@ -57,7 +57,7 @@ unittest_linux:
     - python${PYTHON} -m nox -s unittest -p ${PYTHON}
   parallel:
     matrix:
-      - PYTHON: ["3.10", "3.11", "3.12", "3.13"]
+      - PYTHON: ["3.11", "3.12", "3.13"]
   extends: .tags_manylinux_2_28_std
   needs: []
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
@@ -79,7 +79,7 @@ unittest_win:
     - python -m nox -s unittest -p ${PYTHON}
   parallel:
     matrix:
-      - PYTHON: ["3.10", "3.11", "3.12", "3.13"]
+      - PYTHON: ["3.11", "3.12", "3.13"]
   needs: []
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   extends: .tags_win10_new
