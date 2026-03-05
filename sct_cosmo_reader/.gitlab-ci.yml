@@ -57,7 +57,7 @@ unittest_linux:
     - python${PYTHON} -m nox -s unittest -p ${PYTHON}
   parallel:
     matrix:
-      - PYTHON: ["3.10", "3.11", "3.12", "3.13"]
+      - PYTHON: ["3.11", "3.12", "3.13"]
   extends: .tags_manylinux_2_28_std
   needs: []
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
@@ -79,7 +79,7 @@ unittest_win:
     - python -m nox -s unittest -p ${PYTHON}
   parallel:
     matrix:
-      - PYTHON: ["3.10", "3.11", "3.12", "3.13"]
+      - PYTHON: ["3.11", "3.12", "3.13"]
   needs: []
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   extends: .tags_win10_new
@@ -99,10 +99,10 @@ integration_test_linux:
     - python${PYTHON} -m venv ./ci_test
     - source ./ci_test/bin/activate
     - python -m pip install .[test]
-    - sct-testing -r ./tests/test_registry_linux.json -out ./test_output
+    - sct testing test -r ./tests/test_registry_linux.json -out ./test_output
   parallel:
     matrix:
-      - PYTHON: ["3.10", "3.11", "3.12", "3.13"]
+      - PYTHON: ["3.11", "3.12", "3.13"]
   extends: .tags_manylinux_2_28
   needs: []
 
@@ -113,10 +113,10 @@ integration_test_windows:
     - conda create -y -n integration_test python=${PYTHON}
     - conda activate integration_test
     - python -m pip install -e .[test]
-    - sct-testing -r ./tests/test_registry_windows.json -out ./test_output
+    - sct testing test -r ./tests/test_registry_windows.json -out ./test_output
   parallel:
     matrix:
-      - PYTHON: ["3.10", "3.11", "3.12", "3.13"]
+      - PYTHON: ["3.11", "3.12", "3.13"]
   extends: .tags_win10_new
   needs: []
 

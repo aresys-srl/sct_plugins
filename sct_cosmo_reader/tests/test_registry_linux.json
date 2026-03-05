@@ -1,14 +1,14 @@
 {
     "cosmo": {
         "gen1-grd-pta": {
-            "analysis": "pta",
+            "analysis": "point_target",
             "product": "/data/reference_dataset/cosmo/products/CSKS1_DGM_B_WR_00_HH_RA_FF_20240107043057_20240107043111.h5",
             "config": "/data/integration_tests/sct/configurations/test_d347c358_config.toml",
             "targets": "/data/reference_dataset/cosmo/auxiliaries/neusterlitz_corner_reflectors_data.csv",
             "reference_output": "/data/integration_tests/sct/reference_results/cosmo/gen1-grd-pta/pta_res.csv"
         },
         "gen1-rain-forest-slc": {
-            "analysis": "rf",
+            "analysis": "radiometry-rain-forest",
             "product": "/data/reference_dataset/cosmo/products/CSKS4_SCS_B_HR_02_VV_RA_SF_20250427103653_20250427103723.h5",
             "config": "",
             "targets": "",
@@ -18,14 +18,14 @@
             ]
         },
         "gen2-sim-pta-slc": {
-            "analysis": "pta",
+            "analysis": "point_target",
             "product": "/data/reference_dataset/cosmo/products/CSG_SSAR3_SCS_U_0101_SPP_001_VV_LA_R_20000101123033_20000101123048_1_F_08S_Z20_N00.h5",
             "config": "/data/integration_tests/sct/configurations/test_d347c358_config.toml",
             "targets": "/data/reference_dataset/cosmo/auxiliaries/simulation_corner_reflectors_data.csv",
             "reference_output": "/data/integration_tests/sct/reference_results/cosmo/gen2-sim-pta-slc/pta_res.csv"
         },
         "gen2-rain-forest-slc": {
-            "analysis": "rf",
+            "analysis": "radiometry-rain-forest",
             "product": "/data/reference_dataset/cosmo/products/CSG_SSAR1_SCS_B_0101_SC2_003_VV_RA_F_20250205103650_20250205103720_1_F_07S_Z19_N00.h5",
             "config": "",
             "targets": "",

@@ -3,29 +3,37 @@
 
 """
 COSMO-SkyMed format PERSEO-Quality protocol-compliant wrapper
-------------------------------------------------------------------
+-------------------------------------------------------------
 """
 
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
-from eo_products.cosmo.utilities import is_cosmo_product
+from sct_cosmo_reader import __version__
 
-from sct_cosmo_reader.protocol_implementation import COSMOProductManager
-
-
-def get_manager() -> type[COSMOProductManager]:
-    """Retrieve manager"""
-    return COSMOProductManager
+if TYPE_CHECKING:
+    from sct.io.extended_protocols import ALECorrectionFunctionType, SCTInputProduct
 
 
-def get_detector() -> Callable[[str | Path], bool]:
-    """Retrieve detector"""
-    return is_cosmo_product
+class COSMOProductPlugin:
+    """Plugin for COSMO product format"""
 
+    version = __version__
 
-def get_ale_corrector() -> None:
-    """Retrieve ALE corrector class"""
-    return None
+    @classmethod
+    def get_manager(cls) -> type[SCTInputProduct]:
+        from sct_cosmo_reader.protocol_implementation import COSMOProductManager
+
+        return COSMOProductManager
+
+    @classmethod
+    def get_detector(cls) -> Callable[[str | Path], bool]:
+        from eo_products.cosmo.utilities import is_cosmo_product
+
+        return is_cosmo_product
+
+    @classmethod
+    def get_ale_corrector(cls) -> ALECorrectionFunctionType:
+        return None

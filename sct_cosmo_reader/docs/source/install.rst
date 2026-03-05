@@ -4,7 +4,7 @@ Installation
 Requirements
 ------------
 
-SCT COSMO-SkyMed Reader plugin requires a Python version **equal or higher than 3.10**.
+SCT COSMO-SkyMed Reader plugin requires a Python version **equal or higher than 3.11**.
 
 
 Install with pip
