@@ -6,6 +6,8 @@ v1.1.2
 
 **Incompatible Changes**
 
+- Changing plugin structure to be compliant with the new SCT plugins discovery and loading using **Stevedore**
+- Dropping support for Python 3.10
 - Removing ``pulse_rate`` property form protocol implementation
 
 v1.1.1

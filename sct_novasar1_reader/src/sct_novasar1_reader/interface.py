@@ -9,23 +9,31 @@ NovaSAR1 format PERSEO-Quality protocol-compliant wrapper
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
-from eo_products.novasar1.utilities import is_novasar_1_product
+from sct_novasar1_reader import __version__
 
-from sct_novasar1_reader.protocol_implementation import NovaSAR1ProductManager
-
-
-def get_manager() -> type[NovaSAR1ProductManager]:
-    """Retrieve manager"""
-    return NovaSAR1ProductManager
+if TYPE_CHECKING:
+    from sct.io.extended_protocols import ALECorrectionFunctionType, SCTInputProduct
 
 
-def get_detector() -> Callable[[str | Path], bool]:
-    """Retrieve detector"""
-    return is_novasar_1_product
+class NovaSAR1InputProductPlugin:
+    """Plugin for NovaSAR-1 product format"""
 
+    version = __version__
 
-def get_ale_corrector() -> None:
-    """Retrieve ALE corrector class"""
-    return None
+    @classmethod
+    def get_manager(cls) -> type[SCTInputProduct]:
+        from sct_novasar1_reader.protocol_implementation import NovaSAR1ProductManager
+
+        return NovaSAR1ProductManager
+
+    @classmethod
+    def get_detector(cls) -> Callable[[str | Path], bool]:
+        from eo_products.novasar1.utilities import is_novasar_1_product
+
+        return is_novasar_1_product
+
+    @classmethod
+    def get_ale_corrector(cls) -> ALECorrectionFunctionType:
+        return None
