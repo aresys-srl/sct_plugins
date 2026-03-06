@@ -6,6 +6,7 @@ v1.0.1
 
 **Incompatible Changes**
 
+- Changing plugin structure to be compliant with the new SCT plugins discovery and loading using **Stevedore**
 - Removing ``pulse_rate`` property form protocol implementation
 
 v1.0.0

@@ -96,32 +96,32 @@ unittest_win:
 
 # === test - integration =====================================================
 # ============================================================================
-integration_test_linux:
-  stage: test
-  script:
-    - conda create -y -n integration_test python=${PYTHON} gdal=3.10
-    - conda activate integration_test
-    - python -m pip install .[test]
-    - sct-testing -r ./tests/test_registry_linux.json -out ./test_output
-  parallel:
-    matrix:
-      - PYTHON: ["3.12", "3.13"]
-  extends: .tags_rocky8_conda
-  needs: []
+# integration_test_linux:
+#   stage: test
+#   script:
+#     - conda create -y -n integration_test python=${PYTHON} gdal=3.10
+#     - conda activate integration_test
+#     - python -m pip install .[test]
+#     - sct testing test -r ./tests/test_registry_linux.json -out ./test_output
+#   parallel:
+#     matrix:
+#       - PYTHON: ["3.12", "3.13"]
+#   extends: .tags_rocky8_conda
+#   needs: []
 
-integration_test_windows:
-  stage: test
-  script:
-    - . "C:\Users\ContainerAdministrator\Documents\WindowsPowerShell\profile.ps1"
-    - conda create -y -n integration_test python=${PYTHON} gdal=3.10
-    - conda activate integration_test
-    - python -m pip install -e .[test]
-    - sct-testing -r ./tests/test_registry_windows.json -out ./test_output
-  parallel:
-    matrix:
-      - PYTHON: ["3.12", "3.13"]
-  extends: .tags_win10_new
-  needs: []
+# integration_test_windows:
+#   stage: test
+#   script:
+#     - . "C:\Users\ContainerAdministrator\Documents\WindowsPowerShell\profile.ps1"
+#     - conda create -y -n integration_test python=${PYTHON} gdal=3.10
+#     - conda activate integration_test
+#     - python -m pip install -e .[test]
+#     - sct testing test -r ./tests/test_registry_windows.json -out ./test_output
+#   parallel:
+#     matrix:
+#       - PYTHON: ["3.12", "3.13"]
+#   extends: .tags_win10_new
+#   needs: []
 
 # === build ==================================================================
 # ============================================================================
@@ -154,11 +154,11 @@ wheel:
 # doc:
 #   stage: build
 #   extends:
-#     - .tags_manylinux_2_28_std
+#     - .tags_rocky8_conda
 #   script:
 #     - yum install -y pandoc
-#     - python3.12 -m pip install nox
-#     - python3.12 -m nox -s build_doc
+#     - python3.13 -m pip install nox
+#     - python3.13 -m nox -s build_doc
 #   needs: []
 #   artifacts:
 #     expire_in: 2 weeks

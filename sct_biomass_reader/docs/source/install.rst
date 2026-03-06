@@ -4,7 +4,7 @@ Installation
 Requirements
 ------------
 
-SCT Biomass Product Reader plugin requires a Python version **equal or higher than 3.10**.
+SCT Biomass Product Reader plugin requires a Python version **equal or higher than 3.12**.
 
 
 Install with pip
