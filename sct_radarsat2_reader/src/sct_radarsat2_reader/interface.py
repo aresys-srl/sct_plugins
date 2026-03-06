@@ -3,29 +3,37 @@
 
 """
 RADARSAT-2 format PERSEO-Quality protocol-compliant wrapper
-----------------------------------------------------------------
+-----------------------------------------------------------
 """
 
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
-from eo_products.radarsat2.utilities import is_radarsat_product
+from sct_radarsat2_reader import __version__
 
-from sct_radarsat2_reader.protocol_implementation import RADARSAT2ProductManager
-
-
-def get_manager() -> type[RADARSAT2ProductManager]:
-    """Retrieve manager"""
-    return RADARSAT2ProductManager
+if TYPE_CHECKING:
+    from sct.io.extended_protocols import ALECorrectionFunctionType, SCTInputProduct
 
 
-def get_detector() -> Callable[[str | Path], bool]:
-    """Retrieve detector"""
-    return is_radarsat_product
+class RADARSAT2ProductPlugin:
+    """Plugin for RADARSAT-2 product format"""
 
+    version = __version__
 
-def get_ale_corrector() -> None:
-    """Retrieve ALE corrector class"""
-    return None
+    @classmethod
+    def get_manager(cls) -> type[SCTInputProduct]:
+        from sct_radarsat2_reader.protocol_implementation import RADARSAT2ProductManager
+
+        return RADARSAT2ProductManager
+
+    @classmethod
+    def get_detector(cls) -> Callable[[str | Path], bool]:
+        from eo_products.radarsat2.utilities import is_radarsat_product
+
+        return is_radarsat_product
+
+    @classmethod
+    def get_ale_corrector(cls) -> ALECorrectionFunctionType:
+        return None
