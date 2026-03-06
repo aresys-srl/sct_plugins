@@ -1,7 +1,7 @@
 {
     "envisat": {
         "grd-pta": {
-            "analysis": "pta",
+            "analysis": "point_target",
             "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/envisat/ASA_IMS_1PNESA20030124_100448_000000182013_00151_04714_0000.N1",
             "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_906f38dc_config.toml",
             "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/envisat/ASAR_transponders_dataset.csv",

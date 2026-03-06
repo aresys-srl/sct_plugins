@@ -11,7 +11,7 @@ import unittest
 
 from perseo_quality.io.quality_input_protocol import ChannelData, SARCoordinatesFunction
 from sct.io.extended_protocols import SCTInputProduct
-from sct.io.input_product_plugins import import_input_product_plugins
+from sct.plugins.loader import import_input_product_plugins
 
 from sct_asar_reader.core.utilities import is_asar_product
 from sct_asar_reader.protocol_implementation import (
@@ -25,12 +25,12 @@ class PluginProtocolComplianceTest(unittest.TestCase):
     """Test Plugin Protocol Compliance"""
 
     def setUp(self):
-        self.plugin = import_input_product_plugins(additional_plugins=[])
+        self.plugin = import_input_product_plugins()
 
     def test_installed_plugin(self) -> None:
         """Testing correct plugin installation"""
         self.assertEqual(len(self.plugin), 1)
-        self.assertEqual(self.plugin[0].__name__, "sct_asar_reader")
+        self.assertEqual(self.plugin[0].__name__, "ASARProductPlugin")
 
     def test_get_manager(self) -> None:
         """Testing manager protocol compliance"""
