@@ -5,12 +5,14 @@ Installation
 
 Requirements
 ------------
-* Python 3.10 or higher.
+
+SCT STRIX Reader plugin requires a Python version **equal or higher than 3.11**.
 
 
-Install
--------
-1. Install **sct_strix_reader** package and its dependencies using ``pip`` tool:
+Install with pip
+----------------
+
+SCT STRIX Reader package and its dependencies can be installed using ``pip`` tool:
 
 .. code-block:: bash
 

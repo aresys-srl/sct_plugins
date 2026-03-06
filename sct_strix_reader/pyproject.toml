@@ -2,17 +2,17 @@
 name = "sct_strix_reader"
 description = "SCT (SAR Calibration Toolbox) plugin for reading Synspective StriX Level 1 product format."
 authors = [{ name = "Aresys S.R.L.", email = "info@aresys.it" }]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 readme = "README.md"
 license = { file = "LICENSE.txt" }
 dependencies = [
     "numpy",
-    "arepytools >= 1.7.6",
+    "arepytools>=1.7.6",
     "perseo-quality",
     "eo-products",
     "scipy",
     "shapely>=2.1.0",
-    "sct>=2.0.6",
+    "sct>=2.1.1",
 ]
 dynamic = ["version"]
 classifiers = [
@@ -25,7 +25,6 @@ classifiers = [
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -34,6 +33,9 @@ classifiers = [
     "Topic :: Scientific/Engineering",
     "Typing :: Typed",
 ]
+
+[project.entry-points."sct.input_products"]
+aresys = "sct_strix_reader.interface:STRIXProductPlugin"
 
 [build-system]
 requires = ["hatchling"]
@@ -50,7 +52,7 @@ allow-direct-references = true
 
 [project.optional-dependencies]
 dev = ["nox", "ruff", "pylint"]
-test = ["unittest-xml-reporting", "coverage", "sct[cli,graphs]"]
+test = ["unittest-xml-reporting", "coverage", "sct[graphs]>=2.1.1"]
 doc = [
     "ipython",
     "nbsphinx",

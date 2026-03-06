@@ -1,14 +1,14 @@
 {
     "strix": {
         "stripmap-slc-pta": {
-            "analysis": "pta",
+            "analysis": "point_target",
             "product": "C:/chopper/reference_dataset/strix/products/stripmap/IMG-VV-STRIX3-20240603T115211Z-SMSLC-SICD.nitf",
             "config": "C:/chopper/integration_tests/sct/configurations/test_906f38dc_config.toml",
             "targets": "C:/chopper/reference_dataset/strix/auxiliaries/rosamond_point_target_stripmap.csv",
             "reference_output": "C:/chopper/integration_tests/sct/reference_results/strix/stripmap-slc-pta/pta_res.csv"
         },
         "sliding-spot-slc-pta": {
-            "analysis": "pta",
+            "analysis": "point_target",
             "product": "C:/chopper/reference_dataset/strix/products/sliding_spotlight/IMG-VV-STRIX2-20250727T222030Z-SLSLC-SICD.nitf",
             "config": "C:/chopper/integration_tests/sct/configurations/test_906f38dc_config.toml",
             "targets": "C:/chopper/reference_dataset/strix/auxiliaries/rosamond_point_target_sliding_spot.csv",
