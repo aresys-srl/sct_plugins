@@ -3,29 +3,37 @@
 
 """
 Saocom format PERSEO-Quality protocol-compliant wrapper
-------------------------------------------------------------
+-------------------------------------------------------
 """
 
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
-from eo_products.saocom.utilities import is_saocom_product
+from sct_saocom_reader import __version__
 
-from sct_saocom_reader.protocol_implementation import SAOCOMProductManager
-
-
-def get_manager() -> type[SAOCOMProductManager]:
-    """Retrieve manager"""
-    return SAOCOMProductManager
+if TYPE_CHECKING:
+    from sct.io.extended_protocols import ALECorrectionFunctionType, SCTInputProduct
 
 
-def get_detector() -> Callable[[str | Path], bool]:
-    """Retrieve detector"""
-    return is_saocom_product
+class SAOCOMProductPlugin:
+    """Plugin for SAOCOM product format"""
 
+    version = __version__
 
-def get_ale_corrector() -> None:
-    """Retrieve ALE corrector class"""
-    return None
+    @classmethod
+    def get_manager(cls) -> type[SCTInputProduct]:
+        from sct_saocom_reader.protocol_implementation import SAOCOMProductManager
+
+        return SAOCOMProductManager
+
+    @classmethod
+    def get_detector(cls) -> Callable[[str | Path], bool]:
+        from eo_products.saocom.utilities import is_saocom_product
+
+        return is_saocom_product
+
+    @classmethod
+    def get_ale_corrector(cls) -> ALECorrectionFunctionType:
+        return None
