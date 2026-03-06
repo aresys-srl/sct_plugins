@@ -1,21 +1,21 @@
 {
     "terrasar-x": {
         "slc-stripmap-pta": {
-            "analysis": "pta",
+            "analysis": "point_target",
             "product": "/data/reference_dataset/terrasarx/products/TDX1_SAR__SSC______SM_S_SRA_20250912T083006_20250912T083014",
             "config": "/data/integration_tests/sct/configurations/test_906f38dc_config.toml",
             "targets": "/data/reference_dataset/terrasarx/auxiliaries/surat_basin_corner_reflectors_data.csv",
             "reference_output": "/data/integration_tests/sct/reference_results/terrasarx/slc-stripmap-pta/pta_res.csv"
         },
         "slc-spotlight-pta": {
-            "analysis": "pta",
+            "analysis": "point_target",
             "product": "/data/reference_dataset/terrasarx/products/TDX1_SAR__SSC______SL_S_SRA_20250821T083011_20250821T083013",
             "config": "/data/integration_tests/sct/configurations/test_906f38dc_config.toml",
             "targets": "/data/reference_dataset/terrasarx/auxiliaries/surat_basin_corner_reflectors_data.csv",
             "reference_output": "/data/integration_tests/sct/reference_results/terrasarx/slc-spotlight-pta/pta_res.csv"
         },
         "slc-stripmap-rain-forest": {
-            "analysis": "rf",
+            "analysis": "radiometry-rain-forest",
             "product": "/data/reference_dataset/terrasarx/products/TSX1_SAR__SSC______SM_S_SRA_20240516T224859_20240516T224907",
             "config": "",
             "targets": "",

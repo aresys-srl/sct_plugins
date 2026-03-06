@@ -9,23 +9,31 @@ TERRASAR-X format PERSEO-Quality protocol-compliant wrapper
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
-from eo_products.terrasarx.utilities import is_terrasarx_product
+from sct_terrasarx_reader import __version__
 
-from sct_terrasarx_reader.protocol_implementation import TERRASARXProductManager
-
-
-def get_manager() -> type[TERRASARXProductManager]:
-    """Retrieve manager"""
-    return TERRASARXProductManager
+if TYPE_CHECKING:
+    from sct.io.extended_protocols import ALECorrectionFunctionType, SCTInputProduct
 
 
-def get_detector() -> Callable[[str | Path], bool]:
-    """Retrieve detector"""
-    return is_terrasarx_product
+class TERRASARXProductPlugin:
+    """Plugin for TERRASAR-X product format"""
 
+    version = __version__
 
-def get_ale_corrector() -> None:
-    """Retrieve ALE corrector class"""
-    return None
+    @classmethod
+    def get_manager(cls) -> type[SCTInputProduct]:
+        from sct_terrasarx_reader.protocol_implementation import TERRASARXProductManager
+
+        return TERRASARXProductManager
+
+    @classmethod
+    def get_detector(cls) -> Callable[[str | Path], bool]:
+        from eo_products.terrasarx.utilities import is_terrasarx_product
+
+        return is_terrasarx_product
+
+    @classmethod
+    def get_ale_corrector(cls) -> ALECorrectionFunctionType:
+        return None
