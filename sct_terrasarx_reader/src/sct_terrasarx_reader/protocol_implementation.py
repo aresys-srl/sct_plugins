@@ -608,7 +608,7 @@ class TERRASARXChannelManager:
 
         Parameters
         ----------
-        azimuth_time : ArrayLike
+        azimuth_times : ArrayLike
             azimuth time array in PreciseDateTime format
 
         Returns

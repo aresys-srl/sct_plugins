@@ -129,8 +129,10 @@ class SAOCOMChannelManager:
 
         Parameters
         ----------
-        channel_files : list[Path]
-            files corresponding to the selected channel
+        channel_metadata_file : Path
+            path to the channel metadata xml file
+        channel_raster_file : Path
+            path to the channel raster file
         channel_name : str
             name of the current channel
         """
@@ -477,10 +479,10 @@ class SAOCOMChannelManager:
 
         Parameters
         ----------
-        abs_azimuth_time : PreciseDateTime
-            selected absolute azimuth time
-        abs_range_time : float
-            selected absolute range time
+        azimuth_time : PreciseDateTime
+            selected azimuth time
+        range_time : float
+            selected range time
 
         Returns
         -------
@@ -667,7 +669,7 @@ class SAOCOMChannelManager:
 
         Parameters
         ----------
-        azimuth_time : ArrayLike
+        azimuth_times : ArrayLike
             azimuth time array in PreciseDateTime format
 
         Returns

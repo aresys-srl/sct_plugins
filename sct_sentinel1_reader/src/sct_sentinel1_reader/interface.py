@@ -24,18 +24,21 @@ class Sentinel1InputProductPlugin:
 
     @classmethod
     def get_manager(cls) -> type[SCTInputProduct]:
+        """Implementation of Plugin interface method to get the Product Manager class"""
         from sct_sentinel1_reader.protocol_implementation import Sentinel1ProductManager
 
         return Sentinel1ProductManager
 
     @classmethod
     def get_detector(cls) -> Callable[[str | Path], bool]:
+        """Implementation of Plugin interface method to get the product detection function"""
         from eo_products.sentinel1.utilities import is_s1_safe_product
 
         return is_s1_safe_product
 
     @classmethod
     def get_ale_corrector(cls) -> ALECorrectionFunctionType:
+        """Implementation of Plugin interface method to get the Absolute Localization Error Correction class"""
         from sct_sentinel1_reader.corrections.main import S1ALECorrector
 
         return S1ALECorrector

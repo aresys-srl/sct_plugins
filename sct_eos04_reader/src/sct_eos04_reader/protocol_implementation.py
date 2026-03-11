@@ -480,10 +480,10 @@ class EOS04ChannelManager:
 
         Parameters
         ----------
-        abs_azimuth_time : PreciseDateTime
-            selected absolute azimuth time
-        abs_range_time : float
-            selected absolute range time
+        azimuth_time : PreciseDateTime
+            selected azimuth time
+        range_time : float
+            selected range time
 
         Returns
         -------
@@ -670,7 +670,7 @@ class EOS04ChannelManager:
 
         Parameters
         ----------
-        azimuth_time : ArrayLike
+        azimuth_times : ArrayLike
             azimuth time array in PreciseDateTime format
 
         Returns

@@ -126,8 +126,8 @@ class ASARChannelManager:
 
         Parameters
         ----------
-        channel_files : list[Path]
-            files corresponding to the selected channel
+        product_path : Path
+            Path to ASAR product
         channel_name : str
             name of the current channel
         """
@@ -471,10 +471,10 @@ class ASARChannelManager:
 
         Parameters
         ----------
-        abs_azimuth_time : PreciseDateTime
-            selected absolute azimuth time
-        abs_range_time : float
-            selected absolute range time
+        azimuth_time : PreciseDateTime
+            selected azimuth time
+        range_time : float
+            selected range time
 
         Returns
         -------
@@ -662,7 +662,7 @@ class ASARChannelManager:
 
         Parameters
         ----------
-        azimuth_time : ArrayLike
+        azimuth_times : ArrayLike
             azimuth time array in PreciseDateTime format
 
         Returns

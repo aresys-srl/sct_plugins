@@ -24,16 +24,19 @@ class SAOCOMProductPlugin:
 
     @classmethod
     def get_manager(cls) -> type[SCTInputProduct]:
+        """Implementation of Plugin interface method to get the Product Manager class"""
         from sct_saocom_reader.protocol_implementation import SAOCOMProductManager
 
         return SAOCOMProductManager
 
     @classmethod
     def get_detector(cls) -> Callable[[str | Path], bool]:
+        """Implementation of Plugin interface method to get the product detection function"""
         from eo_products.saocom.utilities import is_saocom_product
 
         return is_saocom_product
 
     @classmethod
     def get_ale_corrector(cls) -> ALECorrectionFunctionType:
+        """Implementation of Plugin interface method to get the Absolute Localization Error Correction class"""
         return None
