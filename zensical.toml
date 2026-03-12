@@ -14,7 +14,7 @@ repo_url = "https://github.com/aresys-srl/sct"
 repo_name = "aresys/sct-format-plugins"
 site_url = "https://www.example.com/"
 copyright = """
-Copyright &copy; 2026 Aresys s.r.l.
+Copyright &copy; 2026-present Aresys s.r.l.
 """
 
 # Zensical supports both implicit navigation and explicitly defined navigation.
@@ -236,7 +236,6 @@ show_root_toc_entry = false
 show_root_full_path = false
 show_object_full_path = false
 show_category_heading = true
-show_root_docstring = false
 separate_signature = true
 show_if_no_docstring = true
 unwrap_annotated = true

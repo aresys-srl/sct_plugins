@@ -21,3 +21,8 @@
     width: 100% !important;
     max-width: 100% !important;
 }
+
+.mermaid {
+  display: flex;
+  justify-content: center;
+}
