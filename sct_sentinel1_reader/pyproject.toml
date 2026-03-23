@@ -9,7 +9,7 @@ dependencies = [
     "numpy",
     "arepytools>=1.7.6",
     "perseo-quality",
-    "eo-products>=1.0.5",
+    "eo-products",
     "scipy",
     "pyproj",
     "pandas",
@@ -48,7 +48,7 @@ build-backend = "hatchling.build"
 path = "src/sct_sentinel1_reader/__init__.py"
 
 [tool.hatch.build.targets.sdist]
-only-include = ["src", "tests", "docs"]
+only-include = ["src", "tests"]
 
 [tool.hatch.metadata]
 allow-direct-references = true
@@ -68,7 +68,7 @@ doc = [
 [tool.ruff]
 line-length = 120
 output-format = "grouped"
-extend-exclude = [".venv", "scripts", "docs", "noxfile.py"]
+extend-exclude = [".venv", "scripts", "noxfile.py"]
 
 [tool.ruff.format]
 docstring-code-format = true

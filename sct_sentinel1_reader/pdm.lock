@@ -5,7 +5,7 @@
 groups = ["default", "dev", "doc", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:a71b39d470e2b7e97df1ce813ac9f4d31ec316f7bf5d86f0392bbd60e0534aa8"
+content_hash = "sha256:39b9421ad5464b1b6eb2239086b70cc02b1cb3de5dce5674829b681c466d718c"
 
 [[metadata.targets]]
 requires_python = ">=3.11"
@@ -769,8 +769,9 @@ files = [
 
 [[package]]
 name = "eo-products"
-version = "1.0.5"
+version = "1.0.6"
 requires_python = ">=3.10"
+path = "C:/ARESYS_PROJ/ext-eo-products/dist/eo_products-1.0.6-py3-none-any.whl"
 summary = "Collection of SAR Earth Observation L1 Product Formats readers."
 groups = ["default"]
 dependencies = [
@@ -784,8 +785,7 @@ dependencies = [
     "zarr",
 ]
 files = [
-    {file = "eo_products-1.0.5-py3-none-any.whl", hash = "sha256:c58635c2ca79d2dbf7bdab23d9cb754a73075fa94ea280bfec5aee8c129d0381"},
-    {file = "eo_products-1.0.5.tar.gz", hash = "sha256:5b5ca5933555f2e5cf1222464b16b95ed2f8c24358a16388d9598adb64af4b61"},
+    {file = "eo_products-1.0.6-py3-none-any.whl", hash = "sha256:6ef9bc2fe3d5be6db3497906b39701b46923fd4bd1fce59d2d6d5b76cf4903c4"},
 ]
 
 [[package]]
@@ -2926,7 +2926,7 @@ files = [
 
 [[package]]
 name = "sct"
-version = "2.1.1"
+version = "2.1.2"
 requires_python = ">=3.11"
 summary = "SCT (SAR Calibration Toolbox) is the Aresys Python module for SAR products quality analysis."
 groups = ["default", "test"]
@@ -2946,25 +2946,25 @@ dependencies = [
     "typer>=0.24.1",
 ]
 files = [
-    {file = "sct-2.1.1-py3-none-any.whl", hash = "sha256:6d1766b4a6810c00539b667e6573a282604b4261a3d45a49f76b09c8f298e78c"},
-    {file = "sct-2.1.1.tar.gz", hash = "sha256:933d39b550e0170f20a9e05873475d44d1bb552fc61cf206385c2cce28645a94"},
+    {file = "sct-2.1.2-py3-none-any.whl", hash = "sha256:598f2aed11553cd506c80cdfe4e68737876776143963df37022717743a24b679"},
+    {file = "sct-2.1.2.tar.gz", hash = "sha256:50e33f0369c191590407c64483afc0cdfc3e9041867195d4a905fc05db9b6c39"},
 ]
 
 [[package]]
 name = "sct"
-version = "2.1.1"
-extras = ["cli", "graphs"]
+version = "2.1.2"
+extras = ["graphs"]
 requires_python = ">=3.11"
 summary = "SCT (SAR Calibration Toolbox) is the Aresys Python module for SAR products quality analysis."
 groups = ["test"]
 dependencies = [
     "matplotlib>=3.5",
     "perseo-quality[graphs]",
-    "sct==2.1.1",
+    "sct==2.1.2",
 ]
 files = [
-    {file = "sct-2.1.1-py3-none-any.whl", hash = "sha256:6d1766b4a6810c00539b667e6573a282604b4261a3d45a49f76b09c8f298e78c"},
-    {file = "sct-2.1.1.tar.gz", hash = "sha256:933d39b550e0170f20a9e05873475d44d1bb552fc61cf206385c2cce28645a94"},
+    {file = "sct-2.1.2-py3-none-any.whl", hash = "sha256:598f2aed11553cd506c80cdfe4e68737876776143963df37022717743a24b679"},
+    {file = "sct-2.1.2.tar.gz", hash = "sha256:50e33f0369c191590407c64483afc0cdfc3e9041867195d4a905fc05db9b6c39"},
 ]
 
 [[package]]

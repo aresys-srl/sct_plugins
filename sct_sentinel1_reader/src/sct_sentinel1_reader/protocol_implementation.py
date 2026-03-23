@@ -27,7 +27,9 @@ from eo_products.sentinel1.reader import (
     read_channel_calibration,
     read_channel_data,
     read_channel_metadata,
+    read_channel_noise_vectors,
 )
+from eo_products.sentinel1.utilities import get_noise_vector
 from numpy.typing import ArrayLike
 from perseo_quality.core.custom_errors import (
     CoordinatesOutOfBounds,
@@ -121,11 +123,12 @@ class Sentinel1ProductManager:
         SafeChannelManager
             ChannelData-compliant object containing data corresponding to the selected channel
         """
-        metadata, raster, calibration = self._product.get_files_from_channel_name(channel_name=channel_id)
+        metadata, raster, calibration, noise = self._product.get_files_from_channel_name(channel_name=channel_id)
         return Sentinel1ChannelManager(
             channel_metadata_path=metadata,
             channel_raster_path=raster,
             channel_calibration_path=calibration,
+            channel_noise_path=noise,
             external_orbit_path=self._external_orbit_path,
             channel_name=channel_id,
         )
@@ -139,6 +142,7 @@ class Sentinel1ChannelManager:
         channel_metadata_path: Path,
         channel_raster_path: Path,
         channel_calibration_path: Path,
+        channel_noise_path: Path,
         channel_name: str,
         external_orbit_path: str | Path | None = None,
     ) -> None:
@@ -248,6 +252,8 @@ class Sentinel1ChannelManager:
             self._antenna_pattern_altitudes = self._channel.antenna_pattern[
                 self._channel.general_info.swath
             ].terrain_height
+
+        self._az_noise_vectors, self._rng_noise_vectors = read_channel_noise_vectors(noise_file=channel_noise_path)
 
     def _compute_range_step_m(self) -> float:
         """Computing step along range direction, in meters"""
@@ -580,6 +586,31 @@ class Sentinel1ChannelManager:
             if not self._projection == SARProjection.GROUND_RANGE
             else 0
         )
+
+    def get_noise_vector(self, azimuth_index: int) -> np.ndarray | None:
+        """Compute noise vector at a given azimuth index.
+
+        Parameters
+        ----------
+        azimuth_index : int
+            azimuth index
+
+        Returns
+        -------
+        np.ndarray | None
+            noise vector
+        """
+        try:
+            noise_vector = get_noise_vector(
+                swath=self.swath_name,
+                azimuth_index=azimuth_index,
+                azimuth_noise_vectors=self._az_noise_vectors,
+                range_noise_vectors=self._rng_noise_vectors,
+                is_grd=self.projection == SARProjection.GROUND_RANGE,
+            )
+            return np.sqrt(noise_vector) * self._scaling_factor
+        except Exception:
+            return None
 
     def get_location_data(self, azimuth_time: PreciseDateTime, range_time: float) -> LocationData:
         """Generating a LocationData object containing data and info derived from the current SafeChannelManager and

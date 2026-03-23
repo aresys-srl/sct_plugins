@@ -4,6 +4,12 @@ icon: lucide/history
 
 # Changelog
 
+## v1.1.8
+
+**Additional Features**
+
+- Adding ``get_noise_vector`` method to protocol implementation to be used in PERSEO-Quality NESZ Analysis
+
 ## v1.1.7
 
 **Incompatible Changes**
@@ -19,13 +25,11 @@ icon: lucide/history
 
 ## v1.1.5
 
-
 **Bug Fixing**
 
 - Adapting to changes in EO Products >= 1.0.5
 
 ## v1.1.4
-
 
 **Bug Fixing**
 
@@ -33,14 +37,12 @@ icon: lucide/history
 
 ## v1.1.3
 
-
 **Additional Features**
 
 - Adding ``get_roll_angle_deg`` method to protocol implementation to be used in PERSEO-Quality Elevation Notch Analysis
 - Adding ``get_altitude_m`` method to protocol implementation to be used in PERSEO-Quality Elevation Notch Analysis
 
 ## v1.1.2
-
 
 **Incompatible Changes**
 
@@ -53,20 +55,17 @@ icon: lucide/history
 
 ## v1.1.1
 
-
 **Incompatible Changes**
 
 - Changing Arepyextras - EO Products dependency with EO Products
 
 ## v1.1.0
 
-
 **Incompatible Changes**
 
 - Changing Arepyextras-Quality dependency with PERSEO-Quality
 
 ## v1.0.2
-
 
 **Incompatible Changes**
 
@@ -75,12 +74,10 @@ icon: lucide/history
 
 ## v1.0.1
 
-
 **Incompatible Changes**
 
 - Fix to take into account latest Arepyextras-EO Products updates.
 
 ## v1.0.0
-
 
 First release version of this plugin.
