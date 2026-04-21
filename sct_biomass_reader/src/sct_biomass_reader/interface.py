@@ -32,7 +32,10 @@ class BIOMASSProductPlugin:
     def get_detector(cls) -> Callable[[str | Path], bool]:
         from bps.transcoder.utils.product_name import is_l1_product_name_valid
 
-        return is_l1_product_name_valid
+        def _is_valid_biomass_product(product_path: str | Path) -> bool:
+            return is_l1_product_name_valid(Path(product_path).name)
+
+        return _is_valid_biomass_product
 
     @classmethod
     def get_ale_corrector(cls) -> ALECorrectionFunctionType:
