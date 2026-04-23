@@ -35,7 +35,7 @@ classifiers = [
 ]
 
 [project.entry-points."sct.input_products"]
-aresys = "sct_eos04_reader.interface:EOS04ProductPlugin"
+eos04 = "sct_eos04_reader.interface:EOS04ProductPlugin"
 
 [build-system]
 requires = ["hatchling"]

@@ -35,7 +35,7 @@ classifiers = [
 ]
 
 [project.entry-points."sct.input_products"]
-aresys = "sct_radarsat2_reader.interface:RADARSAT2ProductPlugin"
+radarsat2 = "sct_radarsat2_reader.interface:RADARSAT2ProductPlugin"
 
 [build-system]
 requires = ["hatchling"]

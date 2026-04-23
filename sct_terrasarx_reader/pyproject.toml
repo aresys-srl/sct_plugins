@@ -35,7 +35,7 @@ classifiers = [
 ]
 
 [project.entry-points."sct.input_products"]
-aresys = "sct_terrasarx_reader.interface:TERRASARXProductPlugin"
+terrasarx = "sct_terrasarx_reader.interface:TERRASARXProductPlugin"
 
 [build-system]
 requires = ["hatchling"]

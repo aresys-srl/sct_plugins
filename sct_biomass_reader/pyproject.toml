@@ -32,7 +32,7 @@ classifiers = [
 ]
 
 [project.entry-points."sct.input_products"]
-aresys = "sct_biomass_reader.interface:BIOMASSProductPlugin"
+biomass = "sct_biomass_reader.interface:BIOMASSProductPlugin"
 
 [build-system]
 requires = ["hatchling"]

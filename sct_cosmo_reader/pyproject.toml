@@ -35,7 +35,7 @@ classifiers = [
 ]
 
 [project.entry-points."sct.input_products"]
-aresys = "sct_cosmo_reader.interface:COSMOProductPlugin"
+cosmo = "sct_cosmo_reader.interface:COSMOProductPlugin"
 
 [build-system]
 requires = ["hatchling"]

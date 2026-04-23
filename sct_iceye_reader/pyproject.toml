@@ -35,7 +35,7 @@ classifiers = [
 ]
 
 [project.entry-points."sct.input_products"]
-aresys = "sct_iceye_reader.interface:ICEYEProductPlugin"
+iceye = "sct_iceye_reader.interface:ICEYEProductPlugin"
 
 [build-system]
 requires = ["hatchling"]

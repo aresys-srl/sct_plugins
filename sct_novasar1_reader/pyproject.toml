@@ -35,7 +35,7 @@ classifiers = [
 ]
 
 [project.entry-points."sct.input_products"]
-aresys = "sct_novasar1_reader.interface:NovaSAR1InputProductPlugin"
+novasar1 = "sct_novasar1_reader.interface:NovaSAR1InputProductPlugin"
 
 [build-system]
 requires = ["hatchling"]

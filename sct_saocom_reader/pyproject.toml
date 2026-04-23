@@ -35,7 +35,7 @@ classifiers = [
 ]
 
 [project.entry-points."sct.input_products"]
-aresys = "sct_saocom_reader.interface:SAOCOMProductPlugin"
+saocom = "sct_saocom_reader.interface:SAOCOMProductPlugin"
 
 [build-system]
 requires = ["hatchling"]
