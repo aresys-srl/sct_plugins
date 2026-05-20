@@ -29,7 +29,7 @@ from eo_products.sentinel1.reader import (
     read_channel_metadata,
     read_channel_noise_vectors,
 )
-from eo_products.sentinel1.utilities import get_noise_vector
+from eo_products.sentinel1.utilities import get_noise_vectors
 from numpy.typing import ArrayLike
 from perseo_quality.core.custom_errors import (
     CoordinatesOutOfBounds,
@@ -587,23 +587,23 @@ class Sentinel1ChannelManager:
             else 0
         )
 
-    def get_noise_vector(self, azimuth_index: int) -> np.ndarray | None:
-        """Compute noise vector at a given azimuth index.
+    def get_noise_vector(self, azimuth_indexes: int | tuple[int, int]) -> np.ndarray | None:
+        """Get noise vector(s) at a given azimuth index(es).
 
         Parameters
         ----------
-        azimuth_index : int
-            azimuth index
+        azimuth_index : int | tuple[int, int]
+            azimuth index or tuple of azimuth indexes (start, stop)
 
         Returns
         -------
         np.ndarray | None
-            noise vector
+            noise vector(s) corresponding to the input azimuth index(es)
         """
         try:
-            noise_vector = get_noise_vector(
+            noise_vector = get_noise_vectors(
                 swath=self.swath_name,
-                azimuth_index=azimuth_index,
+                azimuth_indexes=azimuth_indexes,
                 azimuth_noise_vectors=self._az_noise_vectors,
                 range_noise_vectors=self._rng_noise_vectors,
                 is_grd=self.projection == SARProjection.GROUND_RANGE,

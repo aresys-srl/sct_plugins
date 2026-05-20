@@ -6,4 +6,4 @@ SCT-Plugin: Sentinel-1 product format reader
 --------------------------------------------
 """
 
-__version__ = "1.1.8"
+__version__ = "1.1.9"

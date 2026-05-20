@@ -4,6 +4,12 @@ icon: lucide/history
 
 # Changelog
 
+## v1.1.9
+
+**Other Changes**
+
+- Improved ``get_noise_vector`` method to get multiple noise vectors at once based on the input azimuth indexes
+
 ## v1.1.8
 
 **Additional Features**
