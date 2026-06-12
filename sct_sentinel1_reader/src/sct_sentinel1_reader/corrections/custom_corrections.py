@@ -1,18 +1,15 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-Sentinel-1 IPF range and azimuth custom corrections
----------------------------------------------------
-"""
+"""Sentinel-1 IPF range and azimuth custom corrections."""
 
 from uuid import uuid4
 
 import numpy as np
 import pandas as pd
-from arepytools.timing.precisedatetime import PreciseDateTime
 from eo_products.sentinel1.utilities import S1AcquisitionMode
 from numpy.typing import ArrayLike
+from perseo_core.timing import PreciseDateTime
 from perseo_quality.io.quality_input_protocol import QualityInputProduct
 from scipy.constants import speed_of_light
 from sct.configuration.logger import sct_logger

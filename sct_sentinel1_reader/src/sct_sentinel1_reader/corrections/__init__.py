@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-Sentinel-1 ALE Corrections
---------------------------
-"""
+"""Sentinel-1 ALE Corrections."""
 
 ALE_CORRECTIONS_FIELDS = {
     "etad_range": "ext_range_correction_[m]",

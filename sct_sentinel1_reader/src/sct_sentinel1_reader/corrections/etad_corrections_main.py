@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-Loading ETAD corrections
-------------------------
-"""
+"""Sentinel-1 ETAD ALE corrections."""
 
 from __future__ import annotations
 

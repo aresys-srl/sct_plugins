@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-Sentinel-1 ALE Corrections: ALE Corrector
------------------------------------------
-"""
+"""ALE Corrector for Sentinel-1 products."""
 
 from __future__ import annotations
 
