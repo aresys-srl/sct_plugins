@@ -6,7 +6,5 @@
 import sys
 from pathlib import Path
 
-import nox
-
 sys.path.append("..")
 import nox_common
