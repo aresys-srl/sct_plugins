@@ -21,9 +21,31 @@ _LICENSE_HEADER_MIT = """# SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it
 
 """
 
-PY_VERSIONS = ["3.10", "3.11", "3.12", "3.13"]
+PY_VERSIONS = ["3.11", "3.12", "3.13", "3.14"]
 WIN32 = sys.platform == "win32"
 PLATFORM = "win" if WIN32 else "linux"
+
+
+def pytest_executor(session: nox.Session, project: str) -> None:
+    """Executor of pytest from nox session.
+    Parameters
+    ----------
+    session : nox.Session
+        nox session
+    project : str
+        project name, with "-" as separator for namespace sub-packages
+    """
+    Path("_build").mkdir(exist_ok=True)
+    project = project.replace("-", "_")
+    session.install("-e", ".[test]", silent=True)
+    # Run pytest with coverage and JUnit XML output
+    session.run(
+        "python",
+        "-m",
+        "pytest",
+        f"--junitxml=_build/pytest-report-{PLATFORM}-py{session.python}.xml",
+        f"--cov-report=xml:_build/pytest-coverage-{PLATFORM}-py{session.python}.xml",
+    )
 
 
 @nox.session()
@@ -95,6 +117,13 @@ def unittest(session: nox.Session):
         "-o",
         f"_build/unittest-coverage-{PLATFORM}-py{session.python}.xml",
     )
+
+
+@nox.session(python=PY_VERSIONS)
+def pytest(session: nox.Session) -> None:
+    """Module testing with pytest"""
+    cwd = Path.cwd()
+    pytest_executor(session, project=cwd.name)
 
 
 @nox.session()
