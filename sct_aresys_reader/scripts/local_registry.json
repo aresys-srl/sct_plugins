@@ -5,7 +5,7 @@
             "product": "C:/Users/giorgio.parma/Aresys_DATA/quality_data/demo_topsar/SLC",
             "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_906f38dc_config.toml",
             "targets": "C:/Users/giorgio.parma/Aresys_DATA/quality_data/pt_datasets/demo_topsar_pt_dataset.csv",
-            "reference_output": "C:/chopper/integration_tests/sct/reference_results/aresys_pf/slc-topsar-pta/pta_res.csv"
+            "reference_output": "C:/Users/giorgio.parma/Desktop/pta_res.csv"
         },
         "slc-real-pta": {
             "analysis": "point_target",

@@ -9,13 +9,6 @@ from itertools import product
 from pathlib import Path
 
 import numpy as np
-from arepytools.io import (
-    open_product_folder,
-    read_metadata,
-    read_raster_with_raster_info,
-)
-from arepytools.io.metadata import BurstInfo, RasterInfo, StateVectors
-from arepytools.math.genericpoly import SortedPolyList, create_sorted_poly_list
 from numpy.typing import ArrayLike
 from perseo_core.geometry import compute_ground_velocity, compute_incidence_angles, compute_look_angles
 from perseo_core.geometry.coordinates import xyz2llh
@@ -47,9 +40,17 @@ from perseo_quality.io.protocol_utilities import roi_validation
 from scipy.constants import speed_of_light
 from shapely import Polygon
 
+from sct_aresys_reader.reader.io import (
+    open_product_folder,
+    read_metadata,
+    read_raster_with_raster_info,
+)
+from sct_aresys_reader.reader.io.metadata import BurstInfo, RasterInfo, StateVectors
+from sct_aresys_reader.reader.math.genericpoly import SortedPolyList, create_sorted_poly_list
+
 
 def _create_trajectory(state_vectors: StateVectors) -> CubicSplineTrajectory:
-    """Create a Perseo CORE Trajectory compliant object from Arepytools StateVectors."""
+    """Create a Perseo CORE Trajectory compliant object from StateVectors."""
     _time_axis = (
         np.arange(state_vectors.number_of_state_vectors) * state_vectors.time_step + state_vectors.reference_time
     )
@@ -472,7 +473,7 @@ class ChannelManager:
     @property
     def attitude(self) -> Attitude | None:
         """Channel attitude"""
-        return self._boresight_normal
+        return self._attitude
 
     @property
     def doppler_centroid(self) -> DopplerPolynomialWrapper | None:

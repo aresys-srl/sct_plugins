@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:ced46aadc22f3cc24e631c847e6997d1cd70dbf07d051f03377c4b895b7be8d5"
+content_hash = "sha256:9a2c349f3f6d1daacf40fe99c5a47044a53e83387e07b2ac7ac01997db3bfe51"
 
 [[metadata.targets]]
 requires_python = ">=3.11"
@@ -33,26 +33,6 @@ dependencies = [
 files = [
     {file = "annotated_types-0.7.0-py3-none-any.whl", hash = "sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53"},
     {file = "annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89"},
-]
-
-[[package]]
-name = "arepytools"
-version = "1.8.1"
-requires_python = ">=3.10"
-summary = "ArePyTools is the Aresys Python toolset for SAR data processing."
-groups = ["default"]
-dependencies = [
-    "lxml",
-    "numpy>=1.20",
-    "numpydantic>=1.6.8",
-    "pydantic>=2.11.4",
-    "python-dateutil",
-    "scipy",
-    "xsdata",
-]
-files = [
-    {file = "arepytools-1.8.1-py3-none-any.whl", hash = "sha256:39d8e16023c8f499df96f8d2d89f8a143c0cbc225f580f9b287c9efb951c0b85"},
-    {file = "arepytools-1.8.1.tar.gz", hash = "sha256:736b54076a3a2b97e08a42a878b8addc4ae40a95d9150d163422941d6610efd1"},
 ]
 
 [[package]]
@@ -1510,22 +1490,6 @@ files = [
 ]
 
 [[package]]
-name = "numpydantic"
-version = "1.9.1"
-requires_python = "<4.0,>=3.10"
-summary = "Type and shape validation and serialization for arbitrary array types in pydantic models"
-groups = ["default"]
-dependencies = [
-    "numpy>=2.0.0",
-    "pydantic>=2.7.0",
-    "typing-extensions>=4.11.0; python_version < \"3.11\"",
-]
-files = [
-    {file = "numpydantic-1.9.1-py3-none-any.whl", hash = "sha256:3811c2843508bded722207b5603be0d78fdb01a668cde1716df314b7b2a91016"},
-    {file = "numpydantic-1.9.1.tar.gz", hash = "sha256:d1f50f0e291bc1d4a93751bfedc95fcd0df0608667d44c0ae33434668c1a91cd"},
-]
-
-[[package]]
 name = "packaging"
 version = "26.2"
 requires_python = ">=3.8"
@@ -2749,7 +2713,7 @@ version = "2026.2"
 requires_python = ">=2"
 summary = "Provider of IANA time zone data"
 groups = ["default", "test"]
-marker = "sys_platform == \"emscripten\" or sys_platform == \"win32\""
+marker = "sys_platform == \"win32\" or sys_platform == \"emscripten\""
 files = [
     {file = "tzdata-2026.2-py2.py3-none-any.whl", hash = "sha256:bbe9af844f658da81a5f95019480da3a89415801f6cc966806612cc7169bffe7"},
     {file = "tzdata-2026.2.tar.gz", hash = "sha256:9173fde7d80d9018e02a662e168e5a2d04f87c41ea174b139fbef642eda62d10"},

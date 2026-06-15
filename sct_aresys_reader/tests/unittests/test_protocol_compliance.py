@@ -8,7 +8,6 @@ SCT Aresys Product Format Reader Plugin - Testing Plugin Protocol Compliance
 from __future__ import annotations
 
 import pytest
-from arepytools.io.productfolder2 import is_product_folder as is_aresys_product
 from perseo_quality.io.quality_input_protocol import ChannelData, SARCoordinatesFunction
 from sct.io.extended_protocols import SCTInputProduct
 from sct.plugins.loader import import_input_product_plugins
@@ -18,6 +17,7 @@ from sct_aresys_reader.protocol_implementation import (
     DopplerPolynomialWrapper,
     ProductFolderManagerExtended,
 )
+from sct_aresys_reader.reader.io.productfolder2 import is_product_folder as is_aresys_product
 
 
 @pytest.fixture

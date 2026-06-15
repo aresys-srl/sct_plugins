@@ -9,10 +9,11 @@ dependencies = [
     "numpy>2",
     "scipy",
     "shapely>=2.1.0",
-    "arepytools>=1.8.1",
     "perseo-core>=1.0.0",
     "perseo-quality>=1.1.0",
     "sct>=2.2.0",
+    "lxml",
+    "xsdata"
 ]
 dynamic = ["version"]
 classifiers = [
