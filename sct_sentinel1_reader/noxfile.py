@@ -4,7 +4,6 @@
 """Automating python testing, formatting and distribution of SCT Sentinel-1 Plugin"""
 
 import sys
-from pathlib import Path
 
 sys.path.append("..")
 import nox_common
