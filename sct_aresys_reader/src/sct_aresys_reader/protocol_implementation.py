@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-Aresys product format PERSEO-Quality protocol-compliant wrapper
---------------------------------------------------------------------
-"""
+"""Aresys product format PERSEO-Quality protocol-compliant wrapper."""
 
 from __future__ import annotations
 
@@ -12,30 +9,24 @@ from itertools import product
 from pathlib import Path
 
 import numpy as np
-from arepytools.geometry.conversions import xyz2llh
-from arepytools.geometry.curve import Generic3DCurve
-from arepytools.geometry.direct_geocoding import direct_geocoding_monostatic
-from arepytools.geometry.generalsarattitude import (
-    create_attitude_boresight_normal_curve_wrapper,
-    create_general_sar_attitude,
-)
-from arepytools.geometry.geometric_functions import (
-    compute_ground_velocity_from_trajectory,
-    compute_incidence_angles_from_trajectory,
-    compute_look_angles_from_trajectory,
-)
-from arepytools.geometry.inverse_geocoding_core import inverse_geocoding_monostatic_core
-from arepytools.geometry.orbit import Orbit
 from arepytools.io import (
     open_product_folder,
     read_metadata,
     read_raster_with_raster_info,
 )
-from arepytools.io.create_orbit import create_orbit
-from arepytools.io.metadata import BurstInfo, RasterInfo
+from arepytools.io.metadata import BurstInfo, RasterInfo, StateVectors
 from arepytools.math.genericpoly import SortedPolyList, create_sorted_poly_list
-from arepytools.timing.precisedatetime import PreciseDateTime
 from numpy.typing import ArrayLike
+from perseo_core.geometry import compute_ground_velocity, compute_incidence_angles, compute_look_angles
+from perseo_core.geometry.coordinates import xyz2llh
+from perseo_core.geometry.geocoding import direct_geocoding_monostatic, inverse_geocoding_monostatic
+from perseo_core.geometry.navigation import CubicSplineTrajectory, Trajectory
+from perseo_core.geometry.pointing import (
+    Attitude,
+    compute_antenna_attitude_from_euler_angles,
+    compute_sensor_local_axis,
+)
+from perseo_core.timing import PreciseDateTime
 from perseo_quality.core.custom_errors import (
     CoordinatesOutOfBounds,
 )
@@ -55,6 +46,18 @@ from perseo_quality.io.layout import L1BurstLayout, L1RasterLayout
 from perseo_quality.io.protocol_utilities import roi_validation
 from scipy.constants import speed_of_light
 from shapely import Polygon
+
+
+def _create_trajectory(state_vectors: StateVectors) -> CubicSplineTrajectory:
+    """Create a Perseo CORE Trajectory compliant object from Arepytools StateVectors."""
+    _time_axis = (
+        np.arange(state_vectors.number_of_state_vectors) * state_vectors.time_step + state_vectors.reference_time
+    )
+    return CubicSplineTrajectory(
+        times=_time_axis,
+        positions=state_vectors.position_vector.reshape(-1, 3),
+        velocities=state_vectors.velocity_vector.reshape(-1, 3),
+    )
 
 
 def raster_layout_from_metadata(burst_info: BurstInfo | None, raster_info: RasterInfo) -> L1RasterLayout:
@@ -180,7 +183,7 @@ class ProductFolderManagerExtended(ProductFolderManager):
             dataset_info = metadata.get_dataset_info()
             burst_info = metadata.get_burst_info()
             raster_info = metadata.get_raster_info()
-            trajectory = create_orbit(state_vectors=metadata.get_state_vectors())
+            trajectory = _create_trajectory(state_vectors=metadata.get_state_vectors())
 
             if burst_info is not None:
                 first_burst = burst_info.get_burst(0)
@@ -216,13 +219,13 @@ class ProductFolderManagerExtended(ProductFolderManager):
                     sensor_positions=trajectory.evaluate(az),
                     sensor_velocities=trajectory.evaluate_first_derivatives(az),
                     range_times=rng,
-                    frequencies_doppler_centroid=0,
+                    doppler_frequencies=0,
                     wavelength=1,
-                    geodetic_altitude=0,
-                    geocoding_side=dataset_info.side_looking.value,
+                    look_direction=dataset_info.side_looking.value,
+                    altitude=0,
                 )
-                corner_llh = xyz2llh(corner_xyz).squeeze()
-                footprint_corners.append(np.rad2deg(corner_llh[:2]))
+                corner_llh = xyz2llh(corner_xyz)
+                footprint_corners.append(np.rad2deg(corner_llh[..., :2]))
 
         footprint = np.stack(footprint_corners)
         min_lat, min_lon = footprint.min(axis=0)
@@ -345,16 +348,31 @@ class ChannelManager:
         self._raster_layout = raster_layout
 
         # generating trajectory
-        self._trajectory_rx = create_orbit(state_vectors=self._state_vectors)
+
+        self._trajectory_rx = _create_trajectory(state_vectors=self._state_vectors)
         self._trajectory_tx = None
 
         # generating attitude boresight normal curve
-        self._boresight_normal = None
+        self._attitude = None
         if self._attitude_info is not None:
-            self._attitude = create_general_sar_attitude(
-                self._state_vectors, attitude_info=self._attitude_info, ignore_anx_after_orbit_start=True
+            _time_axis = (
+                np.arange(self._attitude_info.attitude_records_number) * self._attitude_info.time_step
+                + self._attitude_info.reference_time
             )
-            self._boresight_normal = create_attitude_boresight_normal_curve_wrapper(attitude=self._attitude)
+            zero_doppler_local_axis = compute_sensor_local_axis(
+                sensor_positions=self._trajectory_rx.position(_time_axis),
+                sensor_velocities=self._trajectory_rx.velocity(_time_axis),
+                reference_frame="ZERODOPPLER",
+            )
+            ypr_rad = np.deg2rad(
+                np.c_[self._attitude_info.yaw_vector, self._attitude_info.pitch_vector, self._attitude_info.roll_vector]
+            )
+            self._attitude = compute_antenna_attitude_from_euler_angles(
+                ypr_rad=ypr_rad,
+                rotation_order=self._attitude_info.rotation_order.value.upper(),
+                times=_time_axis,
+                sensor_local_axis=zero_doppler_local_axis,
+            )
 
     def _get_raster_layout(self) -> tuple[list[PreciseDateTime], list[float]]:
         """Evaluating raster boundaries taking into account the bursts, if needed.
@@ -447,13 +465,13 @@ class ChannelManager:
         return self._az_time_half_swath
 
     @property
-    def trajectory(self) -> Orbit:
+    def trajectory(self) -> Trajectory:
         """Channel trajectory 3D curve"""
         return self._trajectory_rx
 
     @property
-    def boresight_normal_curve(self) -> Generic3DCurve | None:
-        """Channel attitude boresight normal 3D curve"""
+    def attitude(self) -> Attitude | None:
+        """Channel attitude"""
         return self._boresight_normal
 
     @property
@@ -548,20 +566,20 @@ class ChannelManager:
             LocationData instance related to the selected location
         """
 
-        incidence_angle = compute_incidence_angles_from_trajectory(
+        incidence_angle = compute_incidence_angles(
             trajectory=self.trajectory,
             azimuth_time=azimuth_time,
             range_times=range_time,
             look_direction=self.looking_side.value,
         )
         # TODO compute look angles/ground velocity directly at target position and not a mid range
-        look_angle = compute_look_angles_from_trajectory(
+        look_angle = compute_look_angles(
             trajectory=self.trajectory,
             azimuth_time=azimuth_time,
             range_times=self.mid_range_time,
             look_direction=self.looking_side.value,
         )
-        v_ground = compute_ground_velocity_from_trajectory(
+        v_ground = compute_ground_velocity(
             trajectory=self.trajectory, azimuth_time=azimuth_time, look_angles_rad=look_angle
         )
         azimuth_step_m = self.azimuth_step_s * v_ground
@@ -667,12 +685,12 @@ class ChannelManager:
         bursts = []
         for point in coordinates:
             try:
-                t_azmth, t_rng = inverse_geocoding_monostatic_core(
+                t_azmth, t_rng = inverse_geocoding_monostatic(
                     trajectory=self.trajectory,
                     ground_points=point,
+                    doppler_frequencies=0,
                     wavelength=1,
-                    frequencies_doppler_centroid=0,
-                    initial_guesses=self.mid_azimuth_time,
+                    az_initial_time_guesses=self.mid_azimuth_time,
                 )
 
                 az_check = [(t_azmth < az[1] and t_azmth > az[0]) for az in burst_az_boundaries]
@@ -842,7 +860,7 @@ class ChannelManager:
         # converting to beta nought if radiometric quantity is different
         if self._radiometric_quantity != output_radiometric_quantity:
             azimuth_time, _ = self.pixel_to_times_conversion(azimuth_index=azimuth_index, range_index=range_index)
-            incidence_angles = compute_incidence_angles_from_trajectory(
+            incidence_angles = compute_incidence_angles(
                 trajectory=self.trajectory,
                 azimuth_time=azimuth_time,
                 range_times=self._slant_range_axis[target_block[1] : target_block[1] + target_block[3]],
