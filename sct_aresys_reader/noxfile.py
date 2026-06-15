@@ -4,9 +4,6 @@
 """Automating python testing, formatting and distribution of SCT Aresys Product Plugin"""
 
 import sys
-from pathlib import Path
-
-import nox
 
 sys.path.append("..")
 import nox_common
