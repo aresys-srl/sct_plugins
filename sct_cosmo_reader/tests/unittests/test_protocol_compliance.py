@@ -1,14 +1,11 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-SCT COSMO-SkyMed Product Format Reader Plugin - Testing Plugin Protocol Compliance
-"""
+"""SCT COSMO-SkyMed Product Format Reader Plugin - Testing Plugin Protocol Compliance."""
 
 from __future__ import annotations
 
-import unittest
-
+import pytest
 from eo_products.cosmo.utilities import is_cosmo_product
 from perseo_quality.io.quality_input_protocol import ChannelData, SARCoordinatesFunction
 from sct.io.extended_protocols import SCTInputProduct
@@ -21,42 +18,40 @@ from sct_cosmo_reader.protocol_implementation import (
 )
 
 
-class PluginProtocolComplianceTest(unittest.TestCase):
+@pytest.fixture
+def plugin():
+    return import_input_product_plugins()
+
+
+class TestPluginProtocolCompliance:
     """Test Plugin Protocol Compliance"""
 
-    def setUp(self):
-        self.plugin = import_input_product_plugins()
-
-    def test_installed_plugin(self) -> None:
+    def test_installed_plugin(self, plugin) -> None:
         """Testing correct plugin installation"""
-        self.assertEqual(len(self.plugin), 1)
-        self.assertEqual(self.plugin[0].__name__, "COSMOProductPlugin")
+        assert len(plugin) == 1
+        assert plugin[0].__name__ == "COSMOProductPlugin"
 
-    def test_get_manager(self) -> None:
+    def test_get_manager(self, plugin) -> None:
         """Testing manager protocol compliance"""
-        isinstance(self.plugin[0].get_manager(), COSMOProductManager)
-        isinstance(self.plugin[0].get_manager(), SCTInputProduct)
+        assert plugin[0].get_manager() is COSMOProductManager
+        assert isinstance(plugin[0].get_manager(), SCTInputProduct)
 
-    def test_get_detector(self) -> None:
+    def test_get_detector(self, plugin) -> None:
         """Testing detector protocol compliance"""
-        self.assertTrue(self.plugin[0].get_detector() is is_cosmo_product)
+        assert plugin[0].get_detector() is is_cosmo_product
 
-    def test_get_ale_corrector(self) -> None:
+    def test_get_ale_corrector(self, plugin) -> None:
         """Testing ALE Corrector protocol compliance"""
-        self.assertIsNone(self.plugin[0].get_ale_corrector())
+        assert plugin[0].get_ale_corrector() is None
 
     def test_product_protocol_compliance(self) -> None:
         """Testing product protocol implementation compliance"""
-        isinstance(COSMOProductManager, SCTInputProduct)
+        assert isinstance(COSMOProductManager, SCTInputProduct)
 
     def test_channel_protocol_compliance(self) -> None:
         """Testing channel protocol implementation compliance"""
-        isinstance(COSMOChannelManager, ChannelData)
+        assert isinstance(COSMOChannelManager, ChannelData)
 
     def test_polynomial_protocol_compliance(self) -> None:
         """Testing polynomial protocol implementation compliance"""
-        isinstance(COSMODopplerPolynomial, SARCoordinatesFunction)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert isinstance(COSMODopplerPolynomial, SARCoordinatesFunction)
