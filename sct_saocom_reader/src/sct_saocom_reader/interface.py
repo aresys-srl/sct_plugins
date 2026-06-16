@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-Saocom format PERSEO-Quality protocol-compliant wrapper
--------------------------------------------------------
-"""
+"""Saocom SCT plugin interface."""
 
 from __future__ import annotations
 
