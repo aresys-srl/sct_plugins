@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-ICEYE format PERSEO-Quality protocol-compliant wrapper
------------------------------------------------------------
-"""
+"""ICEYE format reader protocol-compliant wrapper for PERSEO-quality."""
 
 from __future__ import annotations
 
@@ -12,17 +9,13 @@ from itertools import product
 from pathlib import Path
 
 import numpy as np
-from arepytools.geometry.geometric_functions import (
-    compute_ground_velocity_from_trajectory,
-    compute_incidence_angles_from_trajectory,
-    compute_look_angles_from_trajectory,
-)
-from arepytools.geometry.inverse_geocoding_core import inverse_geocoding_monostatic_core
-from arepytools.geometry.orbit import Orbit
-from arepytools.timing.precisedatetime import PreciseDateTime
 from eo_products.common.utilities import DopplerEvaluator
 from eo_products.iceye.reader import open_product, read_channel_data, read_channel_metadata
 from numpy.typing import ArrayLike
+from perseo_core.geometry import compute_ground_velocity, compute_incidence_angles, compute_look_angles
+from perseo_core.geometry.geocoding import inverse_geocoding_monostatic
+from perseo_core.geometry.navigation import Trajectory
+from perseo_core.timing import PreciseDateTime
 from perseo_quality.core.custom_errors import (
     CoordinatesOutOfBounds,
 )
@@ -376,13 +369,13 @@ class ICEYEChannelManager:
         return self._az_time_half_swath
 
     @property
-    def trajectory(self) -> Orbit:
+    def trajectory(self) -> Trajectory:
         """Channel trajectory rx 3D curve"""
         return self._trajectory_rx
 
     @property
-    def boresight_normal_curve(self) -> None:
-        """Channel attitude boresight normal 3D curve"""
+    def attitude(self) -> None:
+        """Channel attitude defined in ECEF Reference Frame"""
         return None
 
     @property
@@ -490,19 +483,19 @@ class ICEYEChannelManager:
             LocationData instance related to the selected location
         """
 
-        incidence_angle = compute_incidence_angles_from_trajectory(
+        incidence_angle = compute_incidence_angles(
             trajectory=self.trajectory,
             azimuth_time=azimuth_time,
             range_times=range_time,
             look_direction=self.looking_side.value,
         )
-        look_angle = compute_look_angles_from_trajectory(
+        look_angle = compute_look_angles(
             trajectory=self.trajectory,
             azimuth_time=azimuth_time,
             range_times=self.mid_range_time,
             look_direction=self.looking_side.value,
         )
-        v_ground = compute_ground_velocity_from_trajectory(
+        v_ground = compute_ground_velocity(
             trajectory=self.trajectory, azimuth_time=azimuth_time, look_angles_rad=look_angle
         )
         azimuth_step_m = self.azimuth_step_s * v_ground
@@ -628,12 +621,12 @@ class ICEYEChannelManager:
         t_azmth, t_rng = [], []
         for coord in coordinates:
             try:
-                t_azmth_i, t_rng_i = inverse_geocoding_monostatic_core(
+                t_azmth_i, t_rng_i = inverse_geocoding_monostatic(
                     trajectory=self.trajectory,
                     ground_points=coord,
-                    initial_guesses=self.mid_azimuth_time,
+                    doppler_frequencies=0,
                     wavelength=1,
-                    frequencies_doppler_centroid=0,
+                    az_initial_time_guesses=self.mid_azimuth_time,
                 )
                 t_azmth.append(t_azmth_i)
                 t_rng.append(t_rng_i)
