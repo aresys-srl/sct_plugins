@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-RADARSAT-2 format PERSEO-Quality protocol-compliant wrapper
------------------------------------------------------------
-"""
+"""RADARSAT-2 SCT plugin interface."""
 
 from __future__ import annotations
 
