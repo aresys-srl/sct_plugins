@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-NovaSAR1 format PERSEO-Quality protocol-compliant wrapper
---------------------------------------------------------------
-"""
+"""NovaSAR-1 SCT plugin interface."""
 
 from __future__ import annotations
 
