@@ -64,10 +64,10 @@ unittest_linux:
   artifacts:
     reports:
       junit:
-        - ${SUBPROJECT}/_build/unittest-report-*.xml
+        - ${SUBPROJECT}/_build/pytest-report-*.xml
       coverage_report:
         coverage_format: cobertura
-        path: ${SUBPROJECT}/_build/unittest-coverage-*.xml
+        path: ${SUBPROJECT}/_build/pytest-coverage-*.xml
 
 unittest_win:
   stage: test
@@ -86,10 +86,10 @@ unittest_win:
   artifacts:
     reports:
       junit:
-        - ${SUBPROJECT}/_build/unittest-report-*.xml
+        - ${SUBPROJECT}/_build/pytest-report-*.xml
       coverage_report:
         coverage_format: cobertura
-        path: ${SUBPROJECT}/_build/unittest-coverage-*.xml
+        path: ${SUBPROJECT}/_build/pytest-coverage-*.xml
 
 # === test - integration =====================================================
 # ============================================================================
