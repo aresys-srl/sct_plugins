@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-StriX format PERSEO-Quality protocol-compliant wrapper
-------------------------------------------------------
-"""
+"""StriX SCT plugin interface."""
 
 from __future__ import annotations
 

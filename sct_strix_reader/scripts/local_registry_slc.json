@@ -1,24 +1,10 @@
 {
     "strix": {
-        "stripmap-slc-pta": {
-            "analysis": "pta",
-            "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/synspective/stripmap/IMG-VV-STRIX3-20240603T115211Z-SMSLC-SICD.nitf",
-            "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/synspective/config.toml",
-            "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/synspective/stripmap/rosamond_point_target.csv",
-            "reference_output": ""
-        },
         "sliding-spot-slc-pta": {
-            "analysis": "pta",
-            "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/synspective/sliding_spotlight/IMG-VV-STRIX2-20250727T222030Z-SLSLC-SICD.nitf",
-            "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/synspective/config.toml",
-            "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/synspective/sliding_spotlight/rosamond_point_target.csv",
-            "reference_output": ""
-        },
-        "staring-spot-slc-pta": {
-            "analysis": "pta",
-            "product": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/synspective/staring_spotlight/IMG-VV-STRIX3-20250420T111758Z-STSLC-SICD.nitf",
-            "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/synspective/config_staring.toml",
-            "targets": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/synspective/staring_spotlight/rosamond_point_target.csv",
+            "analysis": "point_target",
+            "product": "C:/Users/giorgio.parma/Downloads/strix/IMG-VV-STRIX2-20250727T222030Z-SLSLC-SICD.nitf",
+            "config": "C:/Users/giorgio.parma/Aresys_DATA/sct_data/configurations/test_906f38dc_config.toml",
+            "targets": "C:/Users/giorgio.parma/Downloads/strix/rosamond_point_target_sliding_spot.csv",
             "reference_output": ""
         }
     }
