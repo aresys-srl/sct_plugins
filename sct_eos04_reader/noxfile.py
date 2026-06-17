@@ -4,9 +4,6 @@
 """Automating python testing, formatting and distribution of SCT EOS-04 Plugin"""
 
 import sys
-from pathlib import Path
-
-import nox
 
 sys.path.append("..")
 import nox_common

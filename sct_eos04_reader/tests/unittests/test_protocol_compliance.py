@@ -1,14 +1,11 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-SCT EOS04 Product Format Reader Plugin - Testing Plugin Protocol Compliance
-"""
+"""SCT EOS04 Product Format Reader Plugin - Testing Plugin Protocol Compliance."""
 
 from __future__ import annotations
 
-import unittest
-
+import pytest
 from eo_products.eos04.utilities import is_eos04_product
 from perseo_quality.io.quality_input_protocol import ChannelData, SARCoordinatesFunction
 from sct.io.extended_protocols import SCTInputProduct
@@ -21,42 +18,40 @@ from sct_eos04_reader.protocol_implementation import (
 )
 
 
-class PluginProtocolComplianceTest(unittest.TestCase):
+@pytest.fixture
+def plugin():
+    return import_input_product_plugins()
+
+
+class TestPluginProtocolCompliance:
     """Test Plugin Protocol Compliance"""
 
-    def setUp(self):
-        self.plugin = import_input_product_plugins()
-
-    def test_installed_plugin(self) -> None:
+    def test_installed_plugin(self, plugin) -> None:
         """Testing correct plugin installation"""
-        self.assertEqual(len(self.plugin), 1)
-        self.assertEqual(self.plugin[0].__name__, "EOS04ProductPlugin")
+        assert len(plugin) == 1
+        assert plugin[0].__name__ == "EOS04ProductPlugin"
 
-    def test_get_manager(self) -> None:
+    def test_get_manager(self, plugin) -> None:
         """Testing manager protocol compliance"""
-        isinstance(self.plugin[0].get_manager(), EOS04ProductManager)
-        isinstance(self.plugin[0].get_manager(), SCTInputProduct)
+        assert plugin[0].get_manager() is EOS04ProductManager
+        assert isinstance(plugin[0].get_manager(), SCTInputProduct)
 
-    def test_get_detector(self) -> None:
+    def test_get_detector(self, plugin) -> None:
         """Testing detector protocol compliance"""
-        self.assertTrue(self.plugin[0].get_detector() is is_eos04_product)
+        assert plugin[0].get_detector() is is_eos04_product
 
-    def test_get_ale_corrector(self) -> None:
+    def test_get_ale_corrector(self, plugin) -> None:
         """Testing ALE Corrector protocol compliance"""
-        self.assertIsNone(self.plugin[0].get_ale_corrector())
+        assert plugin[0].get_ale_corrector() is None
 
     def test_product_protocol_compliance(self) -> None:
         """Testing product protocol implementation compliance"""
-        isinstance(EOS04ProductManager, SCTInputProduct)
+        assert isinstance(EOS04ProductManager, SCTInputProduct)
 
     def test_channel_protocol_compliance(self) -> None:
         """Testing channel protocol implementation compliance"""
-        isinstance(EOS04ChannelManager, ChannelData)
+        assert isinstance(EOS04ChannelManager, ChannelData)
 
     def test_polynomial_protocol_compliance(self) -> None:
         """Testing polynomial protocol implementation compliance"""
-        isinstance(EOS04DopplerPolynomial, SARCoordinatesFunction)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert isinstance(EOS04DopplerPolynomial, SARCoordinatesFunction)
