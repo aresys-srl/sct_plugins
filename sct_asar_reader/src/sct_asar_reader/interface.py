@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: GPLv3+
 
-"""
-ENVISAT/ERS ASAR format PERSEO-Quality protocol-compliant wrapper
------------------------------------------------------------------
-"""
+"""ENVISAT/ERS ASAR SCT plugin interface."""
 
 from __future__ import annotations
 

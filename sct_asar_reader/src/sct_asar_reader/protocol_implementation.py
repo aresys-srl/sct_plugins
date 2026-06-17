@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: GPLv3+
 
-"""
-ENVISAT/ERS ASAR format PERSEO-Quality protocol-compliant wrapper
-----------------------------------------------------------------------
-"""
+"""ENVISAT/ERS ASAR format reader protocol-compliant wrapper for PERSEO-quality."""
 
 from __future__ import annotations
 
@@ -12,16 +9,11 @@ from itertools import product
 from pathlib import Path
 
 import numpy as np
-from arepytools.geometry.geometric_functions import (
-    compute_ground_velocity_from_trajectory,
-    compute_incidence_angles_from_trajectory,
-    compute_look_angles_from_trajectory,
-)
-from arepytools.geometry.inverse_geocoding_core import inverse_geocoding_monostatic_core
-from arepytools.geometry.orbit import Orbit
-from arepytools.math.genericpoly import SortedPolyList
-from arepytools.timing.precisedatetime import PreciseDateTime
 from numpy.typing import ArrayLike
+from perseo_core.geometry import compute_ground_velocity, compute_incidence_angles, compute_look_angles
+from perseo_core.geometry.geocoding import inverse_geocoding_monostatic
+from perseo_core.geometry.navigation import Trajectory
+from perseo_core.timing import PreciseDateTime
 from perseo_quality.core.custom_errors import (
     CoordinatesOutOfBounds,
 )
@@ -41,14 +33,15 @@ from perseo_quality.io.protocol_utilities import roi_validation
 from scipy.constants import speed_of_light
 from shapely import Polygon
 
+from sct_asar_reader.core.common import DopplerEvaluator
 from sct_asar_reader.core.reader import open_product, read_channel_data, read_channel_metadata
 
 
 class ASARDopplerPolynomial:
     """ASAR doppler polynomial wrapper compliant with PERSEO-quality Coordinate Conversion Function protocol"""
 
-    def __init__(self, sorted_poly: SortedPolyList) -> None:
-        self._sorted_poly = sorted_poly
+    def __init__(self, evaluator: DopplerEvaluator) -> None:
+        self._evaluator = evaluator
 
     def evaluate(self, azimuth_time: PreciseDateTime, range_time: float) -> float:
         """Evaluate the Doppler Polynomial at given azimuth and range times.
@@ -65,7 +58,7 @@ class ASARDopplerPolynomial:
         float
             doppler centroid at that time
         """
-        return self._sorted_poly.evaluate((azimuth_time, range_time))
+        return self._evaluator.evaluate(azimuth_time, range_time)
 
 
 class ASARProductManager:
@@ -147,19 +140,19 @@ class ASARChannelManager:
 
         self._range_step_m = self._compute_range_step_m()
         self._image_type = self._channel.general_info.product_type
-        self._looking_side = SARSideLooking(self._channel.dataset_info.side_looking.value.upper())
+        self._looking_side = SARSideLooking(self._channel.dataset_info.side_looking.upper())
 
         # compute axes
         self._azimuth_axis = self._compute_azimuth_axis()
         self._az_time_half_swath = self._azimuth_axis[self._azimuth_axis.size // 2]
         self._range_axis = (
-            np.arange(0, self._channel.raster_info.samples, 1) * self._channel.raster_info.samples_step
-            + self._channel.raster_info.samples_start
+            np.arange(0, self._channel.raster_info.samples.length, 1) * self._channel.raster_info.samples.step
+            + self._channel.raster_info.samples.start
         )
         self._slant_range_axis = self._compute_slant_range_axis()
         rng_time_half_swath = (
-            self._channel.raster_info.samples_start
-            + (self._channel.raster_info.samples - 1) * self._channel.raster_info.samples_step / 2
+            self._channel.raster_info.samples.start
+            + (self._channel.raster_info.samples.length - 1) * self._channel.raster_info.samples.step / 2
         )
         if self._projection == SARProjection.GROUND_RANGE:
             rng_time_half_swath = self._channel.coordinate_conversions.evaluate_ground_to_slant(
@@ -168,7 +161,7 @@ class ASARChannelManager:
         self._rng_time_half_swath = rng_time_half_swath
 
         # computing range_step_m
-        self._az_step_s = self._channel.raster_info.lines_step
+        self._az_step_s = self._channel.raster_info.lines.step
         self._range_step_m = self._compute_range_step_m()
 
         # lines per burst array
@@ -178,7 +171,7 @@ class ASARChannelManager:
             )
         else:
             # should be a 1D array
-            self._lines_per_burst_array = np.repeat(self._channel.raster_info.lines, 1)
+            self._lines_per_burst_array = np.repeat(self._channel.raster_info.lines.length, 1)
 
         # lines per burst array
         if self._channel.burst_info.num > 0:
@@ -187,7 +180,7 @@ class ASARChannelManager:
             )
         else:
             # should be a 1D array
-            self._lines_per_burst_array = np.repeat(self._channel.raster_info.lines, 1)
+            self._lines_per_burst_array = np.repeat(self._channel.raster_info.lines.length, 1)
 
         # prf
         self._prf = self._channel.swath_info.prf
@@ -200,8 +193,8 @@ class ASARChannelManager:
         self._trajectory_tx = None
 
         # generating doppler centroid wrappers
-        self._doppler_centroid_poly = ASARDopplerPolynomial(sorted_poly=self._channel.doppler_centroid_poly)
-        self._doppler_rate_poly = ASARDopplerPolynomial(sorted_poly=self._channel.doppler_rate_poly)
+        self._doppler_centroid_poly = ASARDopplerPolynomial(evaluator=self._channel.doppler_centroid_poly)
+        self._doppler_rate_poly = ASARDopplerPolynomial(evaluator=self._channel.doppler_rate_poly)
 
         # get burst boundaries
         self._burst_az_boundaries, self._burst_rng_boundaries = self._get_raster_layout()
@@ -209,9 +202,9 @@ class ASARChannelManager:
     def _compute_range_step_m(self) -> float:
         """Computing step along range direction, in meters"""
         if self._projection == SARProjection.GROUND_RANGE:
-            return self._channel.raster_info.samples_step
+            return self._channel.raster_info.samples.step
 
-        return self._channel.raster_info.samples_step * speed_of_light / 2
+        return self._channel.raster_info.samples.step * speed_of_light / 2
 
     def _compute_slant_range_axis(self) -> np.ndarray:
         """Computing slant range full axis.
@@ -238,15 +231,15 @@ class ASARChannelManager:
             azimuth axis
         """
         az_axis = (
-            np.arange(0, self._channel.raster_info.lines, 1) * self._channel.raster_info.lines_step
-            + self._channel.raster_info.lines_start
+            np.arange(0, self._channel.raster_info.lines.length, 1) * self._channel.raster_info.lines.step
+            + self._channel.raster_info.lines.start
         )
         if self._channel.burst_info.num > 0:
             az_axis = []
             for brst in range(self._channel.burst_info.num):
                 az_axis.append(
                     self._channel.burst_info.azimuth_start_times[brst]
-                    + np.arange(0, self._channel.burst_info.lines_per_burst, 1) * self._channel.raster_info.lines_step
+                    + np.arange(0, self._channel.burst_info.lines_per_burst, 1) * self._channel.raster_info.lines.step
                 )
             az_axis = np.concatenate(az_axis)
         return az_axis
@@ -263,30 +256,33 @@ class ASARChannelManager:
 
         if self._channel.burst_info.num > 0:
             az_times = self._channel.burst_info.azimuth_start_times
-            rng_times = np.repeat(self._channel.raster_info.samples_start, az_times.size)
+            rng_times = np.repeat(self._channel.raster_info.samples.start, az_times.size)
             burst_az_boundaries = []
             for az_time in az_times:
                 burst_az_boundaries.append(
-                    [az_time, az_time + self._channel.burst_info.lines_per_burst * self._channel.raster_info.lines_step]
+                    [az_time, az_time + self._channel.burst_info.lines_per_burst * self._channel.raster_info.lines.step]
                 )
             burst_rng_boundaries = []
             for rng_time in rng_times:
                 burst_rng_boundaries.append(
-                    [rng_time, rng_time + self._channel.raster_info.samples * self._channel.raster_info.samples_step]
+                    [
+                        rng_time,
+                        rng_time + self._channel.raster_info.samples.length * self._channel.raster_info.samples.step,
+                    ]
                 )
         else:
             burst_az_boundaries = [
                 [
-                    self._channel.raster_info.lines_start,
-                    self._channel.raster_info.lines_start
-                    + self._channel.raster_info.lines * self._channel.raster_info.lines_step,
+                    self._channel.raster_info.lines.start,
+                    self._channel.raster_info.lines.start
+                    + self._channel.raster_info.lines.length * self._channel.raster_info.lines.step,
                 ]
             ]
             burst_rng_boundaries = [
                 [
-                    self._channel.raster_info.samples_start,
-                    self._channel.raster_info.samples_start
-                    + self._channel.raster_info.samples * self._channel.raster_info.samples_step,
+                    self._channel.raster_info.samples.start,
+                    self._channel.raster_info.samples.start
+                    + self._channel.raster_info.samples.length * self._channel.raster_info.samples.step,
                 ]
             ]
 
@@ -320,7 +316,7 @@ class ASARChannelManager:
     @property
     def azimuth_step_s(self) -> float:
         """Step along azimuth direction, in seconds"""
-        return self._channel.raster_info.lines_step
+        return self._channel.raster_info.lines.step
 
     @property
     def projection(self) -> SARProjection:
@@ -368,13 +364,13 @@ class ASARChannelManager:
         return self._az_time_half_swath
 
     @property
-    def trajectory(self) -> Orbit:
+    def trajectory(self) -> Trajectory:
         """Channel trajectory rx 3D curve"""
         return self._trajectory_rx
 
     @property
-    def boresight_normal_curve(self) -> None:
-        """Channel attitude boresight normal 3D curve"""
+    def attitude(self) -> None:
+        """Channel attitude defined in ECEF Reference Frame"""
         return None
 
     @property
@@ -458,7 +454,7 @@ class ASARChannelManager:
         if self._channel.burst_info.num > 0 and burst is not None:
             time_rel = azimuth_time - self._channel.burst_info.azimuth_start_times[burst]
         else:
-            time_rel = azimuth_time - self._channel.raster_info.lines_start
+            time_rel = azimuth_time - self._channel.raster_info.lines.start
         return (
             self._steering_rate_poly_coeff[0]
             + self._steering_rate_poly_coeff[1] * time_rel
@@ -482,19 +478,19 @@ class ASARChannelManager:
             LocationData instance related to the selected location
         """
 
-        incidence_angle = compute_incidence_angles_from_trajectory(
+        incidence_angle = compute_incidence_angles(
             trajectory=self.trajectory,
             azimuth_time=azimuth_time,
             range_times=range_time,
             look_direction=self.looking_side.value,
         )
-        look_angle = compute_look_angles_from_trajectory(
+        look_angle = compute_look_angles(
             trajectory=self.trajectory,
             azimuth_time=azimuth_time,
             range_times=self.mid_range_time,
             look_direction=self.looking_side.value,
         )
-        v_ground = compute_ground_velocity_from_trajectory(
+        v_ground = compute_ground_velocity(
             trajectory=self.trajectory, azimuth_time=azimuth_time, look_angles_rad=look_angle
         )
         azimuth_step_m = self.azimuth_step_s * v_ground
@@ -541,17 +537,17 @@ class ASARChannelManager:
             range time
         """
 
-        start_time_rng = self._channel.raster_info.samples_start
+        start_time_rng = self._channel.raster_info.samples.start
         if self._channel.burst_info.num > 0 and burst is not None:
             start_time_az = self._channel.burst_info.azimuth_start_times[burst]
             az_time = (
                 azimuth_index - self._channel.burst_info.lines_per_burst * burst
-            ) * self._channel.raster_info.lines_step + start_time_az
+            ) * self._channel.raster_info.lines.step + start_time_az
         else:
-            start_time_az = self._channel.raster_info.lines_start
-            az_time = azimuth_index * self._channel.raster_info.lines_step + start_time_az
+            start_time_az = self._channel.raster_info.lines.start
+            az_time = azimuth_index * self._channel.raster_info.lines.step + start_time_az
 
-        rng_time = range_index * self._channel.raster_info.samples_step + start_time_rng
+        rng_time = range_index * self._channel.raster_info.samples.step + start_time_rng
 
         if self.projection == SARProjection.GROUND_RANGE:
             rng_time = self._channel.coordinate_conversions.evaluate_ground_to_slant(
@@ -589,15 +585,15 @@ class ASARChannelManager:
                 azimuth_time=azimuth_time, slant_range=range_time
             )
 
-        rng_idx = (rng_value - self._channel.raster_info.samples_start) / self._channel.raster_info.samples_step
+        rng_idx = (rng_value - self._channel.raster_info.samples.start) / self._channel.raster_info.samples.step
         if self._channel.burst_info.num > 0:
             if burst is None:
                 burst = self.times_to_burst_association([azimuth_time])[0]
             azmth_idx = (
                 azimuth_time - self._channel.burst_info.azimuth_start_times[burst]
-            ) / self._channel.raster_info.lines_step + self._channel.burst_info.lines_per_burst * burst
+            ) / self._channel.raster_info.lines.step + self._channel.burst_info.lines_per_burst * burst
         else:
-            azmth_idx = (azimuth_time - self._channel.raster_info.lines_start) / self._channel.raster_info.lines_step
+            azmth_idx = (azimuth_time - self._channel.raster_info.lines.start) / self._channel.raster_info.lines.step
 
         return azmth_idx, rng_idx
 
@@ -621,12 +617,12 @@ class ASARChannelManager:
         t_azmth, t_rng = [], []
         for coord in coordinates:
             try:
-                t_azmth_i, t_rng_i = inverse_geocoding_monostatic_core(
+                t_azmth_i, t_rng_i = inverse_geocoding_monostatic(
                     trajectory=self.trajectory,
                     ground_points=coord,
+                    doppler_frequencies=0,
                     wavelength=1,
-                    frequencies_doppler_centroid=0,
-                    initial_guesses=self.mid_azimuth_time,
+                    az_initial_time_guesses=self.mid_azimuth_time,
                 )
                 t_azmth.append(t_azmth_i)
                 t_rng.append(t_rng_i)
@@ -683,7 +679,7 @@ class ASARChannelManager:
             bursts_start_times[0]
             + self._channel.burst_info.num
             * self._channel.burst_info.lines_per_burst
-            * self._channel.raster_info.lines_step
+            * self._channel.raster_info.lines.step
         )
 
         bursts = []
@@ -777,7 +773,7 @@ class ASARChannelManager:
 
         # NOTE: inverting range index starting from the end of the axis due to the fact that the binary is written
         # in the opposite direction along range
-        range_index = self._channel.raster_info.samples - range_index
+        range_index = self._channel.raster_info.samples.length - range_index
         # creating the target block identifier for partial swath reading
         # [start line, start sample, number of lines, number of samples]
         target_block = [
@@ -788,7 +784,7 @@ class ASARChannelManager:
         ]
 
         # full raster boundaries and burst boundaries, if applicable
-        raster_boundaries = [0, 0, self._channel.raster_info.lines, self._channel.raster_info.samples]
+        raster_boundaries = [0, 0, self._channel.raster_info.lines.length, self._channel.raster_info.samples.length]
         burst_boundaries = None
         # if burst is provided, it means that the ROI to be read must be inside of this burst, otherwise the extracted
         # data are not meaningful with respect to times, acquisition consistency and IRF
@@ -797,7 +793,7 @@ class ASARChannelManager:
                 sum(self.lines_per_burst[:burst]),
                 0,
                 self.lines_per_burst[burst],
-                self._channel.raster_info.samples,
+                self._channel.raster_info.samples.length,
             ]
 
         # validating target block extraction with respect to raster boundaries and burst boundaries
@@ -817,7 +813,7 @@ class ASARChannelManager:
         # converting to beta nought if radiometric quantity is different
         if self._radiometric_quantity != output_radiometric_quantity:
             azimuth_time, _ = self.pixel_to_times_conversion(azimuth_index=azimuth_index, range_index=range_index)
-            incidence_angles = compute_incidence_angles_from_trajectory(
+            incidence_angles = compute_incidence_angles(
                 trajectory=self.trajectory,
                 azimuth_time=azimuth_time,
                 range_times=self._slant_range_axis[target_block[1] : target_block[1] + target_block[3]],

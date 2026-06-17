@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: GPLv3+
 
-"""
-Envisat & ERS reader support module
------------------------------------
-"""
+"""Envisat & ERS reader support module."""
 
 from __future__ import annotations
 
@@ -13,22 +10,26 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from pathlib import Path
 
-import arepytools.io.metadata as meta
 import epr
 import numpy as np
-from arepytools.geometry.direct_geocoding import direct_geocoding_monostatic
-from arepytools.geometry.orbit import Orbit
-from arepytools.math.genericpoly import SortedPolyList, create_sorted_poly_list
-from arepytools.timing.precisedatetime import PreciseDateTime
 from epr import Dataset, EPRTime, Record
 from numpy.polynomial import Polynomial
 from numpy.typing import ArrayLike
+from perseo_core.geometry.geocoding import direct_geocoding_monostatic
+from perseo_core.geometry.navigation import CubicSplineTrajectory, Trajectory
+from perseo_core.timing import PreciseDateTime
 from scipy.constants import speed_of_light
 from scipy.interpolate import CubicSpline
 
 from sct_asar_reader.core.common import (
+    ConversionFunction,
     ConversionPolynomial,
+    DatasetInfo,
+    DopplerEvaluator,
     OrbitDirection,
+    PulseInfo,
+    RasterInfo,
+    RasterInfoAxis,
     SARPolarization,
     SARProjection,
     SARRadiometricQuantity,
@@ -132,7 +133,7 @@ def mjd_datetime_converter(epr_time: EPRTime) -> PreciseDateTime:
 
 def raster_info_from_record(
     main_params_dataset: Dataset, geolocation_record: Record, product_type: ASARProductType
-) -> meta.RasterInfo:
+) -> RasterInfo:
     """Generating RasterInfo object from metadata.
 
     Parameters
@@ -146,7 +147,7 @@ def raster_info_from_record(
 
     Returns
     -------
-    meta.RasterInfo
+    RasterInfo
         RasterInfo object
     """
     main_params_records = [m for m in main_params_dataset]
@@ -163,24 +164,24 @@ def raster_info_from_record(
         samples_unit = "m"
         samples_step = main_params_records[0].get_field("range_spacing").get_elem()
 
-    raster_info = meta.RasterInfo(
-        lines=lines,
-        samples=main_params_dataset.read_record(0).get_field("num_samples_per_line").get_elem(),
-        celltype=celltype,
+    raster_lines = RasterInfoAxis(
+        length=lines,
+        start=mjd_datetime_converter(main_params_records[0].get_field("first_zero_doppler_time").get_elem()),
+        step=main_params_records[0].get_field("line_time_interval").get_elem(),
+        step_unit="s",
     )
-    raster_info.set_lines_axis(
-        lines_start=mjd_datetime_converter(main_params_records[0].get_field("first_zero_doppler_time").get_elem()),
-        lines_start_unit="Mjd",
-        lines_step=main_params_records[0].get_field("line_time_interval").get_elem(),
-        lines_step_unit="s",
+    raster_samples = RasterInfoAxis(
+        length=main_params_dataset.read_record(0).get_field("num_samples_per_line").get_elem(),
+        start=samples_start,
+        step=samples_step,
+        step_unit=samples_unit,
     )
-    raster_info.set_samples_axis(
-        samples_start=samples_start,
-        samples_start_unit=samples_unit,
-        samples_step=samples_step,
-        samples_step_unit=samples_unit,
+
+    return RasterInfo(
+        lines=raster_lines,
+        samples=raster_samples,
+        data_type=celltype,
     )
-    return raster_info
 
 
 def dataset_info_from_record(
@@ -189,8 +190,8 @@ def dataset_info_from_record(
     main_params_record: Record,
     mph: ASARMainProductHeader,
     sph: ASARSpecificProductHeader,
-) -> meta.DataSetInfo:
-    """Creating a DataSetInfo Arepytools object from metadata.
+) -> DatasetInfo:
+    """Creating a DataSetInfo object from metadata.
 
     Parameters
     ----------
@@ -210,21 +211,14 @@ def dataset_info_from_record(
     DataSetInfo
         DataSetInfo metadata object
     """
-
-    dataset_info = meta.DataSetInfo(
-        acquisition_mode_i=acquisition_mode.name, fc_hz_i=main_params_record.get_field("radar_freq").get_elem()
+    return DatasetInfo(
+        fc_hz=main_params_record.get_field("radar_freq").get_elem(),
+        acquisition_mode=acquisition_mode.name,
+        image_type="AZIMUTH FOCUSED" if product_type == ASARProductType.SLC else "MULTILOOK",
+        projection=product_type.value,
+        sensor_name="ASAR",
+        side_looking="RIGHT",
     )
-    dataset_info.description = sph.sph_descriptor
-    dataset_info.sensor_name = "ASAR"
-    dataset_info.image_type = "AZIMUTH FOCUSED" if product_type == ASARProductType.SLC else "MULTILOOK"
-    dataset_info.projection = product_type.value
-    dataset_info.side_looking = "RIGHT"
-    dataset_info.acquisition_station = mph.acquisition_station
-    dataset_info.processing_center = mph.processing_center
-    dataset_info.processing_software = mph.software_version
-    dataset_info.processing_date = mph.processing_time
-
-    return dataset_info
 
 
 def sampling_constants_from_record(main_params_record: Record) -> SARSamplingFrequencies:
@@ -248,7 +242,7 @@ def sampling_constants_from_record(main_params_record: Record) -> SARSamplingFre
     )
 
 
-def pulse_info_from_record(main_params_record: Record) -> meta.Pulse:
+def pulse_info_from_record(main_params_record: Record) -> PulseInfo:
     """Creating a Pulse object from metadata.
 
     Parameters
@@ -258,23 +252,23 @@ def pulse_info_from_record(main_params_record: Record) -> meta.Pulse:
 
     Returns
     -------
-    meta.Pulse
+    PulseInfo
         Pulse metadata object
     """
     chirp_bandwidth = main_params_record.get_field("bandwidth.tot_bw_range").get_elem()
     chirp_length = 1  # TODO: understand where to get it!
-    return meta.Pulse(
-        i_pulse_length=chirp_length,
-        i_bandwidth=chirp_bandwidth,
-        i_pulse_sampling_rate=main_params_record.get_field("range_samp_rate").get_elem(),
-        i_pulse_energy=-1,
-        i_pulse_start_frequency=-chirp_bandwidth / 2,
-        i_pulse_start_phase=(np.pi * chirp_bandwidth * chirp_length / 4) % (2 * np.pi),
-        i_pulse_direction=meta.EPulseDirection.up.value,
+    return PulseInfo(
+        length_s=chirp_length,
+        bandwidth_hz=chirp_bandwidth,
+        energy_j=-1,
+        sampling_rate_hz=main_params_record.get_field("range_samp_rate").get_elem(),
+        start_frequency_hz=-chirp_bandwidth / 2,
+        start_phase=(np.pi * chirp_bandwidth * chirp_length / 4) % (2 * np.pi),
+        direction="UP",
     )
 
 
-def doppler_centroid_poly_from_dataset(dc_params_dataset: Dataset) -> SortedPolyList:
+def doppler_centroid_poly_from_dataset(dc_params_dataset: Dataset) -> DopplerEvaluator:
     """Creating a DopplerCentroid SortedPolyList object from metadata.
 
     Parameters
@@ -284,37 +278,27 @@ def doppler_centroid_poly_from_dataset(dc_params_dataset: Dataset) -> SortedPoly
 
     Returns
     -------
-    SortedPolyList
-        Doppler Centroid sorted polynomial list object
+    DopplerEvaluator
+        Doppler Centroid evaluator object
     """
     doppler_poly = []
+    az_ref_times = []
     for dc_params in dc_params_dataset:
+        az_ref_time = mjd_datetime_converter(dc_params.get_field("zero_doppler_time").get_elem())
         coefficients = dc_params.get_field("dop_coef").get_elems()
-
+        az_ref_times.append(az_ref_time)
         doppler_poly.append(
-            meta.DopplerCentroid(
-                i_ref_az=mjd_datetime_converter(dc_params.get_field("zero_doppler_time").get_elem()),
-                i_ref_rg=dc_params.get_field("slant_range_time").get_elem() / 1e9,
-                i_coefficients=[
-                    coefficients[0],
-                    coefficients[1],
-                    0,
-                    0,
-                    coefficients[2],
-                    coefficients[3],
-                    coefficients[4],
-                    0,
-                    0,
-                    0,
-                    0,
-                ],
+            ConversionFunction(
+                azimuth_reference_time=az_ref_time,
+                origin=dc_params.get_field("slant_range_time").get_elem() / 1e9,
+                function=Polynomial(coefficients),
             )
         )
 
-    return create_sorted_poly_list(meta.DopplerCentroidVector(i_poly2d=doppler_poly))
+    return DopplerEvaluator(functions=doppler_poly, azimuth_reference_times=np.array(az_ref_times))
 
 
-def doppler_rate_poly_from_dataset(main_params_dataset: Dataset) -> SortedPolyList:
+def doppler_rate_poly_from_dataset(main_params_dataset: Dataset) -> DopplerEvaluator:
     """Creating a DopplerRate SortedPolyList object from metadata.
 
     Parameters
@@ -324,39 +308,29 @@ def doppler_rate_poly_from_dataset(main_params_dataset: Dataset) -> SortedPolyLi
 
     Returns
     -------
-    SortedPolyList
-        Doppler Rate sorted polynomial list object
+    DopplerEvaluator
+        Doppler Rate evaluator object
     """
 
-    doppler_rate_poly = []
+    doppler_poly = []
+    az_ref_times = []
     for main_params in main_params_dataset:
+        az_ref_time = mjd_datetime_converter(main_params.get_field("first_zero_doppler_time").get_elem())
         coefficients = main_params.get_field("az_fm_rate").get_elems()
-
-        doppler_rate_poly.append(
-            meta.DopplerRate(
-                i_ref_az=mjd_datetime_converter(main_params.get_field("first_zero_doppler_time").get_elem()),
-                i_ref_rg=main_params.get_field("ax_fm_origin").get_elem() / 1e9,
-                i_coefficients=[
-                    coefficients[0],
-                    coefficients[1],
-                    0,
-                    0,
-                    coefficients[2],
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                ],
+        az_ref_times.append(az_ref_time)
+        doppler_poly.append(
+            ConversionFunction(
+                azimuth_reference_time=az_ref_time,
+                origin=main_params.get_field("ax_fm_origin").get_elem() / 1e9,
+                function=Polynomial(coefficients),
             )
         )
 
-    return create_sorted_poly_list(meta.DopplerRateVector(i_poly2d=doppler_rate_poly))
+    return DopplerEvaluator(functions=doppler_poly, azimuth_reference_times=np.array(az_ref_times))
 
 
-def orbit_from_state_vectors(state_vectors: ASARStateVectors) -> Orbit:
-    """Creating an Orbit Arepytools object from ASARStateVectors data.
+def orbit_from_state_vectors(state_vectors: ASARStateVectors) -> CubicSplineTrajectory:
+    """Creating a Trajectory object from ASARStateVectors data.
 
     Parameters
     ----------
@@ -365,10 +339,12 @@ def orbit_from_state_vectors(state_vectors: ASARStateVectors) -> Orbit:
 
     Returns
     -------
-    Orbit
-        Orbit object
+    CubicSplineTrajectory
+        CubicSplineTrajectory object
     """
-    return Orbit(times=state_vectors.time_axis, positions=state_vectors.positions, velocities=state_vectors.velocities)
+    return CubicSplineTrajectory(
+        times=state_vectors.time_axis, positions=state_vectors.positions, velocities=state_vectors.velocities
+    )
 
 
 def _remove_unit_of_measure(text: str) -> str:
@@ -808,14 +784,14 @@ class ASARCoordinateConversions:
         return np.ma.masked_where(diff < 0, diff).argmin()
 
     @classmethod
-    def from_dataset(cls, slant_to_ground_dataset: Dataset, raster_info: meta.RasterInfo) -> ASARCoordinateConversions:
+    def from_dataset(cls, slant_to_ground_dataset: Dataset, raster_info: RasterInfo) -> ASARCoordinateConversions:
         """Generating ASARCoordinateConversions object from metadata.
 
         Parameters
         ----------
         slant_to_ground_dataset : Dataset
             slant to ground Dataset metadata object
-        raster_info : meta.RasterInfo
+        raster_info : RasterInfo
             product raster info metadata object
 
         Returns
@@ -824,7 +800,7 @@ class ASARCoordinateConversions:
             polynomial for coordinate conversion dataclass
         """
         ground_to_slant_poly_list, slant_to_ground_poly_list, az_ref_times = [], [], []
-        range_axis = np.arange(0, (raster_info.samples + 1) * raster_info.samples_step, raster_info.samples_step)
+        range_axis = np.arange(0, (raster_info.samples.length + 1) * raster_info.samples.step, raster_info.samples.step)
         for poly_data in slant_to_ground_dataset:
             az_ref_time = mjd_datetime_converter(poly_data.get_field("zero_doppler_time").get_elem())
             ground_to_slant_poly = Polynomial(poly_data.get_field("srgr_coeff").get_elems())
@@ -853,14 +829,14 @@ class ASARCoordinateConversions:
         )
 
     @classmethod
-    def from_orbit(cls, orbit: Orbit, raster_info: meta.RasterInfo) -> ASARCoordinateConversions:
+    def from_orbit(cls, orbit: Trajectory, raster_info: RasterInfo) -> ASARCoordinateConversions:
         """Generating ASARCoordinateConversions object from orbit and direct geocoding grid.
 
         Parameters
         ----------
-        orbit : Orbit
+        orbit : Trajectory
             sensor orbit
-        raster_info : meta.RasterInfo
+        raster_info : RasterInfo
             product raster info metadata object
 
         Returns
@@ -868,16 +844,16 @@ class ASARCoordinateConversions:
         ASARCoordinateConversions
             polynomial for coordinate conversion dataclass
         """
-        mid_azimuth = raster_info.lines_start + raster_info.lines * raster_info.lines_step / 2
-        range_times = np.arange(0, raster_info.samples, 1) * raster_info.samples_step + raster_info.samples_start
+        mid_azimuth = raster_info.lines.start + raster_info.lines.length * raster_info.lines.step / 2
+        range_times = np.arange(0, raster_info.samples.length, 1) * raster_info.samples.step + raster_info.samples.start
         ground_points = direct_geocoding_monostatic(
-            sensor_positions=orbit.evaluate(mid_azimuth),
-            sensor_velocities=orbit.evaluate_first_derivatives(mid_azimuth),
+            sensor_positions=orbit.position(mid_azimuth),
+            sensor_velocities=orbit.velocity(mid_azimuth),
             range_times=range_times,
-            frequencies_doppler_centroid=0,
+            doppler_frequencies=0,
             wavelength=1,
-            geocoding_side="RIGHT",
-            geodetic_altitude=0,
+            look_direction="RIGHT",
+            altitude=0,
         )
         ground_points_distances = np.linalg.norm(np.diff(ground_points, axis=0), axis=1)
         ground_range_axis = np.r_[[0], np.cumsum(ground_points_distances)]
@@ -885,12 +861,12 @@ class ASARCoordinateConversions:
         ground_to_slant_poly_list = Polynomial.fit(x=ground_range_axis, y=range_times, deg=8)
 
         return cls(
-            azimuth_reference_times=np.array(raster_info.lines_start),
+            azimuth_reference_times=np.array(raster_info.lines.start),
             ground_to_slant=ConversionPolynomial(
-                azimuth_reference_time=raster_info.lines_start, origin=0, polynomial=ground_to_slant_poly_list
+                azimuth_reference_time=raster_info.lines.start, origin=0, polynomial=ground_to_slant_poly_list
             ),
             slant_to_ground=ConversionPolynomial(
-                azimuth_reference_time=raster_info.lines_start, origin=0, polynomial=slant_to_ground_poly
+                azimuth_reference_time=raster_info.lines.start, origin=0, polynomial=slant_to_ground_poly
             ),
         )
 
@@ -956,19 +932,19 @@ class ASARChannelMetadata:
     """ASAR channel metadata dataclass"""
 
     general_info: ASARGeneralChannelInfo
-    orbit: Orbit
+    orbit: Trajectory
     image_calibration_factor: float
     image_radiometric_quantity: SARRadiometricQuantity
     burst_info: ASARBurstInfo
-    raster_info: meta.RasterInfo
-    dataset_info: meta.DataSetInfo
+    raster_info: RasterInfo
+    dataset_info: DatasetInfo
     swath_info: ASARSwathInfo
     sampling_constants: SARSamplingFrequencies
     # acquisition_timeline: meta.AcquisitionTimeLine
-    doppler_centroid_poly: SortedPolyList
-    doppler_rate_poly: SortedPolyList
-    pulse: meta.Pulse
-    coordinate_conversions: ...
+    doppler_centroid_poly: DopplerEvaluator
+    doppler_rate_poly: DopplerEvaluator
+    pulse: PulseInfo
+    coordinate_conversions: ASARCoordinateConversions
     state_vectors: ASARStateVectors
 
 

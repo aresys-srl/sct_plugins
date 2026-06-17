@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: GPLv3+
 
-"""
-Envisat & ERS product format reader
------------------------------------
-"""
+"""Envisat & ERS product format reader."""
 
 from __future__ import annotations
 
@@ -85,10 +82,10 @@ def read_channel_metadata(file_path: Path | str, channel_id: str) -> support.ASA
 
         burst_info = support.ASARBurstInfo(
             num=1,
-            lines_per_burst=raster_info.lines,
-            samples_per_burst=raster_info.samples,
-            azimuth_start_times=np.array([raster_info.lines_start]),
-            range_start_times=np.array([raster_info.samples_start]),
+            lines_per_burst=raster_info.lines.length,
+            samples_per_burst=raster_info.samples.length,
+            azimuth_start_times=np.array([raster_info.lines.start]),
+            range_start_times=np.array([raster_info.samples.start]),
         )
 
         dataset_info = support.dataset_info_from_record(
