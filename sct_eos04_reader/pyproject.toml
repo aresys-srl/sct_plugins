@@ -9,10 +9,10 @@ dependencies = [
     "numpy>2",
     "scipy",
     "shapely>=2.1.0",
-    "arepytools>=1.7.6",
-    "perseo-quality",
-    "eo_products",
-    "sct>=2.1.1",
+    "eo-products>=1.1.0",
+    "perseo-core>=1.0.0",
+    "perseo-quality>=1.1.0",
+    "sct>=2.2.0",
 ]
 dynamic = ["version"]
 classifiers = [
@@ -67,7 +67,7 @@ addopts = [
     "--strict-markers",
     "--strict-config",
     "--tb=short",
-    "--cov=sct_sentinel1_reader",
+    "--cov=sct_eos04_reader",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--no-cov-on-fail",

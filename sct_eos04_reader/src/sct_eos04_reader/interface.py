@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-EOS-04 format PERSEO-Quality protocol-compliant wrapper
--------------------------------------------------------
-"""
+"""EOS-4 SCT plugin interface."""
 
 from __future__ import annotations
 
