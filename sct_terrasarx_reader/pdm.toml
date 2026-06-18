@@ -1,0 +1,3 @@
+[pypi.aresys]
+url = "https://pypi.aresys.it/simple/"
+verify_ssl = false
