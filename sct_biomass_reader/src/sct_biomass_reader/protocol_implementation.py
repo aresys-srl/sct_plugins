@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-Biomass product format PERSEO-Quality protocol-compliant wrapper
---------------------------------------------------------------------
-"""
+"""Biomass format reader protocol-compliant wrapper for PERSEO-quality."""
 
 from __future__ import annotations
 
@@ -13,22 +10,18 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import numpy as np
-from arepytools.geometry.generalsarattitude import (
-    create_attitude_boresight_normal_curve_wrapper,
-    create_general_sar_attitude,
-)
-from arepytools.geometry.geometric_functions import (
-    compute_ground_velocity_from_trajectory,
-    compute_incidence_angles_from_trajectory,
-    compute_look_angles_from_trajectory,
-)
-from arepytools.geometry.inverse_geocoding_core import inverse_geocoding_monostatic_core
-from arepytools.io.create_orbit import create_orbit
-from arepytools.io.metadata import BurstInfo, RasterInfo, SamplingConstants
-from arepytools.math.genericpoly import SortedPolyList, create_sorted_poly_list
+from arepytools.math.genericpoly import create_sorted_poly_list
 from bps.transcoder.sarproduct.biomass_l1product_reader import (
     BIOMASSL1Product,
     BIOMASSL1ProductReader,
+)
+from perseo_core.geometry import compute_ground_velocity, compute_incidence_angles, compute_look_angles
+from perseo_core.geometry.geocoding import inverse_geocoding_monostatic
+from perseo_core.geometry.navigation import CubicSplineTrajectory
+from perseo_core.geometry.pointing import (
+    Attitude,
+    compute_antenna_attitude_from_euler_angles,
+    compute_sensor_local_axis,
 )
 from perseo_quality.core.generic_dataclasses import (
     LocationData,
@@ -38,7 +31,6 @@ from perseo_quality.core.generic_dataclasses import (
     SARPolarization,
     SARProjection,
     SARRadiometricQuantity,
-    SARSamplingFrequencies,
     SARSideLooking,
 )
 from perseo_quality.core.signal_processing import radiometric_correction
@@ -47,15 +39,16 @@ from perseo_quality.io.protocol_utilities import roi_validation
 from scipy.constants import speed_of_light
 from shapely import Polygon
 
+from sct_biomass_reader.utils import DopplerEvaluator, SARSamplingFrequencies
+
 if TYPE_CHECKING:
-    from arepytools.geometry.curve import Generic3DCurve
-    from arepytools.geometry.orbit import Orbit
-    from arepytools.timing.precisedatetime import PreciseDateTime
     from numpy.typing import ArrayLike
+    from perseo_core.geometry.navigation import Trajectory
+    from perseo_core.timing import PreciseDateTime
 
 
-def raster_layout_from_metadata(burst_info: BurstInfo, raster_info: RasterInfo) -> L1RasterLayout:
-    """Generating a L1RasterLayout from Product Folder BurstInfo and RasterInfo metadata for the current channel.
+def raster_layout_from_metadata(burst_info, raster_info) -> L1RasterLayout:
+    """Generating a L1RasterLayout from BurstInfo and RasterInfo metadata for the current channel.
 
     Parameters
     ----------
@@ -87,6 +80,18 @@ def raster_layout_from_metadata(burst_info: BurstInfo, raster_info: RasterInfo) 
     return L1RasterLayout(lines=raster_info.lines, samples=raster_info.samples, bursts=bursts_layout)
 
 
+def _create_trajectory(state_vectors) -> CubicSplineTrajectory:
+    """Create a Perseo CORE Trajectory compliant object from StateVectors."""
+    _time_axis = (
+        np.arange(state_vectors.number_of_state_vectors) * state_vectors.time_step + state_vectors.reference_time
+    )
+    return CubicSplineTrajectory(
+        times=_time_axis,
+        positions=state_vectors.position_vector.reshape(-1, 3),
+        velocities=state_vectors.velocity_vector.reshape(-1, 3),
+    )
+
+
 def _get_raster_layout(bursts: list[L1BurstLayout]) -> tuple[list[list[PreciseDateTime]], list[list[float]]]:
     """Evaluating raster boundaries taking into account the bursts, if needed.
 
@@ -106,8 +111,8 @@ def _get_raster_layout(bursts: list[L1BurstLayout]) -> tuple[list[list[PreciseDa
 class DopplerPolynomialWrapper:
     """Generic Polynomial wrapper used to interpolate Doppler data (Doppler Centroid or Rate)"""
 
-    def __init__(self, sorted_poly: SortedPolyList) -> None:
-        self._sorted_poly = sorted_poly
+    def __init__(self, evaluator: DopplerEvaluator) -> None:
+        self._evaluator = evaluator
 
     def evaluate(self, azimuth_time: PreciseDateTime, range_time: float) -> float:
         """Evaluate the Doppler Polynomial at given azimuth and range times.
@@ -124,7 +129,7 @@ class DopplerPolynomialWrapper:
         float
             doppler at that time
         """
-        return self._sorted_poly.evaluate((azimuth_time, range_time))
+        return self._evaluator.evaluate(azimuth_time, range_time)
 
 
 class BiomassL1ProductManager:
@@ -165,7 +170,7 @@ class BiomassL1ProductManager:
         return Polygon(region_corners).convex_hull
 
 
-def _sampling_frequencies_from_metadata(sampling_constants: SamplingConstants) -> SARSamplingFrequencies:
+def _sampling_frequencies_from_metadata(sampling_constants) -> SARSamplingFrequencies:
     """Generating a SARSamplingFrequencies dataclass from Product Folder SamplingConstants metadata.
 
     Parameters
@@ -209,14 +214,14 @@ class BiomassChannelManager:
 
         centroid_poly = product.dc_vector_list[channel_num]
         self._doppler_centroid_poly = (
-            DopplerPolynomialWrapper(sorted_poly=create_sorted_poly_list(centroid_poly))
+            DopplerPolynomialWrapper(evaluator=create_sorted_poly_list(centroid_poly))
             if centroid_poly.get_number_of_poly() > 0
             else None
         )
 
         rate_poly = product.dr_vector_list[channel_num]
         self._doppler_rate_poly = (
-            DopplerPolynomialWrapper(sorted_poly=create_sorted_poly_list(rate_poly))
+            DopplerPolynomialWrapper(evaluator=create_sorted_poly_list(rate_poly))
             if rate_poly.get_number_of_poly() > 0
             else None
         )
@@ -225,15 +230,24 @@ class BiomassChannelManager:
 
         self._orbit_direction = SAROrbitDirection[product.general_sar_orbit[0].orbit_direction.value]
 
-        self._trajectory_rx = create_orbit(state_vectors=product.general_sar_orbit[0])
+        self._trajectory_rx = _create_trajectory(state_vectors=product.general_sar_orbit[0])
         self._trajectory_tx = None
 
-        self._boresight_normal = create_attitude_boresight_normal_curve_wrapper(
-            attitude=create_general_sar_attitude(
-                product.general_sar_orbit[0],
-                attitude_info=product.attitude_info[0],
-                ignore_anx_after_orbit_start=True,
-            )
+        attitude_info = product.attitude_info[0]
+        _time_axis = (
+            np.arange(attitude_info.attitude_records_number) * attitude_info.time_step + attitude_info.reference_time
+        )
+        zero_doppler_local_axis = compute_sensor_local_axis(
+            sensor_positions=self._trajectory_rx.position(_time_axis),
+            sensor_velocities=self._trajectory_rx.velocity(_time_axis),
+            reference_frame="ZERODOPPLER",
+        )
+        ypr_rad = np.deg2rad(np.c_[attitude_info.yaw_vector, attitude_info.pitch_vector, attitude_info.roll_vector])
+        self._attitude = compute_antenna_attitude_from_euler_angles(
+            ypr_rad=ypr_rad,
+            rotation_order=attitude_info.rotation_order.value.upper(),
+            times=_time_axis,
+            sensor_local_axis=zero_doppler_local_axis,
         )
 
     @property
@@ -318,14 +332,14 @@ class BiomassChannelManager:
         return self._raster_layout.mid_swath_azimuth
 
     @property
-    def trajectory(self) -> Orbit:
+    def trajectory(self) -> Trajectory:
         """Channel trajectory 3D curve"""
         return self._trajectory_rx
 
     @property
-    def boresight_normal_curve(self) -> Generic3DCurve | None:
-        """Channel attitude boresight normal 3D curve"""
-        return self._boresight_normal
+    def attitude(self) -> Attitude | None:
+        """Channel attitude defined in ECEF Reference Frame"""
+        return self._attitude
 
     @property
     def doppler_centroid(self) -> DopplerPolynomialWrapper | None:
@@ -422,20 +436,20 @@ class BiomassChannelManager:
             LocationData instance related to the selected location
         """
 
-        incidence_angle = compute_incidence_angles_from_trajectory(
+        incidence_angle = compute_incidence_angles(
             trajectory=self.trajectory,
             azimuth_time=azimuth_time,
             range_times=range_time,
             look_direction=self.looking_side.value,
         )
         # TODO compute look angles/ground velocity directly at target position and not a mid range
-        look_angle = compute_look_angles_from_trajectory(
+        look_angle = compute_look_angles(
             trajectory=self.trajectory,
             azimuth_time=azimuth_time,
             range_times=self.mid_range_time,
             look_direction=self.looking_side.value,
         )
-        v_ground = compute_ground_velocity_from_trajectory(
+        v_ground = compute_ground_velocity(
             trajectory=self.trajectory,
             azimuth_time=azimuth_time,
             look_angles_rad=look_angle,
@@ -549,12 +563,12 @@ class BiomassChannelManager:
         bursts = []
         for point in coordinates:
             try:
-                t_azmth, t_rng = inverse_geocoding_monostatic_core(
+                t_azmth, t_rng = inverse_geocoding_monostatic(
                     trajectory=self.trajectory,
                     ground_points=point,
+                    doppler_frequencies=0,
                     wavelength=1,
-                    frequencies_doppler_centroid=0,
-                    initial_guesses=self.mid_azimuth_time,
+                    az_initial_time_guesses=self.mid_azimuth_time,
                 )
 
                 az_check: list[bool] = [az[0] < t_azmth < az[1] for az in burst_az_boundaries]
@@ -644,7 +658,7 @@ class BiomassChannelManager:
 
         if self.radiometric_quantity != output_radiometric_quantity:
             azimuth_time, _ = self.pixel_to_times_conversion(azimuth_index=azimuth_index, range_index=range_index)
-            incidence_angles = compute_incidence_angles_from_trajectory(
+            incidence_angles = compute_incidence_angles(
                 trajectory=self.trajectory,
                 azimuth_time=azimuth_time,
                 range_times=self.slant_range_axis[target_block[1] : target_block[1] + target_block[3]],

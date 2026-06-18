@@ -21,6 +21,7 @@ from sct_biomass_reader.protocol_implementation import (
 def plugin():
     return import_input_product_plugins()
 
+
 class TestPluginProtocolCompliance:
     """Test Plugin Protocol Compliance"""
 

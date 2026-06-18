@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-Biomass product format PERSEO-Quality protocol-compliant wrapper
-----------------------------------------------------------------
-"""
+"""Biomass SCT plugin interface."""
 
 from __future__ import annotations
 
