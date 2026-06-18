@@ -1,9 +1,6 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
 # SPDX-License-Identifier: MIT
 
-"""
-SCT-Plugin: Aresys product format reader
-----------------------------------------
-"""
+"""SCT-Plugin: Biomass product format reader."""
 
-__version__ = "1.0.2"
+__version__ = "1.2.0"
