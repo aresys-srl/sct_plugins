@@ -57,20 +57,20 @@ unittest_linux:
   stage: test
   script:
     - python${PYTHON} -m pip install nox
-    - python${PYTHON} -m nox -s unittest -p ${PYTHON}
+    - python${PYTHON} -m nox -s pytest -p ${PYTHON}
   parallel:
     matrix:
-      - PYTHON: ["3.12", "3.13"]
+      - PYTHON: ["3.12", "3.13", "3.14"]
   extends: .tags_manylinux_2_28_std
   needs: []
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     reports:
       junit:
-        - ${SUBPROJECT}/_build/unittest-report-*.xml
+        - ${SUBPROJECT}/_build/pytest-report-*.xml
       coverage_report:
         coverage_format: cobertura
-        path: ${SUBPROJECT}/_build/unittest-coverage-*.xml
+        path: ${SUBPROJECT}/_build/pytest-coverage-*.xml
 
 unittest_win:
   stage: test
@@ -79,20 +79,20 @@ unittest_win:
     - conda create -y -n integration_test python=${PYTHON}
     - conda activate integration_test
     - python -m pip install nox
-    - python -m nox -s unittest -p ${PYTHON}
+    - python -m nox -s pytest -p ${PYTHON}
   parallel:
     matrix:
-      - PYTHON: ["3.12", "3.13"]
+      - PYTHON: ["3.12", "3.13", "3.14"]
   needs: []
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   extends: .tags_win10_new
   artifacts:
     reports:
       junit:
-        - ${SUBPROJECT}/_build/unittest-report-*.xml
+        - ${SUBPROJECT}/_build/pytest-report-*.xml
       coverage_report:
         coverage_format: cobertura
-        path: ${SUBPROJECT}/_build/unittest-coverage-*.xml
+        path: ${SUBPROJECT}/_build/pytest-coverage-*.xml
 
 # === test - integration =====================================================
 # ============================================================================
