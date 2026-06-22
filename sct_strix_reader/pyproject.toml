@@ -10,9 +10,9 @@ dependencies = [
     "scipy",
     "shapely>=2.1.0",
     "eo-products>=1.1.0",
-    "perseo-core>=1.0.0",
-    "perseo-quality>=1.1.0",
-    "sct>=2.2.0",
+    "perseo-core==1.0.0",
+    "perseo-quality==1.0.0",
+    "sct",
 ]
 dynamic = ["version"]
 classifiers = [
@@ -37,7 +37,7 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = ["nox", "ruff", "pylint"]
-test = ["pytest", "pytest-cov", "sct[graphs]>=2.2.0"]
+test = ["pytest", "pytest-cov", "sct[graphs]"]
 docs = ["zensical", "mkdocstrings-python"]
 
 [project.entry-points."sct.input_products"]
