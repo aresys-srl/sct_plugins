@@ -3,4 +3,4 @@
 
 """SCT-Plugin: Sentinel-1 product format reader"""
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"

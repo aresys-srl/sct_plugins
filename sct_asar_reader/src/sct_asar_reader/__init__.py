@@ -3,4 +3,4 @@
 
 """SCT-Plugin: ENVISAT/ERS product in ASAR format reader."""
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"
