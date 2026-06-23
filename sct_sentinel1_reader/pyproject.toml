@@ -11,7 +11,7 @@ dependencies = [
     "pandas",
     "shapely>=2.1.0",
     "s1etad",
-    "eo-products>=1.1.0",
+    "eo-products==1.0.0",
     "perseo-core==1.0.0",
     "perseo-quality==1.0.0",
     "sct",

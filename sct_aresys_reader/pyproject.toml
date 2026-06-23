@@ -8,12 +8,12 @@ license = { file = "LICENSE.txt" }
 dependencies = [
     "numpy>2",
     "scipy",
+    "lxml",
+    "xsdata",
     "shapely>=2.1.0",
     "perseo-core==1.0.0",
     "perseo-quality==1.0.0",
     "sct",
-    "lxml",
-    "xsdata"
 ]
 dynamic = ["version"]
 classifiers = [
