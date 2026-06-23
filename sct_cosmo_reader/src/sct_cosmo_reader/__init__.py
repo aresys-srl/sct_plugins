@@ -3,4 +3,4 @@
 
 """SCT-Plugin: COSMO-SkyMed product format reader."""
 
-__version__ = "1.2.1"
+__version__ = "1.0.0"
