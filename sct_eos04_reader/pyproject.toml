@@ -35,6 +35,11 @@ classifiers = [
     "Typing :: Typed",
 ]
 
+[project.urls]
+Homepage = "https://github.com/aresys-srl/sct_plugins"
+Repository = "https://github.com/aresys-srl/sct_plugins"
+Documentation = "https://aresys-srl.github.io/sct_plugins"
+
 [project.optional-dependencies]
 dev = ["nox", "ruff", "pylint"]
 test = ["pytest", "pytest-cov", "sct[graphs]"]
