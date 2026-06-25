@@ -90,36 +90,6 @@ def pylint(session: nox.Session):
 
 
 @nox.session(python=PY_VERSIONS)
-def unittest(session: nox.Session):
-    """Execute unittest"""
-    project = Path.cwd()
-    Path("_build").mkdir(exist_ok=True)
-
-    session.install("-e", ".[test]")
-    session.run(
-        "python",
-        "-m",
-        "coverage",
-        "run",
-        f"--source={project.name}",
-        "-m",
-        "xmlrunner",
-        "--output-file",
-        f"_build/unittest-report-{PLATFORM}-py{session.python}.xml",
-        "discover",
-    )
-    session.run("python", "-m", "coverage", "report", "-m")
-    session.run(
-        "python",
-        "-m",
-        "coverage",
-        "xml",
-        "-o",
-        f"_build/unittest-coverage-{PLATFORM}-py{session.python}.xml",
-    )
-
-
-@nox.session(python=PY_VERSIONS)
 def pytest(session: nox.Session) -> None:
     """Module testing with pytest"""
     cwd = Path.cwd()
@@ -147,7 +117,7 @@ def build_doc(session: nox.Session):
     if Path("site").exists():
         shutil.rmtree("site")
 
-    tag = os.getenv("CI_COMMIT_TAG", "dev")
+    tag = os.getenv("CI_COMMIT_TAG") or os.getenv("GITHUB_REF_NAME", "dev")
     sha = os.getenv("CI_COMMIT_SHORT_SHA")
     date = datetime.now().strftime("%Y-%m-%d")
 
