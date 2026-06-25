@@ -4,6 +4,8 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.txt)
 
+[![CI](https://github.com/aresys-srl/sct_plugins/actions/workflows/terrasarx.yml/badge.svg)](https://github.com/aresys-srl/sct_plugins/actions/workflows/terrasarx.yml)
+
 [SCT (SAR Calibration Toolbox)](https://github.com/aresys-srl/sct) plugin for reading TerraSAR-X
 Level 1 products, both L1A (SLC) and L1B (GRD). This package integrates with SCT through its
 input products plugin system, enabling all SCT analyses on TerraSAR-X data.
