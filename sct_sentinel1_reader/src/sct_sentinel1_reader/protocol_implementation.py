@@ -585,7 +585,7 @@ class Sentinel1ChannelManager:
 
         Parameters
         ----------
-        azimuth_index : int | tuple[int, int]
+        azimuth_indexes : int | tuple[int, int]
             azimuth index or tuple of azimuth indexes (start, stop)
 
         Returns
