@@ -184,6 +184,8 @@ custom_fences = [
 emoji_index = "zensical.extensions.emoji.twemoji"
 emoji_generator = "zensical.extensions.emoji.to_svg"
 options.custom_icons = ["overrides/.icons"]
+[project.markdown_extensions.attr_list]
+[project.markdown_extensions.md_in_html]
 
 # ----------------------------------------------------------------------------
 # In the "palette" subsection you can configure options for the color scheme.

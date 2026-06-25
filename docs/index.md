@@ -10,6 +10,11 @@ python ecosystem.
 This documentation hub collects the documentation for all the input Product Format plugins developed so far, providing
 a small overview of the functionalities of input plugins, their structure and usage and the python API references.
 
+<figure markdown="span">
+    ![Plugin Mechanism](./assets/images/plugin_mechanism.png){ width="850" }
+    <figcaption>Plugin discovery mechanism in SCT.</figcaption>
+</figure>
+
 Here you will find:
 
 * A list of all the input plugins available in the ecosystem

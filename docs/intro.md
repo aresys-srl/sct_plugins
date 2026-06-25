@@ -33,8 +33,13 @@ This allows:
 
 ## Architecture and internal structure
 
-The plugin architecture is described in detail in the [Plugin Architecture](./architecture/index.md) section while the
+The plugin architecture is described in detail in the [Plugin Architecture](./architecture/arch.md) section while the
 internal structure is described in the [Internal Structure](./architecture/internal.md) section.
+
+<figure markdown="span">
+    ![Plugin Architecture](./assets/images/plugin_architecture.png){ width="850" }
+    <figcaption>Plugin architecture and SCT protocol compliance.</figcaption>
+</figure>
 
 ## Benefits
 
@@ -46,5 +51,10 @@ internal structure is described in the [Internal Structure](./architecture/inter
 ## Plugin Discovery
 
 Plugins are discovered dynamically using [OpenStack's stevedore](https://docs.openstack.org/).
+
+<figure markdown="span">
+    ![Plugin Mechanism](./assets/images/plugin_mechanism.png){ width="950" }
+    <figcaption>Plugin discovery mechanism in SCT.</figcaption>
+</figure>
 
 > Refer to the [Plugin Discovery](./architecture/internal.md#plugin-discovery) paragraph for more details.
