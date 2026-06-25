@@ -3,7 +3,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#license)
 [![ASAR: GPL-3.0](https://img.shields.io/badge/ASAR%20License-GPL--3.0-blue.svg)](#license)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)](https://python.org)
-[![GitHub Release](https://img.shields.io/github/v/release/aresys-srl/sct_plugins)](https://github.com/aresys-srl/sct_plugins/releases)
 [![Docs](https://img.shields.io/badge/docs-github.io-blue)](https://aresys-srl.github.io/sct_plugins)
 
 **SAR** L1 Product Format plugins collection for [SCT (SAR Calibration Toolbox)](https://github.com/aresys-srl/sct).
