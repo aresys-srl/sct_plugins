@@ -4,6 +4,8 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)](https://python.org)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE.txt)
 
+[![CI](https://github.com/aresys-srl/sct_plugins/actions/workflows/asar.yml/badge.svg)](https://github.com/aresys-srl/sct_plugins/actions/workflows/asar.yml)
+
 [SCT (SAR Calibration Toolbox)](https://github.com/aresys-srl/sct) plugin for reading ENVISAT/ERS
 Level 1 ASAR products, both L1A (SLC) and L1B (GRD). This package integrates with SCT through
 its input products plugin system, enabling all SCT analyses on ENVISAT/ERS ASAR data.
