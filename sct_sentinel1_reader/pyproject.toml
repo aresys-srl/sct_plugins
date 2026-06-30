@@ -40,7 +40,7 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/aresys-srl/sct_plugins"
 Repository = "https://github.com/aresys-srl/sct_plugins"
-Documentation = "https://aresys-srl.github.io/sct_plugins"
+Documentation = "https://opensource.aresys.it/sct_plugins"
 
 [project.optional-dependencies]
 dev = ["nox", "ruff", "pylint"]

@@ -4,7 +4,7 @@ icon: lucide/rocket
 
 # Overview
 
-Welcome to the official Product Format Plugins documentation for the [SCT (SAR Calibration Toolbox)](https://aresys-srl.github.io/sct/)
+Welcome to the official Product Format Plugins documentation for the [SCT (SAR Calibration Toolbox)](https://opensource.aresys.it/sct/)
 python ecosystem.
 
 This documentation hub collects the documentation for all the input Product Format plugins developed so far, providing

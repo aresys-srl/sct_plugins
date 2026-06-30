@@ -33,8 +33,8 @@ based plugin system; no additional configuration is required.
 
 ## Documentation
 
-- [SCT documentation](https://aresys-srl.github.io/sct/)
-- [Plugins documentation](https://aresys-srl.github.io/sct_plugins)
+- [SCT documentation](https://opensource.aresys.it/sct/)
+- [Plugins documentation](https://opensource.aresys.it/sct_plugins)
 
 ## License
 
