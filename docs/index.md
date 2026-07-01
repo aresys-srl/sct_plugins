@@ -33,8 +33,11 @@ Here is an up-to-date list of the available plugins:
 | Cosmo Sky-Med | *sct-cosmo-reader* | [Cosmo Plugin](./plugins/cosmo/info.md) |
 | RadarSAT-2 | *sct-radarsat2-reader* | [RadarSAT-2 Plugin](./plugins/radarsat-2/info.md) |
 | ICEYE | *sct-iceye-reader* | [ICEYE Plugin](./plugins/iceye/info.md) |
-| Aresys | *sct-aresys-reader* | [Aresys Plugin](./plugins/aresys/info.md) |
 | ERS/ENVISAT | *sct-asar-reader* | [ASAR Plugin](./plugins/asar/info.md) |
+| EOS-04 | *sct-eos04-reader* | [EOS-04 Plugin](./plugins/eos04/info.md) |
+| STRIX | *sct-strix-reader* | [STRIX Plugin](./plugins/strix/info.md) |
+| TERRASAR-X | *sct-terrasarx-reader* | [TERRASAR-X Plugin](./plugins/terrasar-x/info.md) |
+| Aresys-Format | *sct-aresys-reader* | [Aresys Plugin](./plugins/aresys/info.md) |
 
 ## Installation
 
