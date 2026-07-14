@@ -10,9 +10,9 @@ dependencies = [
     "scipy",
     "shapely>=2.1.0",
     "pyepr",
-    "perseo-core==1.0.0",
-    "perseo-quality==1.0.0",
-    "sct",
+    "perseo-core>=1.0.0",
+    "perseo-quality>=1.0.0",
+    "sct>=3.0.0",
 ]
 dynamic = ["version"]
 classifiers = [
@@ -42,7 +42,7 @@ Documentation = "https://opensource.aresys.it/sct_plugins"
 
 [project.optional-dependencies]
 dev = ["nox", "ruff", "pylint"]
-test = ["pytest", "pytest-cov", "sct[graphs]"]
+test = ["pytest", "pytest-cov", "sct[graphs]>=3.0.0"]
 docs = ["zensical", "mkdocstrings-python"]
 
 [project.entry-points."sct.input_products"]
