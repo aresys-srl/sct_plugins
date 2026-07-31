@@ -12,9 +12,6 @@ variables:
 .tags_manylinux_2_28_std:
   tags: ["manylinux_2_28"]
 
-.tags_deploy:
-  tags: ["eo", "deploy"]
-
 # === build ==================================================================
 # ============================================================================
 build_docs:
@@ -28,24 +25,3 @@ build_docs:
     expire_in: 2 weeks
     paths:
       - ./documentation*.zip
-
-# === deploy =================================================================
-# ============================================================================
-deploy_doc:
-  stage: deploy
-  extends: .tags_deploy
-  rules:
-    - if: "$CI_COMMIT_TAG"
-    - if: '$DEPLOY_DOC == "true"'
-  script:
-    - eval "$(ssh-agent)"
-    - cat "$DASHBOARD_PRIVATE_KEY" | base64 -d | ssh-add -
-    - for file in ./*.zip; do
-      eo_pgp-signme ${file} > ${file}.asc &&
-      ./.gitlab/ci/dashboard-copy.sh ${file} develop/sct-plugins/docs/archive &&
-      ./.gitlab/ci/dashboard-copy.sh ${file}.asc develop/sct-plugins/docs/archive;
-      done
-    - unzip *.zip
-    - mv site ${CI_COMMIT_TAG}
-    - rsync --stats -r ${CI_COMMIT_TAG} sardashboard@intranet.aresys.it:develop/sct-plugins/docs/docs
-    - ssh sardashboard@intranet.aresys.it "cd develop/sct-plugins/docs/docs && rm latest && ln -s ${CI_COMMIT_TAG} latest"
