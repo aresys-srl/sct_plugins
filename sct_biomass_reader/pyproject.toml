@@ -11,9 +11,9 @@ dependencies = [
     "shapely>=2.1.0",
     "bps-transcoder>=4.0.0",
     "arepytools>=1.7.6",
-    "perseo-core==1.0.0",
-    "perseo-quality==1.0.0",
-    "sct",
+    "perseo-core>=1.0.0",
+    "perseo-quality>=1.1.0",
+    "sct>=3.2.1",
 ]
 dynamic = ["version"]
 classifiers = [
@@ -41,7 +41,7 @@ Documentation = "https://opensource.aresys.it/sct_plugins"
 
 [project.optional-dependencies]
 dev = ["nox", "ruff", "pylint"]
-test = ["pytest", "pytest-cov", "sct[graphs]"]
+test = ["pytest", "pytest-cov", "sct[recommended]>=3.2.1"]
 docs = ["zensical", "mkdocstrings-python"]
 
 [project.entry-points."sct.input_products"]

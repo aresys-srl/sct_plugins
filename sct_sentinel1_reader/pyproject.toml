@@ -13,8 +13,8 @@ dependencies = [
     "s1etad",
     "eo-products>=1.0.0",
     "perseo-core>=1.0.0",
-    "perseo-quality>=1.0.0",
-    "sct>=3.0.0",
+    "perseo-quality>=1.1.0",
+    "sct>=3.2.1",
 ]
 dynamic = ["version"]
 classifiers = [
@@ -43,7 +43,7 @@ Documentation = "https://opensource.aresys.it/sct_plugins"
 
 [project.optional-dependencies]
 dev = ["nox", "ruff", "pylint"]
-test = ["pytest", "pytest-cov", "sct[graphs]>=3.0.0"]
+test = ["pytest", "pytest-cov", "sct[recommended]>=3.2.1"]
 docs = ["zensical", "mkdocstrings-python"]
 
 [project.entry-points."sct.input_products"]
