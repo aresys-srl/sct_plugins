@@ -9,8 +9,8 @@ from copy import deepcopy
 from pathlib import Path
 
 import pandas as pd
-from sct.analyses.point_target.config import SCTPointTargetAnalysisCorrectionsConf
 from sct.io.extended_protocols import ALECorrectionFunctionType
+from sct.plugins.protocols import CorrectionsConfigT
 
 from sct_sentinel1_reader.corrections import ALE_CORRECTIONS_FIELDS
 from sct_sentinel1_reader.corrections.custom_corrections import (
@@ -47,20 +47,18 @@ class S1ALECorrector:
             return func
         return compute_corrections
 
-    def update_corrections_config(
-        self, corrections_config: SCTPointTargetAnalysisCorrectionsConf
-    ) -> SCTPointTargetAnalysisCorrectionsConf:
+    def update_corrections_config(self, corrections_config: CorrectionsConfigT) -> CorrectionsConfigT:
         """Updating the SCT Point Target Analysis corrections configuration to disable additional corrections when using
         ETAD products.
 
         Parameters
         ----------
-        corrections_config : SCTPointTargetAnalysisCorrectionsConf
+        corrections_config : CorrectionsConfigT
             original PTA corrections configuration
 
         Returns
         -------
-        SCTPointTargetAnalysisCorrectionsConf
+        CorrectionsConfigT
             updated PTA corrections configuration
         """
         if self._etad_product:
