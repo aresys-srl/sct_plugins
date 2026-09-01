@@ -42,7 +42,7 @@ Repository = "https://github.com/aresys-srl/sct_plugins"
 Documentation = "https://opensource.aresys.it/sct_plugins"
 
 [project.optional-dependencies]
-dev = ["nox", "ruff", "pylint"]
+dev = ["ruff", "pylint"]
 test = ["pytest", "pytest-cov", "sct[recommended]>=3.2.1"]
 docs = ["zensical", "mkdocstrings-python"]
 
