@@ -1,4 +1,4 @@
 # SPDX-FileCopyrightText: Aresys S.r.l. <info@aresys.it>
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: GPLv3+
 
 """SCT ASAR Product Format Reader Plugin - Unittest."""
