@@ -41,7 +41,7 @@ Repository = "https://github.com/aresys-srl/sct_plugins"
 Documentation = "https://opensource.aresys.it/sct_plugins"
 
 [project.optional-dependencies]
-dev = ["nox", "ruff", "pylint"]
+dev = ["ruff", "pylint"]
 test = ["pytest", "pytest-cov", "sct[recommended]>=3.2.1"]
 docs = ["zensical", "mkdocstrings-python"]
 
@@ -85,17 +85,6 @@ source = ["src"]
 [tool.coverage.report]
 skip_covered = true
 show_missing = true
-
-[tool.ruff]
-line-length = 120
-output-format = "grouped"
-extend-exclude = [".venv", "scripts", "noxfile.py"]
-
-[tool.ruff.format]
-docstring-code-format = true
-
-[tool.ruff.lint]
-select = ["E", "W", "F", "A", "B", "I"]
 
 [tool.pylint.master]
 fail-under = 8.5
