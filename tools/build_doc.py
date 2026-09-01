@@ -42,9 +42,6 @@ def main() -> int:
 
     subprocess.run(["zensical", "build", "-f", str(root / "zensical.toml")], check=True)
 
-    if os.getenv("CI") == "true":
-        shutil.make_archive(f"documentation-{doc_name}", "zip", root_dir=root, base_dir="site")
-
     return 0
 
 
