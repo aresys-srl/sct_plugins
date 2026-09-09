@@ -45,7 +45,7 @@ from sct_aresys_reader.reader.io import (
     read_metadata,
     read_raster_with_raster_info,
 )
-from sct_aresys_reader.reader.io.metadata import BurstInfo, RasterInfo, StateVectors
+from sct_aresys_reader.reader.io.metadata import BurstInfo, ImageQuantity, RasterInfo, StateVectors
 from sct_aresys_reader.reader.math.genericpoly import SortedPolyList, create_sorted_poly_list
 
 
@@ -271,14 +271,14 @@ class ChannelManager:
         self._s2g_poly = create_sorted_poly_list(self._channel_metadata.get_slant_to_ground())
 
         # setting image radiometric quantity
-        if self._dataset_info.image_quantity == "BETA":
-            self._radiometric_quantity = SARRadiometricQuantity.BETA_NOUGHT
-        elif self._dataset_info.image_quantity == "GAMMA":
-            self._radiometric_quantity = SARRadiometricQuantity.GAMMA_NOUGHT
-        elif self._dataset_info.image_quantity == "SIGMA":
-            self._radiometric_quantity = SARRadiometricQuantity.SIGMA_NOUGHT
-        else:
-            self._radiometric_quantity = SARRadiometricQuantity.BETA_NOUGHT
+        quantity_map = {
+            ImageQuantity.BETA: SARRadiometricQuantity.BETA_NOUGHT,
+            ImageQuantity.GAMMA: SARRadiometricQuantity.GAMMA_NOUGHT,
+            ImageQuantity.SIGMA: SARRadiometricQuantity.SIGMA_NOUGHT,
+        }
+
+        image_quantity = self._dataset_info.image_quantity
+        self._radiometric_quantity = quantity_map.get(image_quantity, SARRadiometricQuantity.BETA_NOUGHT)
 
         # setting acquisition mode
         if self._dataset_info.acquisition_mode == "SCANSAR":
