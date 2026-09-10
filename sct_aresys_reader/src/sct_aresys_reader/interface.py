@@ -27,7 +27,7 @@ class AresysInputProductPlugin:
 
     @classmethod
     def get_detector(cls) -> Callable[[str | Path], bool]:
-        from sct_aresys_reader.reader.io.productfolder2 import is_product_folder as is_aresys_product
+        from aresys_io.product import is_product_folder as is_aresys_product
 
         return is_aresys_product
 

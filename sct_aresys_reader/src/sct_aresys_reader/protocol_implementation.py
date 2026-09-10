@@ -9,11 +9,21 @@ from itertools import product
 from pathlib import Path
 
 import numpy as np
+from aresys_io.product import (
+    Burst,
+    BurstInfo,
+    DopplerCentroidPoly,
+    DopplerRatePoly,
+    RasterInfo,
+    open_product_folder,
+    read_metadata,
+    read_raster_with_raster_info,
+)
 from numpy.typing import ArrayLike
 from perseo_core.geometry import compute_ground_velocity, compute_incidence_angles, compute_look_angles
 from perseo_core.geometry.coordinates import xyz2llh
 from perseo_core.geometry.geocoding import direct_geocoding_monostatic, inverse_geocoding_monostatic
-from perseo_core.geometry.navigation import CubicSplineTrajectory, Trajectory
+from perseo_core.geometry.navigation import Trajectory
 from perseo_core.geometry.pointing import (
     Attitude,
     compute_antenna_attitude_from_euler_angles,
@@ -40,26 +50,6 @@ from perseo_quality.io.protocol_utilities import roi_validation
 from scipy.constants import speed_of_light
 from shapely import Polygon
 
-from sct_aresys_reader.reader.io import (
-    open_product_folder,
-    read_metadata,
-    read_raster_with_raster_info,
-)
-from sct_aresys_reader.reader.io.metadata import BurstInfo, ImageQuantity, RasterInfo, StateVectors
-from sct_aresys_reader.reader.math.genericpoly import SortedPolyList, create_sorted_poly_list
-
-
-def _create_trajectory(state_vectors: StateVectors) -> CubicSplineTrajectory:
-    """Create a Perseo CORE Trajectory compliant object from StateVectors."""
-    _time_axis = (
-        np.arange(state_vectors.number_of_state_vectors) * state_vectors.time_step + state_vectors.reference_time
-    )
-    return CubicSplineTrajectory(
-        times=_time_axis,
-        positions=state_vectors.position_vector.reshape(-1, 3),
-        velocities=state_vectors.velocity_vector.reshape(-1, 3),
-    )
-
 
 def raster_layout_from_metadata(burst_info: BurstInfo | None, raster_info: RasterInfo) -> L1RasterLayout:
     """Generating a L1RasterLayout from Product Folder BurstInfo and RasterInfo metadata for the current channel.
@@ -77,15 +67,15 @@ def raster_layout_from_metadata(burst_info: BurstInfo | None, raster_info: Raste
         raster layout of current Product Folder channel
     """
     if burst_info is None:
-        burst_info = BurstInfo()
-        burst_info.add_burst(
-            azimuth_start_time_i=raster_info.lines_start,
-            range_start_time_i=raster_info.samples_start,
-            lines_i=raster_info.lines,
+        burst = Burst(
+            azimuth_start_time=raster_info.lines_start,
+            range_start_time=raster_info.samples_start,
+            lines=raster_info.lines,
         )
+        burst_info = BurstInfo(bursts=[burst])
     bursts_layout = []
-    for brst_id in range(burst_info.get_number_of_bursts()):
-        burst = burst_info.get_burst(brst_id)
+    for brst_id in range(len(burst_info.bursts)):
+        burst = burst_info.bursts[brst_id]
         bursts_layout.append(
             L1BurstLayout(
                 burst_id=brst_id,
@@ -103,8 +93,8 @@ def raster_layout_from_metadata(burst_info: BurstInfo | None, raster_info: Raste
 class DopplerPolynomialWrapper:
     """Generic Polynomial wrapper used to interpolate Doppler data (Doppler Centroid or Rate)"""
 
-    def __init__(self, sorted_poly: SortedPolyList) -> None:
-        self._sorted_poly = sorted_poly
+    def __init__(self, poly: DopplerCentroidPoly | DopplerRatePoly) -> None:
+        self._poly: DopplerCentroidPoly | DopplerRatePoly = poly()
 
     def evaluate(self, azimuth_time: PreciseDateTime, range_time: float) -> float:
         """Evaluate the Doppler Polynomial at given azimuth and range times.
@@ -121,7 +111,7 @@ class DopplerPolynomialWrapper:
         float
             doppler at that time
         """
-        return self._sorted_poly.evaluate((azimuth_time, range_time))
+        return self._poly.evaluate(azimuth_value=azimuth_time, range_values=range_time)
 
 
 class ProductFolderManager:
@@ -131,7 +121,7 @@ class ProductFolderManager:
         self._path = Path(path)
         self._product_name = self._path.name
         self._product = open_product_folder(self._path)
-        self._channel_list = self._product.get_channels_list()
+        self._channel_list = self._product.channel_ids
 
     @property
     def path(self) -> Path:
@@ -161,8 +151,8 @@ class ProductFolderManager:
         ChannelManager
             ChannelManager containing data corresponding to the selected channel
         """
-        metadata = self._product.get_channel_metadata(channel_id)
-        raster = self._product.get_channel_data(channel_id)
+        metadata = self._product.channel_metadata_path(channel_id)
+        raster = self._product.channel_data_path(channel_id)
         return ChannelManager(channel_metadata_path=metadata, channel_raster_path=raster, channel_num=channel_id)
 
 
@@ -180,15 +170,15 @@ class ProductFolderManagerExtended(ProductFolderManager):
         """
         footprint_corners = []
         for channel_id in self._channel_list:
-            metadata = read_metadata(self._product.get_channel_metadata(channel_id))
-            dataset_info = metadata.get_dataset_info()
-            burst_info = metadata.get_burst_info()
-            raster_info = metadata.get_raster_info()
-            trajectory = _create_trajectory(state_vectors=metadata.get_state_vectors())
+            metadata = read_metadata(self._product.channel_metadata_path(channel_id))
+            dataset_info = metadata.dataset_info
+            burst_info = metadata.burst_info
+            raster_info = metadata.raster_info
+            orbit = metadata.trajectory
 
             if burst_info is not None:
-                first_burst = burst_info.get_burst(0)
-                last_burst = burst_info.get_burst(burst_info.get_number_of_bursts() - 1)
+                first_burst = burst_info.bursts[0]
+                last_burst = burst_info.bursts[len(burst_info.bursts) - 1]
                 corners_az = [
                     last_burst.azimuth_start_time + last_burst.lines * raster_info.lines_step,
                     last_burst.azimuth_start_time + last_burst.lines * raster_info.lines_step,
@@ -210,19 +200,16 @@ class ProductFolderManagerExtended(ProductFolderManager):
                 raster_info.samples_start,
             ]
             if dataset_info.projection == "GROUND RANGE":
-                gts_poly = metadata.get_ground_to_slant()
-                corners_rng = [
-                    create_sorted_poly_list(gts_poly).evaluate((raster_info.lines_start, r)) for r in corners_rng
-                ]
+                corners_rng = [metadata.ground_to_slant_poly.evaluate(raster_info.lines_start, r) for r in corners_rng]
 
             for az, rng in zip(corners_az, corners_rng, strict=True):
                 corner_xyz = direct_geocoding_monostatic(
-                    sensor_positions=trajectory.evaluate(az),
-                    sensor_velocities=trajectory.evaluate_first_derivatives(az),
+                    sensor_positions=orbit.position(az),
+                    sensor_velocities=orbit.velocity(az),
                     range_times=rng,
                     doppler_frequencies=0,
                     wavelength=1,
-                    look_direction=dataset_info.side_looking.value,
+                    look_direction=dataset_info.side_looking,
                     altitude=0,
                 )
                 corner_llh = xyz2llh(corner_xyz)
@@ -259,22 +246,24 @@ class ChannelManager:
         self._channel_num = channel_num
         self._channel_raster = channel_raster_path
         self._channel_metadata = read_metadata(channel_metadata_path)
-        self._state_vectors = self._channel_metadata.get_state_vectors()
-        self._raster_info = self._channel_metadata.get_raster_info()
-        self._swath_info = self._channel_metadata.get_swath_info()
-        self._dataset_info = self._channel_metadata.get_dataset_info()
-        self._attitude_info = self._channel_metadata.get_attitude_info()
-        self._burst_info = self._channel_metadata.get_burst_info()
-        self._pulse = self._channel_metadata.get_pulse()
-        self._acquisition_time_line = self._channel_metadata.get_acquisition_time_line()
-        self._g2s_poly = create_sorted_poly_list(self._channel_metadata.get_ground_to_slant())
-        self._s2g_poly = create_sorted_poly_list(self._channel_metadata.get_slant_to_ground())
+        self._state_vectors = self._channel_metadata.state_vectors
+        self._raster_info = self._channel_metadata.raster_info
+        self._swath_info = self._channel_metadata.swath_info
+        self._dataset_info = self._channel_metadata.dataset_info
+        self._attitude_info = self._channel_metadata.attitude_info
+        self._burst_info = None
+        if "BurstInfo" in self._channel_metadata:
+            self._burst_info = self._channel_metadata.burst_info
+        self._pulse = self._channel_metadata.pulse
+        self._g2s_poly = self._channel_metadata.ground_to_slant_poly()
+        self._s2g_poly = self._channel_metadata.slant_to_ground_poly()
+        self._sampling_constants = self._channel_metadata.sampling_constants
 
         # setting image radiometric quantity
         quantity_map = {
-            ImageQuantity.BETA: SARRadiometricQuantity.BETA_NOUGHT,
-            ImageQuantity.GAMMA: SARRadiometricQuantity.GAMMA_NOUGHT,
-            ImageQuantity.SIGMA: SARRadiometricQuantity.SIGMA_NOUGHT,
+            "BETA": SARRadiometricQuantity.BETA_NOUGHT,
+            "GAMMA": SARRadiometricQuantity.GAMMA_NOUGHT,
+            "SIGMA": SARRadiometricQuantity.SIGMA_NOUGHT,
         }
 
         image_quantity = self._dataset_info.image_quantity
@@ -294,7 +283,6 @@ class ChannelManager:
 
         # re-arranging signal sampling frequencies
         self._sensor_name = "" if self._dataset_info.sensor_name is None else self._dataset_info.sensor_name
-        self._sampling_constants = self._channel_metadata.get_sampling_constants()
         self._signal_constants = SARSamplingFrequencies(
             range_freq_hz=self._sampling_constants.frg_hz,
             azimuth_freq_hz=self._sampling_constants.faz_hz,
@@ -304,18 +292,13 @@ class ChannelManager:
         self._prf = self._swath_info.acquisition_prf
 
         # creating doppler centroid and rate polynomial wrappers
-        centroid_poly = self._channel_metadata.get_doppler_centroid()
-        rate_poly = self._channel_metadata.get_doppler_rate()
-        self._doppler_centroid_poly = (
-            DopplerPolynomialWrapper(sorted_poly=create_sorted_poly_list(centroid_poly))
-            if centroid_poly.get_number_of_poly() > 0
-            else None
-        )
-        self._doppler_rate_poly = (
-            DopplerPolynomialWrapper(sorted_poly=create_sorted_poly_list(rate_poly))
-            if rate_poly.get_number_of_poly() > 0
-            else None
-        )
+        self._doppler_centroid_poly = None
+        if "DopplerCentroidVector" in self._channel_metadata:
+            self._doppler_centroid_poly = DopplerPolynomialWrapper(poly=self._channel_metadata.doppler_centroid_poly)
+        self._doppler_rate_poly = None
+        if "DopplerRateVector" in self._channel_metadata:
+            self._doppler_rate_poly = DopplerPolynomialWrapper(poly=self._channel_metadata.doppler_rate_poly)
+
         # retrieving azimuth steering rate polynomial coefficients
         self._steering_rate_poly_coeff = self._swath_info.azimuth_steering_rate_pol
 
@@ -323,9 +306,9 @@ class ChannelManager:
         self._swath = self._swath_info.swath
         self._product_folder_image_type = SARImageType.from_str(self._dataset_info.image_type)
         self._channel_projection = SARProjection(self._dataset_info.projection)
-        self._polarization = SARPolarization(self._swath_info.polarization.value)
-        self._orbit_direction = SAROrbitDirection[self._state_vectors.orbit_direction.value]
-        self._looking_side = SARSideLooking(self._dataset_info.side_looking.value.upper())
+        self._polarization = SARPolarization[self._swath_info.polarization]
+        self._orbit_direction = SAROrbitDirection[self._state_vectors.orbit_direction]
+        self._looking_side = SARSideLooking(self._dataset_info.side_looking.upper())
         self._carrier_freq = self._dataset_info.fc_hz
 
         # layout
@@ -339,9 +322,9 @@ class ChannelManager:
         self._range_step_m = self._raster_info.samples_step * speed_of_light / 2
         if self._channel_projection == SARProjection.GROUND_RANGE:
             self._rng_time_half_swath = self._g2s_poly.evaluate(
-                (self._az_time_half_swath, np.floor(self._rng_time_half_swath))
+                self._az_time_half_swath, np.floor(self._rng_time_half_swath)
             )
-            self._slant_range_axis = self._g2s_poly.evaluate((self._az_time_half_swath, self._range_axis))
+            self._slant_range_axis = self._g2s_poly.evaluate(self._az_time_half_swath, self._range_axis)
             self._range_step_m = self._raster_info.samples_step
         self._lines_per_burst_array = np.array(
             [raster_layout.get_burst_lines(burst_id=b) for b in raster_layout.burst_ids]
@@ -349,15 +332,14 @@ class ChannelManager:
         self._raster_layout = raster_layout
 
         # generating trajectory
-
-        self._trajectory_rx = _create_trajectory(state_vectors=self._state_vectors)
+        self._trajectory_rx = self._channel_metadata.trajectory()
         self._trajectory_tx = None
 
         # generating attitude boresight normal curve
         self._attitude = None
         if self._attitude_info is not None:
             _time_axis = (
-                np.arange(self._attitude_info.attitude_records_number) * self._attitude_info.time_step
+                np.arange(self._attitude_info.ypr_deg.shape[0]) * self._attitude_info.time_step
                 + self._attitude_info.reference_time
             )
             zero_doppler_local_axis = compute_sensor_local_axis(
@@ -365,12 +347,10 @@ class ChannelManager:
                 sensor_velocities=self._trajectory_rx.velocity(_time_axis),
                 reference_frame="ZERODOPPLER",
             )
-            ypr_rad = np.deg2rad(
-                np.c_[self._attitude_info.yaw_vector, self._attitude_info.pitch_vector, self._attitude_info.roll_vector]
-            )
+            ypr_rad = np.deg2rad(self._attitude_info.ypr_deg)
             self._attitude = compute_antenna_attitude_from_euler_angles(
                 ypr_rad=ypr_rad,
-                rotation_order=self._attitude_info.rotation_order.value.upper(),
+                rotation_order=self._attitude_info.rotation_order.upper(),
                 times=_time_axis,
                 sensor_local_axis=zero_doppler_local_axis,
             )
@@ -631,7 +611,7 @@ class ChannelManager:
         rng_time = self._raster_layout.pixel_to_range_conversion(rng_pixel_index=range_index)
 
         if self.projection == SARProjection.GROUND_RANGE:
-            rng_time = self._g2s_poly.evaluate((self.mid_azimuth_time, rng_time))
+            rng_time = self._g2s_poly.evaluate(self.mid_azimuth_time, rng_time)
 
         return az_time, rng_time
 
@@ -659,7 +639,7 @@ class ChannelManager:
 
         azmth_idx = self._raster_layout.azimuth_to_pixel_conversion(az=azimuth_time, burst_id=burst)
         if self.projection == SARProjection.GROUND_RANGE:
-            range_time = self._s2g_poly.evaluate((azimuth_time, range_time))
+            range_time = self._s2g_poly.evaluate(azimuth_time, range_time)
         rng_idx = self._raster_layout.range_to_pixel_conversion(rng=range_time, burst_id=burst)
         # TODO: forcing only first burst match
         return azmth_idx[0][1], rng_idx[0][1]
@@ -729,12 +709,10 @@ class ChannelManager:
         if self._channel.burst_info is None:
             return [0] * len(azimuth_times)
 
-        bursts_start_times = [
-            self._burst_info.get_azimuth_start_time(b) for b in range(self._burst_info.get_number_of_bursts())
-        ]
+        bursts_start_times = [self._burst_info.az(b) for b in range(len(self._burst_info.bursts))]
         last_time = (
             bursts_start_times[0]
-            + self._burst_info.get_number_of_bursts() * self._burst_info.lines_per_burst * self._raster_info.lines_step
+            + len(self._burst_info.bursts) * self._burst_info.lines_per_burst * self._raster_info.lines_step
         )
 
         bursts = []
@@ -771,7 +749,7 @@ class ChannelManager:
         if self._burst_info is None:
             return [0] * len(azimuth_px_indexes)
 
-        bursts_lines = np.repeat(self._burst_info.lines_per_burst, self._burst_info.get_number_of_bursts())
+        bursts_lines = np.repeat(self._burst_info.lines_per_burst, len(self._burst_info.bursts))
         burst_boundaries = np.array([0] + [sum(bursts_lines[: t + 1]) for t, _ in enumerate(bursts_lines)])
 
         bursts = []

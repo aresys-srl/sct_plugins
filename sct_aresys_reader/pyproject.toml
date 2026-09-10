@@ -13,6 +13,7 @@ dependencies = [
     "shapely>=2.1.0",
     "perseo-core>=1.0.0",
     "perseo-quality>=1.1.0",
+    "aresys-io",
     "sct>=3.2.1",
 ]
 dynamic = ["version"]
