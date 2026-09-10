@@ -4,6 +4,12 @@ icon: lucide/history
 
 # Changelog
 
+# v1.0.3
+
+**Other Changes**
+
+- Removing internal format reader code from the plugin package in favor of ``aresys-io`` dependency.
+
 # v1.0.2
 
 **Bug Fixing**
