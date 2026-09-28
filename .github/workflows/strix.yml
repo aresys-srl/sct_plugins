@@ -30,7 +30,7 @@ jobs:
         working-directory: sct_strix_reader
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
@@ -51,7 +51,7 @@ jobs:
         working-directory: sct_strix_reader
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
@@ -80,7 +80,7 @@ jobs:
         working-directory: sct_strix_reader
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
@@ -105,7 +105,7 @@ jobs:
             --cov-report=xml:_build/pytest-coverage-linux-py${{ matrix.python }}.xml
 
       - name: Upload junit and coverage
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: linux-test-${{ matrix.python }}
           path: |
@@ -130,12 +130,12 @@ jobs:
         working-directory: sct_strix_reader
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
 
@@ -149,7 +149,7 @@ jobs:
           python -m pytest ./tests/ --junitxml=_build/pytest-report-win-py${{ matrix.python }}.xml --cov-report=xml:_build/pytest-coverage-win-py${{ matrix.python }}.xml
 
       - name: Upload junit and coverage
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: windows-test-${{ matrix.python }}
           path: |
@@ -167,7 +167,7 @@ jobs:
         working-directory: sct_strix_reader
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
@@ -194,7 +194,7 @@ jobs:
 
     steps:
       - name: Download wheels and sdist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
