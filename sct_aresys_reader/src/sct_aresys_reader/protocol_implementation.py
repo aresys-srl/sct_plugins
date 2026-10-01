@@ -250,11 +250,12 @@ class ChannelManager:
         self._raster_info = self._channel_metadata.raster_info
         self._swath_info = self._channel_metadata.swath_info
         self._dataset_info = self._channel_metadata.dataset_info
-        self._attitude_info = self._channel_metadata.attitude_info
+        self._attitude_info = None
+        if "AttitudeInfo" in self._channel_metadata:
+            self._attitude_info = self._channel_metadata.attitude_info
         self._burst_info = None
         if "BurstInfo" in self._channel_metadata:
             self._burst_info = self._channel_metadata.burst_info
-        self._pulse = self._channel_metadata.pulse
         self._g2s_poly = self._channel_metadata.ground_to_slant_poly()
         self._s2g_poly = self._channel_metadata.slant_to_ground_poly()
         self._sampling_constants = self._channel_metadata.sampling_constants

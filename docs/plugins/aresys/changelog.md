@@ -4,6 +4,16 @@ icon: lucide/history
 
 # Changelog
 
+# v1.0.4
+
+**Bug Fixing**
+
+- Fixed a bug when accessing missing ``attitude_info``.
+
+**Other Changes**
+
+- Removed unused `pulse` info from ``ChannelManager``.
+
 # v1.0.3
 
 **Other Changes**
