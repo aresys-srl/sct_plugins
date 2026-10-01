@@ -129,7 +129,7 @@ class DopplerPolynomialWrapper:
         float
             doppler at that time
         """
-        return self._evaluator.evaluate(azimuth_time, range_time)
+        return self._evaluator.evaluate((azimuth_time, range_time))
 
 
 class BiomassL1ProductManager:
