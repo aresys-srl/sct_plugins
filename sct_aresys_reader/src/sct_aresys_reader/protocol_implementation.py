@@ -256,8 +256,10 @@ class ChannelManager:
         self._burst_info = None
         if "BurstInfo" in self._channel_metadata:
             self._burst_info = self._channel_metadata.burst_info
-        self._g2s_poly = self._channel_metadata.ground_to_slant_poly()
-        self._s2g_poly = self._channel_metadata.slant_to_ground_poly()
+        if "GroundToSlantVector" in self._channel_metadata:
+            self._g2s_poly = self._channel_metadata.ground_to_slant_poly()
+        if "SlantToGroundVector" in self._channel_metadata:
+            self._s2g_poly = self._channel_metadata.slant_to_ground_poly()
         self._sampling_constants = self._channel_metadata.sampling_constants
 
         # setting image radiometric quantity

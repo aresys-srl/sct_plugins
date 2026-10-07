@@ -4,6 +4,12 @@ icon: lucide/history
 
 # Changelog
 
+# v1.0.5
+
+**Bug Fixing**
+
+- Fixed a bug when loading a SLC product not having the ``GroundToSlantVector`` or ``SlantToGroundVector`` metadata.
+
 # v1.0.4
 
 **Bug Fixing**
