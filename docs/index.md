@@ -11,7 +11,7 @@ This documentation hub collects the documentation for all the input Product Form
 a small overview of the functionalities of input plugins, their structure and usage and the python API references.
 
 <figure markdown="span">
-    ![Plugin Mechanism](./assets/images/plugin_mechanism.png){ width="850" }
+    ![Plugin Mechanism](./assets/images/plugin_mechanism.png){ width="950" }
     <figcaption>Plugin discovery mechanism in SCT.</figcaption>
 </figure>
 
@@ -36,7 +36,7 @@ Here is an up-to-date list of the available plugins:
 | ERS/ENVISAT | *sct-asar-reader* | [ASAR Plugin](./plugins/asar/info.md) |
 | EOS-04 | *sct-eos04-reader* | [EOS-04 Plugin](./plugins/eos04/info.md) |
 | STRIX | *sct-strix-reader* | [STRIX Plugin](./plugins/strix/info.md) |
-| TERRASAR-X | *sct-terrasarx-reader* | [TERRASAR-X Plugin](./plugins/terrasar-x/info.md) |
+| TERRASAR-X | *sct-terrasarx-reader* | [TERRASAR-X Plugin](./plugins/terrasarx/info.md) |
 | Aresys-Format | *sct-aresys-reader* | [Aresys Plugin](./plugins/aresys/info.md) |
 
 ## Installation
