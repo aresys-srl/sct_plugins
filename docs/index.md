@@ -37,6 +37,7 @@ Here is an up-to-date list of the available plugins:
 | EOS-04 | *sct-eos04-reader* | [EOS-04 Plugin](./plugins/eos04/info.md) |
 | STRIX | *sct-strix-reader* | [STRIX Plugin](./plugins/strix/info.md) |
 | TERRASAR-X | *sct-terrasarx-reader* | [TERRASAR-X Plugin](./plugins/terrasarx/info.md) |
+| Biomass | *sct-biomass-reader* | [Biomass Plugin](./plugins/biomass/info.md) |
 | Aresys-Format | *sct-aresys-reader* | [Aresys Plugin](./plugins/aresys/info.md) |
 
 ## Installation
