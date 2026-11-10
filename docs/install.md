@@ -21,3 +21,8 @@ where `<name>` is the name of the plugin you want to install. The list of availa
     We recommend using a dedicated virtual environment to install the plugins and the main SCT software.  
     This will ensure that the plugin is installed in a separate environment and avoids conflicts with other packages
     or dependencies.
+
+## Notable exceptions
+
+Please also refer to the dedicated section for each plugin to check whether its installation requires any specific conditions
+or deviations from the procedure described above (i.e. [Biomass plugin](./plugins/biomass/info.md)).
