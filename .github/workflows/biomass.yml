@@ -1,0 +1,177 @@
+name: sct-biomass-reader
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+    tags:
+      - "sct-biomass-reader-v*"
+    paths:
+      - ".github/workflows/biomass.yml"
+      - "sct_biomass_reader/**"
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/biomass.yml"
+      - "sct_biomass_reader/**"
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/pypa/manylinux_2_28_x86_64
+
+    defaults:
+      run:
+        working-directory: sct_biomass_reader
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - run: echo "/opt/python/cp312-cp312/bin" >> $GITHUB_PATH
+      - run: python --version
+      - run: python -m pip install ruff
+      - run: python -m ruff --version
+      - run: python -m ruff format --check .
+      - run: python -m ruff check .
+
+  pylint:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/pypa/manylinux_2_28_x86_64
+
+    defaults:
+      run:
+        working-directory: sct_biomass_reader
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - run: echo "/opt/python/cp312-cp312/bin" >> $GITHUB_PATH
+      - run: python --version
+      - run: python -m pip install pylint
+      - run: python -m pylint --version
+      - run: python -m pylint ./src/sct_biomass_reader
+
+  unittest_linux:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/pypa/manylinux_2_28_x86_64
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python:
+          - "3.12"
+          - "3.13"
+          - "3.14"
+
+    defaults:
+      run:
+        working-directory: sct_biomass_reader
+        shell: bash -el {0}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - name: Set up Conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          activate-environment: test-env
+          auto-activate-base: false
+
+      - name: Check Python version
+        run: |
+          python --version
+          which python
+          conda list
+
+      - name: Create Conda environment
+        run: |
+          conda install -y \
+            "python=${{ matrix.python }}" \
+            biomass-bps::bps-transcoder
+
+      - name: Install package
+        run: python -m pip install -e ".[test]"
+
+      - name: Run unit tests with coverage
+        run: |
+          mkdir -p _build
+          python -m pytest ./tests/ \
+            --junitxml=_build/pytest-report-linux-py${{ matrix.python }}.xml \
+            --cov-report=xml:_build/pytest-coverage-linux-py${{ matrix.python }}.xml
+
+      - name: Upload junit and coverage
+        uses: actions/upload-artifact@v7
+        with:
+          name: linux-test-${{ matrix.python }}
+          path: |
+            sct_biomass_reader/_build/pytest-report-*.xml
+            sct_biomass_reader/_build/pytest-coverage-*.xml
+          retention-days: 14
+
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/pypa/manylinux_2_28_x86_64
+
+    defaults:
+      run:
+        working-directory: sct_biomass_reader
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - run: echo "/opt/python/cp312-cp312/bin" >> $GITHUB_PATH
+      - run: uv build --sdist --wheel .
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: sct_biomass_reader/dist/
+          retention-days: 14
+
+  publish:
+    needs: [ruff, pylint, unittest_linux, unittest_windows, build]
+    if: startsWith(github.ref_name, 'sct-biomass-reader-v')
+
+    runs-on: ubuntu-latest
+
+    environment: pypi-sct-biomass-reader
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Download wheels and sdist
+        uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Clean dist
+        run: |
+          find dist -type f ! -name "*.whl" ! -name "*.tar.gz" -delete
+
+      - name: Show artifacts
+        run: |
+          find dist -type f -maxdepth 2
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist
