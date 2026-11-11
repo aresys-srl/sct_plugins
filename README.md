@@ -26,7 +26,7 @@ unified protocol, enabling all analyses regardless of the input format.
 | **sct-aresys-reader** | [![PyPI](https://img.shields.io/pypi/v/sct-aresys-reader)](https://pypi.org/project/sct-aresys-reader/) | [![CI](https://github.com/aresys-srl/sct_plugins/actions/workflows/aresys.yml/badge.svg)](https://github.com/aresys-srl/sct_plugins/actions/workflows/aresys.yml) | Aresys internal Level 1 product format |
 | **sct-strix-reader** | [![PyPI](https://img.shields.io/pypi/v/sct-strix-reader)](https://pypi.org/project/sct-strix-reader/) | [![CI](https://github.com/aresys-srl/sct_plugins/actions/workflows/strix.yml/badge.svg)](https://github.com/aresys-srl/sct_plugins/actions/workflows/strix.yml) | Synspective StriX Level 1 products |
 | **sct-terrasarx-reader** | [![PyPI](https://img.shields.io/pypi/v/sct-terrasarx-reader)](https://pypi.org/project/sct-terrasarx-reader/) | [![CI](https://github.com/aresys-srl/sct_plugins/actions/workflows/terrasarx.yml/badge.svg)](https://github.com/aresys-srl/sct_plugins/actions/workflows/terrasarx.yml) | TerraSAR-X Level 1 products |
-| **sct-biomass-reader** | TBD | TBD | Biomass Level 1 products |
+| **sct-biomass-reader** | [![PyPI](https://img.shields.io/pypi/v/sct-biomass-reader)](https://pypi.org/project/sct-biomass-reader/) | [![CI](https://github.com/aresys-srl/sct_plugins/actions/workflows/biomass.yml/badge.svg)](https://github.com/aresys-srl/sct_plugins/actions/workflows/biomass.yml) | Biomass Level 1 products |
 
 ## Documentation
 
