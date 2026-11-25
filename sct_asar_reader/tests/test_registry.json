@@ -1,0 +1,11 @@
+{
+    "envisat": {
+        "grd-pta": {
+            "analysis": "point_target",
+            "product": "${SCT_TEST_DATA_ROOT}/envisat/products/ASA_IMS_1PNESA20030124_100448_000000182013_00151_04714_0000.N1",
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_906f38dc_config.toml",
+            "targets": "${SCT_TEST_DATA_ROOT}/envisat/auxiliaries/ASAR_transponders_dataset.csv",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/asar/grd-pta/pta_res.csv"
+        }
+    }
+}
