@@ -1,0 +1,63 @@
+{
+    "aresys-product-folder": {
+        "slc-topsar-pta": {
+            "analysis": "point_target",
+            "product": "${SCT_TEST_DATA_ROOT}/aresysPF/products/demo_topsar/SLC",
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_906f38dc_config.toml",
+            "targets": "${SCT_TEST_DATA_ROOT}/aresysPF/auxiliaries/sct_pt/demo_topsar_pt_dataset.csv",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/aresys_pf/slc-topsar-pta/pta_res.csv"
+        },
+        "slc-real-pta": {
+            "analysis": "point_target",
+            "product": "${SCT_TEST_DATA_ROOT}/aresysPF/products/real_slc/SLH_45599_SLC",
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_906f38dc_config.toml",
+            "targets": "${SCT_TEST_DATA_ROOT}/aresysPF/auxiliaries/sct_pt/real_iceye_pt_dataset.csv",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/aresys_pf/slc-real-pta/pta_res.csv"
+        },
+        "slc-squint20deg-pta": {
+            "analysis": "point_target",
+            "product": "${SCT_TEST_DATA_ROOT}/aresysPF/products/squinted_data/20deg/SLC",
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_906f38dc_config.toml",
+            "targets": "${SCT_TEST_DATA_ROOT}/aresysPF/auxiliaries/sct_pt/squinted_20deg_pt_dataset.csv",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/aresys_pf/slc-squint20deg-pta/pta_res.csv"
+        },
+        "slc-squint40deg-pta": {
+            "analysis": "point_target",
+            "product": "${SCT_TEST_DATA_ROOT}/aresysPF/products/squinted_data/40deg/SLC",
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_906f38dc_config.toml",
+            "targets": "${SCT_TEST_DATA_ROOT}/aresysPF/auxiliaries/sct_pt/squinted_40deg_pt_dataset.csv",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/aresys_pf/slc-squint40deg-pta/pta_res.csv"
+        },
+        "grd-biomass-pta": {
+            "analysis": "point_target",
+            "product": "${SCT_TEST_DATA_ROOT}/aresysPF/products/biomass_multichannel/iGRD",
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_906f38dc_config.toml",
+            "targets": "${SCT_TEST_DATA_ROOT}/aresysPF/auxiliaries/sct_pt/biomass_multichannel_pt_dataset.csv",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/aresys_pf/grd-biomass-pta/pta_res.csv"
+        },
+        "interf-coregistered": {
+            "analysis": "interferometry",
+            "product": [
+                "${SCT_TEST_DATA_ROOT}/aresysPF/products/interferometry/PF",
+                "${SCT_TEST_DATA_ROOT}/aresysPF/products/interferometry/PF_Cor"
+            ],
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_dc014546_config.toml",
+            "targets": "",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/aresys_pf/interf-coregistered/coherence_histograms.nc"
+        },
+        "interf-interferogram": {
+            "analysis": "interferometry",
+            "product": "${SCT_TEST_DATA_ROOT}/aresysPF/products/interferometry/PF_Cor_SCI",
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_dc014546_config.toml",
+            "targets": "",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/aresys_pf/interf-interferogram/coherence_histograms.nc"
+        },
+        "interf-coherence": {
+            "analysis": "interferometry",
+            "product": "${SCT_TEST_DATA_ROOT}/aresysPF/products/interferometry/PF_Cor_SCI_CM",
+            "config": "",
+            "targets": "",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/aresys_pf/interf-coherence/coherence_histograms.nc"
+        }
+    }
+}
