@@ -1,0 +1,45 @@
+{
+    "novasar1": {
+        "slc-pta": {
+            "analysis": "point_target",
+            "product": "${SCT_TEST_DATA_ROOT}/novasar1/products/NovaSAR_01_38993_slc_11_221103_004941_HH",
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_906f38dc_config.toml",
+            "targets": "${SCT_TEST_DATA_ROOT}/novasar1/auxiliaries/novasar_surat_data.csv",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/novasar1/slc-pta/pta_res.csv"
+        },
+        "grd-pta": {
+            "analysis": "point_target",
+            "product": "${SCT_TEST_DATA_ROOT}/novasar1/products/NovaSAR_01_38993_grd_13_221103_004941_HH",
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_906f38dc_config.toml",
+            "targets": "${SCT_TEST_DATA_ROOT}/novasar1/auxiliaries/novasar_surat_data.csv",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/novasar1/grd-pta/pta_res.csv"
+        },
+        "scd-pta": {
+            "analysis": "point_target",
+            "product": "${SCT_TEST_DATA_ROOT}/novasar1/products/NovaSAR_01_41461_scd_23_230126_005204_VV_HH",
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_906f38dc_config.toml",
+            "targets": "${SCT_TEST_DATA_ROOT}/novasar1/auxiliaries/novasar_surat_data.csv",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/novasar1/scd-pta/pta_res.csv"
+        },
+        "scd-rain-forest": {
+            "analysis": "radiometry-rain-forest",
+            "product": "${SCT_TEST_DATA_ROOT}/novasar1/products/NovaSAR_01_40720_scd_20_221231_214639_VV",
+            "config": "",
+            "targets": "",
+            "reference_output": [
+                "${SCT_INTEGRATION_TESTS_REF}/reference_results/novasar1/scd-rain-forest/kpi_stats.csv",
+                "${SCT_INTEGRATION_TESTS_REF}/reference_results/novasar1/scd-rain-forest/RAIN_FOREST_profiles.nc"
+            ]
+        },
+        "grd-nesz": {
+            "analysis": "radiometry-nesz",
+            "product": "${SCT_TEST_DATA_ROOT}/novasar1/products/NovaSAR_01_29655_grd_211218_150627_HH",
+            "config": "",
+            "targets": "",
+            "reference_output": [
+                "${SCT_INTEGRATION_TESTS_REF}/reference_results/novasar1/grd-nesz/kpi_stats.csv",
+                "${SCT_INTEGRATION_TESTS_REF}/reference_results/novasar1/grd-nesz/NESZ_profiles.nc"
+            ]
+        }
+    }
+}
