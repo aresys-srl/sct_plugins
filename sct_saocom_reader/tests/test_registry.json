@@ -1,0 +1,18 @@
+{
+    "saocom": {
+        "sm-slc-pta": {
+            "analysis": "point_target",
+            "product": "${SCT_TEST_DATA_ROOT}/saocom/products/L1A_SLC_SM",
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_906f38dc_config.toml",
+            "targets": "${SCT_TEST_DATA_ROOT}/saocom/auxiliaries/saocom_data.csv",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/saocom/sm-slc-pta/pta_res.csv"
+        },
+        "sm-grd-pta": {
+            "analysis": "point_target",
+            "product": "${SCT_TEST_DATA_ROOT}/saocom/products/L1B_RGC_SM",
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_906f38dc_config.toml",
+            "targets": "${SCT_TEST_DATA_ROOT}/saocom/auxiliaries/saocom_data.csv",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/saocom/sm-grd-pta/pta_res.csv"
+        }
+    }
+}
