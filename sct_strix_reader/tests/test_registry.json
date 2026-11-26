@@ -1,0 +1,18 @@
+{
+    "strix": {
+        "stripmap-slc-pta": {
+            "analysis": "point_target",
+            "product": "${SCT_TEST_DATA_ROOT}/strix/products/stripmap/IMG-VV-STRIX3-20240603T115211Z-SMSLC-SICD.nitf",
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_906f38dc_config.toml",
+            "targets": "${SCT_TEST_DATA_ROOT}/strix/auxiliaries/rosamond_point_target_stripmap.csv",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/strix/stripmap-slc-pta/pta_res.csv"
+        },
+        "sliding-spot-slc-pta": {
+            "analysis": "point_target",
+            "product": "${SCT_TEST_DATA_ROOT}/strix/products/sliding_spotlight/IMG-VV-STRIX2-20250727T222030Z-SLSLC-SICD.nitf",
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_906f38dc_config.toml",
+            "targets": "${SCT_TEST_DATA_ROOT}/strix/auxiliaries/rosamond_point_target_sliding_spot.csv",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/strix/sliding-spot-slc-pta/pta_res.csv"
+        }
+    }
+}
