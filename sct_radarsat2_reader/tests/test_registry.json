@@ -1,0 +1,11 @@
+{
+    "radarsat2": {
+        "stripmap-pta": {
+            "analysis": "point_target",
+            "product": "${SCT_TEST_DATA_ROOT}/radarsat2/products/RS2_OK160407_PK1473274_DK1437615_W3_20250821_015358_HH_SLC",
+            "config": "${SCT_INTEGRATION_TESTS_REF}/configurations/test_906f38dc_config.toml",
+            "targets": "${SCT_TEST_DATA_ROOT}/radarsat2/auxiliaries/rosamond_data.csv",
+            "reference_output": "${SCT_INTEGRATION_TESTS_REF}/reference_results/radarsat2/stripmap-pta/pta_res.csv"
+        }
+    }
+}
