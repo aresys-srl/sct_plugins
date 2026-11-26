@@ -157,6 +157,54 @@ jobs:
             sct_saocom_reader/_build/pytest-coverage-*.xml
           retention-days: 14
 
+  integration_test_linux:
+    if: >-
+      !startsWith(github.ref, 'refs/tags/') ||
+      startsWith(github.ref_name, 'sct-saocom-reader-v')
+
+    runs-on: k8s-runners
+    container:
+      image: quay.io/pypa/manylinux_2_28_x86_64
+
+    defaults:
+      run:
+        working-directory: sct_saocom_reader
+
+    env:
+      SCT_TEST_DATA_ROOT: /data/reference_dataset
+      SCT_INTEGRATION_TESTS_REF: /data/integration_tests/sct
+
+    timeout-minutes: 120
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python:
+          - "3.11"
+          - "3.12"
+          - "3.13"
+          - "3.14"
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - name: Select Python ${{ matrix.python }}
+        run: |
+          case "${{ matrix.python }}" in
+            3.11) echo "/opt/python/cp311-cp311/bin" >> $GITHUB_PATH ;;
+            3.12) echo "/opt/python/cp312-cp312/bin" >> $GITHUB_PATH ;;
+            3.13) echo "/opt/python/cp313-cp313/bin" >> $GITHUB_PATH ;;
+            3.14) echo "/opt/python/cp314-cp314/bin" >> $GITHUB_PATH ;;
+          esac
+
+      - name: Install package and readers
+        run: python -m pip install ".[test]"
+
+      - name: Run integration tests
+        run: sct testing -r ./tests/test_registry.json -out ./test_output --cli
+
   build:
     runs-on: ubuntu-latest
     container:
