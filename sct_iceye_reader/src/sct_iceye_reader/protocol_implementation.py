@@ -128,14 +128,13 @@ class ICEYEChannelManager:
         """
 
         self._channel_id = channel_name
-        if len(channel_files) > 1:
-            # GRD case
-            self._channel = read_channel_metadata(file_path=channel_files[1], channel_id=channel_name)
-            self._raster_file = channel_files[0]
-        else:
-            # SLC case
-            self._channel = read_channel_metadata(file_path=channel_files[0], channel_id=channel_name)
-            self._raster_file = channel_files[0]
+        channel_files = [Path(f) for f in channel_files]
+        # SLC: [.h5], GRD: [.tif, .xml], SLC-COG and GRD-COG: [.tif, .json]
+        metadata_file = next((f for f in channel_files if f.suffix in (".xml", ".json")), channel_files[0])
+        self._raster_file = next(f for f in channel_files if f.suffix in (".h5", ".tif", ".tiff"))
+        self._channel = read_channel_metadata(file_path=metadata_file, channel_id=channel_name)
+        # raster layout is only defined for COG products (and only by eo_products versions supporting them)
+        self._raster_layout = getattr(self._channel, "raster_layout", None)
 
         self._sensor_name = (
             "" if self._channel.dataset_info.sensor_name is None else self._channel.dataset_info.sensor_name
@@ -809,6 +808,7 @@ class ICEYEChannelManager:
             raster_file=self._raster_file,
             block_to_read=target_block,
             scaling_conversion=self._channel.image_calibration_factor,
+            **({"raster_layout": self._raster_layout} if self._raster_layout is not None else {}),
         ).T
 
         # converting to beta nought if radiometric quantity is different

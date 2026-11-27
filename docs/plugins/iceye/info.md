@@ -5,7 +5,8 @@ icon: lucide/plug-2
 # Plugin
 
 This python package is a plugin designed for **Sar Calibration Toolbox (SCT)** to allow quality processing on ICEYE L1
-products, both L1-A and L1-B.
+products, both L1-A and L1-B, in legacy format (SLC HDF5, GRD GeoTiff + XML) and in COG format
+(SLC-COG, GRD-COG: Cloud Optimized GeoTiff + STAC .json).
 
 ==Plugin name:== ``sct-iceye-reader``
 
